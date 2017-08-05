@@ -124,6 +124,13 @@ io.on('connection', function(socket){
         //updateControllers();
     });
 
+    socket.on('shell', function(cmd){
+		for(var i = 0; i < scanners.length; i++){
+			scanners[i].emit('shell', cmd);
+		}
+        //updateControllers();
+    });
+
     socket.on('update data', function(cmd){
         updateControllers();
     });
