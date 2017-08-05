@@ -3,6 +3,10 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 80;
+var fs = require('fs');
+var ss = require('socket.io-stream');
+
+
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -25,21 +29,22 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function(){
 
-        //console.log("disconnect", JSON.stringify(socket));
+        //console.log("disconnect");
+		
         var pos = scanners.indexOf(socket);
         if(pos != -1){
             scanners.splice(pos, 1);
-            console.log("disconnected scanner. IP: " + socket.scanner.ip);
+        //    console.log("disconnected scanner. IP: " + socket.scanner.ip);
         }
         var pos = controllers.indexOf(socket);
         if(pos != -1){
             controllers.splice(pos, 1);
-            console.log("disconnected controller");
+         //   console.log("disconnected controller");
         }
 
         if(mainTrigger === socket){
             mainTrigger = null;
-            console.log("disconnected trigger");
+           // console.log("disconnected trigger");
         }
 
         updateControllers();
@@ -53,7 +58,7 @@ io.on('connection', function(socket){
 	scanners.push(socket);
       updateControllers();
 
-      console.log("added scanner. IP: " + scanner.ip);
+      //console.log("added scanner. IP: " + scanner.ip);
     //io.emit('chat message', msg);
   });
 
@@ -62,7 +67,7 @@ io.on('connection', function(socket){
 	controllers.push(socket);
       updateControllers();
 
-      console.log("added controller");
+      //console.log("added controller");
     //io.emit('chat message', msg);
   });
 
@@ -71,9 +76,36 @@ io.on('connection', function(socket){
 	mainTrigger = socket;
       updateControllers();
 
-      console.log("added trigger");
+      //console.log("added trigger");
     //io.emit('chat message', msg);
   });
+  
+  
+  
+  
+
+      ss(socket).on('file', function(stream,data) {
+        console.log('received' + data.ip);
+		
+		stream.pipe(fs.createWriteStream(__dirname + "/photos/" + data.ip + "_" + data.index + ".jpg" ));
+      });
+  
+  
+  /*socket.on('send-file', function(name, data){
+	console.log(">>>>> " + name);
+		
+	fs.open( __dirname + "/photos/" + name, 'w', 0755, function(err, fd) {
+		if (err) throw err;
+
+		fs.write(fd, data, null, 'Binary', function(err, written, buff) {
+			fs.close(fd, function() {
+				console.log('File saved successful!');
+			});
+		})
+	});
+
+  });*/
+  
 
   // 
 
@@ -120,5 +152,9 @@ function updateControllers(){
 }
 
 http.listen(port, function(){
-  console.log('listening on *:' + port);
+  //console.log('listening on *:' + port);
 });
+
+
+
+

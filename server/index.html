@@ -22,6 +22,7 @@
       <input id="m" autocomplete="off" value="raspistill -n -t 1 -tl 0 -o test" />
       <button id="setup">Setup config</button>
       <button id="execute">Execute</button>
+      <button id="shell">Execute</button>
     </form>
 
 
@@ -60,6 +61,12 @@
               $('#m').val('');
               return false;
           });
+
+          $('#shell').click(function(){
+              socket.emit('shell', $('#m').val());
+              return false;
+          });
+
 
         /*$('form').submit(function(){
           socket.emit('setup command', $('#m').val());
