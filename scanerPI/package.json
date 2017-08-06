@@ -1,0 +1,10 @@
+{
+  "name": "piScanner3d",
+  "version": "0.0.1",
+  "description": "Scanner 3d app",
+  "dependencies": {
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
