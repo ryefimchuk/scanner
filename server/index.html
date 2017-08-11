@@ -1,99 +1,61 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 50%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
-    </style>
-  </head>
-  <body>
-    <ul id="messages">
+<head>
+    <title>3D Scanner</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <div>
+        <h2>3D Scanner</h2>
+    </div>
+    <div>
+        <div>
+            <span class="text-normal">Total count: </span><span id="totalCameras">140</span>
+        </div>
+        <div>
+            <span class="text-warning">Not configured: </span><span id="notConfigured">23</span>
+        </div>
+    </div>
+    <div>
+        <div>
+            <button id="goSetupMode">Setup</button>
+        </div>
+        <div>
+            <button id="goStandByMode">StandBy</button>
+        </div>
+    </div>
+</header>
 
-    </ul>
-    <form action="">
-      <input id="m" autocomplete="off" value="raspistill -n -t 1 -tl 0 -o test" />
-      <button id="setup">Setup config</button>
-      <button id="execute">Execute</button>
-      <button id="shell">Shell</button>
-    </form>
+<div id="container">
+    <div id="modeSetup">
+        <div id="setupCameras">
 
+        </div>
+    </div>
+    <div id="modeStandBy">
+        <div id="standByCameras">
 
+        </div>
 
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var socket = io();
+        <form>
+            <input id="m" autocomplete="off" value="raspistill -n -t 1 -tl 0 -o test"/>
+            <button id="setup">Setup config</button>
+            <button id="execute">Execute</button>
+            <button id="shell">Shell</button>
+        </form>
+    </div>
 
-          socket.on('connect', function(c){
-              console.log("connected to server");
+    <div id="modeCameraPreview">
 
-              socket.emit("add controller", {});
+    </div>
 
-              setTimeout(function(){
-                  socket.emit("update data", {});
-              }, 3000)
-          });
-          socket.on('update data', function(data){
-              console.log("scanner data:", data);
-          });
-          socket.on('disconnect', function(e){
-              console.log("disconnected from server");
+</div>
 
-          });
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 
-
-          $('#execute').click(function(){
-              socket.emit('start command', "");
-              return false;
-          });
-
-          $('#setup').click(function(){
-              socket.emit('setup command', $('#m').val());
-              $('#m').val('');
-              return false;
-          });
-
-          $('#shell').click(function(){
-              socket.emit('shell', $('#m').val());
-              return false;
-          });
-
-
-        /*$('form').submit(function(){
-          socket.emit('setup command', $('#m').val());
-          $('#m').val('');
-          return false;
-        });*/
-
-        /*socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
-        });*/
-
-          socket.on('update data', function(data){
-
-              $('#messages').html("");
-
-
-              for(var i = 0; i < data.scanners.length; i++){
-                  var sc = data.scanners[i];
-                  $('#messages').append($('<li class="scanner">').text("Scanner :" + sc.data.ip));
-              }
-
-              window.scrollTo(0, document.body.scrollHeight);
-          });
-
-
-      });
-    </script>
-  </body>
+<script src="main.js"></script>
+</body>
 </html>

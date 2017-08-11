@@ -8,24 +8,12 @@ var ss = require('socket.io-stream');
 var RaspiCam = require("raspicam");
 
 
-
-/*var Raspistill = require('node-raspistill').Raspistill;
-var camera = new Raspistill({
-	time: 10
-});*/
-
-
-
 setTimeout(function(){
 
 	var rpiIp = ip.address() // my ip address
 
-
 	var command = "";
-
-
 	var socket = s('http://192.168.1.99');
-
 
 	socket.on('connect', function(c){
 		console.log("connected to server");
@@ -36,9 +24,6 @@ setTimeout(function(){
 		});
 	});
 	
-	
-
-
 	socket.on('shell', function(data){
 		shell.exec(data);
 
@@ -59,16 +44,12 @@ setTimeout(function(){
 
 	});
 
-
-
 	var opts = {
 		mode: "timelapse",
 		tl: 300,
 		t: 400,
 		n: true,
 		output: __dirname + "/test%d.jpg",
-/*		w: 1920,
-		h: 1024*/
 		w: 3280,
 		h: 2464
 	};

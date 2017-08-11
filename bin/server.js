@@ -1,5 +1,6 @@
 var _ = require('lodash');
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 80;
@@ -7,10 +8,12 @@ var fs = require('fs');
 var ss = require('socket.io-stream');
 
 
+app.use(express.static('server'))
 
-app.get('/', function(req, res){
+
+/*app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
-});
+});*/
 
 
 
