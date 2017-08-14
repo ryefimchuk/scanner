@@ -35,7 +35,7 @@ function saveConfig(){
     fs.writeFile(configFile, data, function(err) {
         if(err) {
             //return console.log(err);
-            retutn;
+            return;
         }
     });
 }
@@ -134,7 +134,7 @@ setTimeout(function(){
             command = 'file';
         }
 
-console.log("command");
+	console.log(command);
 
         var stream = ss.createStream();
         ss(socket).emit(command, stream, {
@@ -177,8 +177,8 @@ console.log("command");
                 break;
             }
             case "preview":{
-                camera.set('width', 3280);
-                camera.set('height', 2464);
+/*                camera.set('width', 3280);
+                camera.set('height', 2464);*/
                 camera.set('output', __dirname + "/file-preview.jpg");
 
                 break;
@@ -202,7 +202,7 @@ console.log("command");
 
 /*    	camera.set('mode', 'photo');
 
-        camera.start();
+        camera.start();*/
 
 
         setTimeout(function(){
@@ -211,16 +211,16 @@ console.log("command");
             var stream = ss.createStream();
             ss(socket).emit('file-preview', stream, {
                 ip:rpiIp,
-				numb: config.numb,
+		numb: config.numb,
                 index: "0"
             });
 
-            var filename = '/home/pi/test0.jpg';
+            var filename = '/home/pi/file-preview.jpg';
             fs.createReadStream(filename).pipe(stream);
 
 //            console.log("send file");
 
-        }, 4000);*/
+        }, 4000);
     });
 
 
@@ -236,7 +236,7 @@ console.log("command");
 			console.log("execute command");
 
 
-            takePhoto('photo');
+            		takePhoto('photo');
 
             //camera.set('mode', 'timelapse');
 
