@@ -62,7 +62,7 @@ setTimeout(function(){
 			files:[]
 		});
 
-//        takePhoto('preview');
+        takePhoto('thumb');
     });
 	
 	socket.on('shell', function(data){
@@ -117,25 +117,24 @@ setTimeout(function(){
 
 
 	camera.on("read", function(err, timestamp, filename){
+		
+		console.log("current file name:" + filename)
 
         camera.stop();
 
-	console.log("read");
-
-
         var command = "";
         if(filename.indexOf('file-preview') > -1){
-            command = 'file-preview';
+            command = 'file-preview';			
         }
-        if(filename.indexOf('file-thumb') > -1){
+		else if(filename.indexOf('file-thumb') > -1){
             command = 'file-thumb';
         }
-        if(filename.indexOf('photo') > -1){
+		else if(filename.indexOf('photo') > -1){
             command = 'file';
         }
 
-	console.log(command);
-
+		console.log('read: ' + command);
+		
         var stream = ss.createStream();
         ss(socket).emit(command, stream, {
             ip:rpiIp,
@@ -163,10 +162,10 @@ setTimeout(function(){
 
 
 	function takePhoto(config){ // "thumb", "preview", "photo"
+		
+		console.log("takePhoto:" + config)
+		
 		camera.set('mode', 'photo');
-
-
-		console.log("Previw config: " + config);
 
 		switch(config){
             case "thumb":{
@@ -177,8 +176,8 @@ setTimeout(function(){
                 break;
             }
             case "preview":{
-/*                camera.set('width', 3280);
-                camera.set('height', 2464);*/
+                camera.set('width', 3280);
+                camera.set('height', 2464);
                 camera.set('output', __dirname + "/file-preview.jpg");
 
                 break;
@@ -202,7 +201,7 @@ setTimeout(function(){
 
 /*    	camera.set('mode', 'photo');
 
-        camera.start();*/
+        camera.start();
 
 
         setTimeout(function(){
@@ -211,16 +210,16 @@ setTimeout(function(){
             var stream = ss.createStream();
             ss(socket).emit('file-preview', stream, {
                 ip:rpiIp,
-		numb: config.numb,
+				numb: config.numb,
                 index: "0"
             });
 
-            var filename = '/home/pi/file-preview.jpg';
+            var filename = '/home/pi/test0.jpg';
             fs.createReadStream(filename).pipe(stream);
 
 //            console.log("send file");
 
-        }, 4000);
+        }, 4000);*/
     });
 
 
@@ -236,7 +235,7 @@ setTimeout(function(){
 			console.log("execute command");
 
 
-            		takePhoto('photo');
+            takePhoto('photo');
 
             //camera.set('mode', 'timelapse');
 

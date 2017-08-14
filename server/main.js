@@ -182,12 +182,16 @@ $(function () {
     }
 
     socket.on('update-scanner', function (data) {
-        var scanner = getScannerBy(data.data.ip);
+        
+		
+        var scanner = getScannerBy(data.ip);
         if(scanner){
-            //debugger;
-            //scanner.numb =
+            scanner.data.numb = data.numb;
+            scanner.data.thumb = data.thumb;
+            scanner.data.files = data.numb.files;
+			
+			updateData();
         }
-
     });
 
     socket.on('file-preview', function (data) {
@@ -236,8 +240,10 @@ $(function () {
 
         ///// setup
         $('#setupCameras').html("");
+		
+		var url = 'css/temp.png';
 
-        var scannerTemplate =  '<div class="scanner" style="background-image: url(css/temp.png)">' +
+        var scannerTemplate =  '<div class="scanner" style="background-image: url([URL])">' +
             '<div ip=""></div>&nbsp;<div numb=""></div>' +
             '</div>';
 
@@ -245,7 +251,7 @@ $(function () {
             for (var i = 0; i < _notConfigured.length; i++) {
                 var sc = _notConfigured[i];
 
-                var node = $(scannerTemplate).appendTo($('#setupCameras'));
+                var node = $(scannerTemplate.replace("[URL]", sc.data.thumb || url)).appendTo($('#setupCameras'));
                 node.find("[ip]").text(sc.data.ip);
             }
         }
@@ -261,12 +267,13 @@ $(function () {
             for(var j = 0; j < scanner_col; j++){
                 counter  = (scanner_row - i) + (scanner_row * j);
 
-                var node = $('<td >' +  scannerTemplate + '</td>').appendTo(row);
-
-                node.attr("number", counter);
-
                 var scanner = getScannerByNumber(counter);
                 if(scanner){
+				
+					var node = $('<td >' +  scannerTemplate.replace("[URL]", scanner.data.thumb || url) + '</td>').appendTo(row);
+
+					node.attr("number", counter);
+
                     node.find("[ip]").text(scanner.data.ip);
 
                     //debugger;
@@ -274,6 +281,12 @@ $(function () {
                         node.find("[numb]").text("(" + scanner.data.numb + ")");
                     }
                 }
+				else{
+					var node = $('<td >' +  scannerTemplate.replace("[URL]", url) + '</td>').appendTo(row);
+
+					node.attr("number", counter);
+				}
+
             }
         }
 

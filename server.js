@@ -70,14 +70,13 @@ io.on('connection', function (socket) {
 
 
     ss(socket).on('file', function (stream, data) {
-        
-		
-		//stream.pipe(fs.createWriteStream(__dirname + "/server/photos/" + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
+		console.log("~~~~file");
+        stream.pipe(fs.createWriteStream(__dirname + "/server/photos/" + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
     });
 
     ss(socket).on('file-preview', function (stream, data) {
 		
-		//console.log("file-preview input");
+		console.log("~~~~file-preview");
 
         var previewFileName = "/preview/preview_" + data.ip + ".jpg";
         stream.pipe(fs.createWriteStream(__dirname + "/server" + previewFileName));
@@ -94,25 +93,28 @@ io.on('connection', function (socket) {
     });
 
     ss(socket).on('file-thumb', function (stream, data) {
+		console.log("~~~~file-thumb:" + data.ip);
+		
+		var ip = data.ip;
 
         var thumbFileName = "/preview/thumb_" + data.ip + ".jpg";
         stream.pipe(fs.createWriteStream(__dirname + "/server" + thumbFileName));
 
         stream.on('finish', function () {
 
-            var scanner = getScannerByIp(data.ip);
-            if(scanner){
-                scanner.data.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
+            var scanner = getScannerByIp(ip);
+            if(scanner){				
+                scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
             }
 
-            updateScanner(scanner);
+            updateScanner(scanner.scanner);
         });
     });
 
 
     function getScannerByIp(ip){
         return _.first(scanners, function(scan){
-            return scan.data.ip == ip;
+            return scan.scanner.ip == ip;
         })
     }
 
@@ -125,15 +127,10 @@ io.on('connection', function (socket) {
     });
 
     socket.on('preview ip', function (data) {
-		
-		console.log('preview')
-		
         var scanner = getScannerByIp(data.ip);
         if(scanner) {
-			console.log('ip:' + data.ip);
-            scanner.emit('preview');
+            scanner.emit('preview', data);
         }else{
-			console.log('ip not found')
             //alert("Scanner")
         }
     });
