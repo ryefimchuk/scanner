@@ -62,7 +62,7 @@ setTimeout(function(){
 			files:[]
 		});
 
-        takePhoto('preview');
+//        takePhoto('preview');
     });
 	
 	socket.on('shell', function(data){
@@ -102,8 +102,8 @@ setTimeout(function(){
 		t: 400,
 		n: true,
 		output: __dirname + "/photo%d.jpg",
-		w: 3280,
-		h: 2464
+		width: 3280,
+		height: 2464
 	};
 
 	var camera = new RaspiCam(opts);
@@ -120,16 +120,21 @@ setTimeout(function(){
 
         camera.stop();
 
+	console.log("read");
+
+
         var command = "";
-        if(filename.indexOf('file-preview')){
+        if(filename.indexOf('file-preview') > -1){
             command = 'file-preview';
         }
-        if(filename.indexOf('file-thumb')){
+        if(filename.indexOf('file-thumb') > -1){
             command = 'file-thumb';
         }
-        if(filename.indexOf('photo')){
+        if(filename.indexOf('photo') > -1){
             command = 'file';
         }
+
+console.log("command");
 
         var stream = ss.createStream();
         ss(socket).emit(command, stream, {
@@ -160,24 +165,27 @@ setTimeout(function(){
 	function takePhoto(config){ // "thumb", "preview", "photo"
 		camera.set('mode', 'photo');
 
+
+		console.log("Previw config: " + config);
+
 		switch(config){
             case "thumb":{
-                camera.set('w', 160);
-                camera.set('h', 90);
+                camera.set('width', 160);
+                camera.set('height', 90);
                 camera.set('output', __dirname + "/file-thumb.jpg");
 
                 break;
             }
             case "preview":{
-                camera.set('w', 3280);
-                camera.set('h', 2464);
+                camera.set('width', 3280);
+                camera.set('height', 2464);
                 camera.set('output', __dirname + "/file-preview.jpg");
 
                 break;
             }
             case "photo":{
-                camera.set('w', 3280);
-                camera.set('h', 2464);
+                camera.set('width', 3280);
+                camera.set('height', 2464);
                 camera.set('output', __dirname + "/photo%d.jpg");
 
                 break;

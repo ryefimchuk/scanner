@@ -41,6 +41,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('add scanner', function (scanner) {
+		console.log("add scanner");
         socket.scanner = scanner;
         scanners.push(socket);
         reloadData();
@@ -73,6 +74,8 @@ io.on('connection', function (socket) {
     });
 
     ss(socket).on('file-preview', function (stream, data) {
+		
+		console.log("file-preview input");
 
         var previewFileName = "/preview/preview_" + data.ip + ".jpg";
         stream.pipe(fs.createWriteStream(__dirname + "/server" + previewFileName));
@@ -122,6 +125,9 @@ io.on('connection', function (socket) {
     socket.on('preview ip', function (data) {
         var scanner = getScannerByIp(data.ip);
         if(scanner) {
+			
+			console.log("preview");
+			
             scanner.emit('preview', data);
         }else{
             //alert("Scanner")
@@ -191,7 +197,7 @@ function reloadData(controller) {
 
 
 http.listen(port, function () {
-
+	console.log("connected")
 });
 
 
