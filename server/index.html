@@ -1,8 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>3D Scanner</title>
+    <title>3D Scanner (140)</title>
     <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 <header>
@@ -10,20 +14,13 @@
         <h2>3D Scanner</h2>
     </div>
     <div>
-        <div>
-            <span class="text-normal">Total count: </span><span id="totalCameras">140</span>
-        </div>
-        <div>
-            <span class="text-warning">Not configured: </span><span id="notConfigured">23</span>
-        </div>
+        <span class="text-normal">Total Count: <span id="totalCameras">140</span></span>&nbsp;&nbsp;&nbsp;
+        <span class="text-warning">Not Configured: <span id="notConfigured">23</span></span>
     </div>
     <div>
-        <div>
-            <button id="goSetupMode">Setup</button>
-        </div>
-        <div>
-            <button id="goStandByMode">StandBy</button>
-        </div>
+        <button id="rebootDevices">Reboot</button>
+        <button id="goSetupMode">Setup</button>
+        <button id="goStandByMode">StandBy</button>
     </div>
 </header>
 
@@ -35,22 +32,35 @@
     </div>
     <div id="modeStandBy">
         <div id="standByCameras">
+            <table>
 
+            </table>
         </div>
 
-        <form>
+
+        <form style="display: none">
             <input id="m" autocomplete="off" value="raspistill -n -t 1 -tl 0 -o test"/>
             <button id="setup">Setup config</button>
             <button id="execute">Execute</button>
             <button id="shell">Shell</button>
         </form>
     </div>
-
-    <div id="modeCameraPreview">
-
-    </div>
-
 </div>
+
+<div id="modeCameraPreview"  >
+    <form id="numberEditorForm">
+        <div class="panel">
+            <div ip></div>
+            <div numb></div>
+            <input/>
+
+            <div id="reloadPreview">Reload</div>
+            <div id="closePreview">Close</div>
+        </div>
+    </form>
+    <img src="css/temp.png"/>
+</div>
+
 
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>

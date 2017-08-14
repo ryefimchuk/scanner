@@ -8,6 +8,44 @@ var ss = require('socket.io-stream');
 var RaspiCam = require("raspicam");
 
 
+var configFile = '/home/pi/camera.json';
+
+
+var config = {
+	numb: ""
+};
+
+
+
+
+function loadConfig(){
+    fs.readFile(configFile, function read(err, data) {
+        if (err) {
+
+
+            return;
+        }
+        config = JSON.parse(data);
+    });
+}
+
+function saveConfig(){
+    var data = JSON.stringify(config);
+
+    fs.writeFile(configFile, data, function(err) {
+        if(err) {
+            //return console.log(err);
+            retutn;
+        }
+    });
+}
+
+
+
+loadConfig();
+
+
+
 setTimeout(function(){
 
 	var rpiIp = ip.address() // my ip address
@@ -19,23 +57,37 @@ setTimeout(function(){
 		console.log("connected to server");
 
 		socket.emit("add scanner", {
-			ip: rpiIp, 
+			ip: rpiIp,
+            numb: config.numb,
 			files:[]
 		});
-	});
+
+        takePhoto('preview');
+    });
 	
 	socket.on('shell', function(data){
 		shell.exec(data);
 
 		socket.emit("shell", {
-			ip: rpiIp, 
+			ip: rpiIp,
+            numb: config.numb,
 			result:[]
 		});
 
 	});
 
 
-	socket.on('setup command', function(data){
+    socket.on('set number', function(newNumber){
+
+    	config.numb = newNumber;
+
+    	saveConfig();
+
+    });
+
+
+
+    socket.on('setup command', function(data){
 		command = data;
 		console.log("setup command:", data);
 	});
@@ -49,7 +101,7 @@ setTimeout(function(){
 		tl: 300,
 		t: 400,
 		n: true,
-		output: __dirname + "/test%d.jpg",
+		output: __dirname + "/photo%d.jpg",
 		w: 3280,
 		h: 2464
 	};
@@ -64,10 +116,33 @@ setTimeout(function(){
 	});
 
 
-	camera.on("read", function(err, timestamp, filename){ 
-	//	console.log(">>>>>>>>>>>>>>>>>>>>");
+	camera.on("read", function(err, timestamp, filename){
 
-		console.log(new Date());
+        camera.stop();
+
+        var command = "";
+        if(filename.indexOf('file-preview')){
+            command = 'file-preview';
+        }
+        if(filename.indexOf('file-thumb')){
+            command = 'file-thumb';
+        }
+        if(filename.indexOf('photo')){
+            command = 'file';
+        }
+
+        var stream = ss.createStream();
+        ss(socket).emit(command, stream, {
+            ip:rpiIp,
+            numb: config.numb,
+            index: "0"
+        });
+
+        //var filename = '/home/pi/test0.jpg';
+        fs.createReadStream(filename).pipe(stream);
+
+
+        console.log(filename + " : "+ (new Date()));
 	});
 
 
@@ -81,7 +156,67 @@ setTimeout(function(){
 		//do stuff
 	});
 
-	console.log("Scanner started");
+
+	function takePhoto(config){ // "thumb", "preview", "photo"
+		camera.set('mode', 'photo');
+
+		switch(config){
+            case "thumb":{
+                camera.set('w', 160);
+                camera.set('h', 90);
+                camera.set('output', __dirname + "/file-thumb.jpg");
+
+                break;
+            }
+            case "preview":{
+                camera.set('w', 3280);
+                camera.set('h', 2464);
+                camera.set('output', __dirname + "/file-preview.jpg");
+
+                break;
+            }
+            case "photo":{
+                camera.set('w', 3280);
+                camera.set('h', 2464);
+                camera.set('output', __dirname + "/photo%d.jpg");
+
+                break;
+            }
+		}
+
+        camera.start();
+	}
+
+
+    socket.on('preview', function(data){
+
+        takePhoto('preview');
+
+/*    	camera.set('mode', 'photo');
+
+        camera.start();
+
+
+        setTimeout(function(){
+            camera.stop();
+
+            var stream = ss.createStream();
+            ss(socket).emit('file-preview', stream, {
+                ip:rpiIp,
+				numb: config.numb,
+                index: "0"
+            });
+
+            var filename = '/home/pi/test0.jpg';
+            fs.createReadStream(filename).pipe(stream);
+
+//            console.log("send file");
+
+        }, 4000);*/
+    });
+
+
+    console.log("Scanner started");
 	console.log("Current ip: " + rpiIp);
 
 	var attempt = 0;
@@ -91,12 +226,14 @@ setTimeout(function(){
 		if(channel == 7 && value == 1){
 
 			console.log("execute command");
-	
-			camera.start();
 
-			var array = [];
-			
-			setTimeout(function(){				 
+
+            takePhoto('photo');
+
+            //camera.set('mode', 'timelapse');
+
+            //camera.start();
+			/*setTimeout(function(){
 								  
 				var stream = ss.createStream();
 				ss(socket).emit('file', stream, {
@@ -104,12 +241,12 @@ setTimeout(function(){
 					index: "0"
 				});
 
-				var filename = '/home/pi/test0.jpg';
+				var filename = __dirname + '/test0.jpg';
 				fs.createReadStream(filename).pipe(stream);
 				  
 				console.log("send file");
 				
-			}, 4000);
+			}, 4000);*/
 
 			setTimeout(function(){
 				gpio.write(12, false);

@@ -1,59 +1,116 @@
 $(function () {
 
+    var scanner_col = 20;
+    var scanner_row = 7;
+
+    var socket = io();
+
     var isSetupMode = false;
 
     var allScanners = [];
 
 
+    var divSetup = $('#modeSetup');
+    var divStandBy = $('#modeStandBy');
+    var divCameraPreview = $('#modeCameraPreview');
+    var standByCameras = $('#standByCameras');
+
+    var goSetupModeBut = $('#goSetupMode');
+    var goStandByModeBut = $('#goStandByMode');
+    var rebootDevicesBut = $('#rebootDevices');
+    var closePreviewBut = $('#closePreview');
+    var reloadPreviewBut = $('#reloadPreview');
+
+
+
 
     //// SOCKET IO
-
-    var socket = io();
     socket.on('connect', function (c) {
         console.log("connected to server");
 
         socket.emit("add controller", {});
 
         setTimeout(function () {
-            socket.emit("update data", {});
+            socket.emit("get-data", {});
         }, 3000)
-    });
-    socket.on('update data', function (data) {
-        console.log("scanner data:", data);
     });
     socket.on('disconnect', function (e) {
         console.log("disconnected from server");
     });
 
+    socket.on('load data', function (data) {
+        allScanners = data.scanners;
+        updateData();
+    });
+
 
     //// CONTROLS
-
-    var divSetup = $('#modeSetup')[0];
-    var divStandBy = $('#modeSetup')[0];
-
     function openSetupMode() {
-        divSetup.style.display = "block";
+        divSetup.show();
+        divStandBy.hide();
+        goSetupModeBut.attr("disabled", "disabled");
+        goStandByModeBut.removeAttr("disabled");
     }
 
     function closeSetupMode() {
-        divSetup.style.display = "none";
+        divSetup.hide();
+        divStandBy.show();
+        goSetupModeBut.removeAttr("disabled");
+        goStandByModeBut.attr("disabled", "disabled");
     }
 
-    //closeSetupMode(); //close setup mode by default
+    closeSetupMode(); //close setup mode by default
 
 
-    $('#goSetupMode').click(function () {
+    goSetupModeBut.click(function () {
         isSetupMode = true;
         openSetupMode();
         return false;
     });
 
-    $('#goStandByMode').click(function () {
+    goStandByModeBut.click(function () {
         isSetupMode = false;
         closeSetupMode();
         return false;
     });
 
+    rebootDevicesBut.click(function () {
+        socket.emit('shell', "sudo reboot");
+        return false;
+    });
+
+
+    function closePreview(){
+        divCameraPreview.css({
+            "background-image": ""
+        });
+        divCameraPreview.hide();
+    }
+
+    closePreviewBut.click(function () {
+        closePreview();
+        return false;
+    });
+
+    reloadPreviewBut.click(function (evt) {
+
+
+        var ip = $(evt.target).parent().find("[ip]").text();
+
+        if(ip) {
+            var data = {
+                ip: ip,
+                w: 160,
+                h: 90
+            };
+
+            divCameraPreview.find("img").show();
+
+            socket.emit('preview ip', data);
+        }
+
+        return false;
+    });
 
 
     $('#execute').click(function () {
@@ -72,25 +129,86 @@ $(function () {
         return false;
     });
 
+    $('#numberEditorForm').submit(function(evt){
+        evt.preventDefault();
 
-    /*$('form').submit(function(){
-     socket.emit('setup command', $('#m').val());
-     $('#m').val('');
-     return false;
-     });*/
+        var ip = divCameraPreview.find("[ip]").text();
+        var numb = divCameraPreview.find("input").val();
 
-    /*socket.on('chat message', function(msg){
-     $('#messages').append($('<li>').text(msg));
-     window.scrollTo(0, document.body.scrollHeight);
-     });*/
+        if(numb != "") {
+            var _numb = parseInt(numb);
+            if (!isNaN(_numb)){
 
-    socket.on('update data', function (data) {
+                if(_numb > 0 && _numb <= 140) {
+                    setNumb(_numb);
+                }
+                else{
+                    alert("Range 1 - 140");
+                }
+            }else{
+                alert("Please enter number");
+            }
+        }else{
+            setNumb(""); // clear number
+        }
 
-        allScanners = data.scanners;
+        function setNumb(numb){
+            socket.emit('set number', {
+                numb: numb,
+                ip: ip
+            });
 
+            var scanner = getScannerBy(ip);
+            scanner.data.numb = numb;
+
+            updateData();
+            closePreview();
+        }
+
+    });
+
+
+    function getScannerBy(ip){
+        return _.find(allScanners, function(scan){
+            return scan.data.ip == ip;
+        })
+    }
+
+    function getScannerByNumber(numb){
+        //debugger;
+        return _.find(allScanners, function(scan){
+            return scan.data.numb == numb;
+        })
+    }
+
+    socket.on('update-scanner', function (data) {
+        var scanner = getScannerBy(data.data.ip);
+        if(scanner){
+            //debugger;
+            //scanner.numb =
+        }
+
+    });
+
+    socket.on('file-preview', function (data) {
+        divCameraPreview.find("[ip]").text(data.ip);
+        //divCameraPreview.find(".panel").show();
+        divCameraPreview.find("img").hide();
+        divCameraPreview.find("input").val(data.numb);
+        divCameraPreview.find("input").focus();
+
+        divCameraPreview.css({
+            "background-image": "url(" + data.preview + "?" + Math.round(Math.random() * 10000000) + ")"
+        });
+    });
+
+/*    socket.on('file-thumb', function (data) {
+    });*/
+
+
+    function updateData(){
         var _configured = [];
         var _notConfigured = [];
-
 
         for (var i = 0; i < allScanners.length; i++) {
 
@@ -101,38 +219,89 @@ $(function () {
 
             } else{
                 _notConfigured.push(sc);
-
             }
         }
 
+        // update counters
+        $("#totalCameras").text(allScanners.length);
+        $("#notConfigured").text(_notConfigured.length);
 
 
+        // grouping configured cameras by numb
         var groupedByNumb = _.groupBy (_configured, function(scanner){
             return scanner.data.numb;
         });
 
 
-        //debugger;
 
+        ///// setup
         $('#setupCameras').html("");
+
+        var scannerTemplate =  '<div class="scanner" style="background-image: url(css/temp.png)">' +
+            '<div ip=""></div>&nbsp;<div numb=""></div>' +
+            '</div>';
 
         if(_notConfigured.length > 0){
             for (var i = 0; i < _notConfigured.length; i++) {
                 var sc = _notConfigured[i];
 
-                $('#setupCameras').append($('<li class="scanner">').text("Scanner :" + sc.data.ip));
+                var node = $(scannerTemplate).appendTo($('#setupCameras'));
+                node.find("[ip]").text(sc.data.ip);
             }
         }
 
+        ///// stand by
+        var table = $('#standByCameras').find('table');
+        table.html("");
 
-        /*            $('#cameras').html("");
+        var counter = 0;
+        for (var i = 0; i < scanner_row; i++) {
+            var row = $("<tr class='scanners-row'>").appendTo(table);
 
-         for (var i = 0; i < data.scanners.length; i++) {
-         var sc = data.scanners[i];
-         $('#cameras').append($('<li class="scanner">').text("Scanner :" + sc.data.ip));
-         }*/
+            for(var j = 0; j < scanner_col; j++){
+                counter  = (scanner_row - i) + (scanner_row * j);
+
+                var node = $('<td >' +  scannerTemplate + '</td>').appendTo(row);
+
+                node.attr("number", counter);
+
+                var scanner = getScannerByNumber(counter);
+                if(scanner){
+                    node.find("[ip]").text(scanner.data.ip);
+
+                    //debugger;
+                    if(scanner.data.numb) {
+                        node.find("[numb]").text("(" + scanner.data.numb + ")");
+                    }
+                }
+            }
+        }
+
+        ///// preview
+
+        $("div.scanner").click(function(evt){
+            var ip = $(evt.target).find("[ip]").text();
+
+            if(ip) {
+                var data = {
+                    ip: ip,
+                    w: 160,
+                    h: 90
+                };
+                socket.emit('preview ip', data);
+                //divCameraPreview.find(".panel").hide();
+                divCameraPreview.find("img").attr("src", "/css/loading.gif");
+                divCameraPreview.find("img").show();
+                divCameraPreview.show();
+            }
+        });
+
+
+
 
         window.scrollTo(0, document.body.scrollHeight);
-    });
+    }
+
+
 
 });
