@@ -188,7 +188,7 @@ $(function () {
         if(scanner){
             scanner.data.numb = data.numb;
             scanner.data.thumb = data.thumb;
-            scanner.data.files = data.numb.files;
+            scanner.data.files = data.files;
 			
 			updateData();
         }

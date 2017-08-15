@@ -70,13 +70,13 @@ io.on('connection', function (socket) {
 
 
     ss(socket).on('file', function (stream, data) {
-		console.log("~~~~file");
+		//console.log("~~~~file");
         stream.pipe(fs.createWriteStream(__dirname + "/server/photos/" + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
     });
 
     ss(socket).on('file-preview', function (stream, data) {
 		
-		console.log("~~~~file-preview");
+		//console.log("~~~~file-preview");
 
         var previewFileName = "/preview/preview_" + data.ip + ".jpg";
         stream.pipe(fs.createWriteStream(__dirname + "/server" + previewFileName));
@@ -93,7 +93,7 @@ io.on('connection', function (socket) {
     });
 
     ss(socket).on('file-thumb', function (stream, data) {
-		console.log("~~~~file-thumb:" + data.ip);
+		//console.log("~~~~file-thumb:" + data.ip);
 		
 		var ip = data.ip;
 

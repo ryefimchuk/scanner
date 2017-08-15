@@ -97,9 +97,9 @@ setTimeout(function(){
 	});
 
 	var opts = {
-		mode: "timelapse",
-		tl: 300,
-		t: 400,
+		mode: "photo",
+		/*tl: 300,*/
+		t: 500,
 		n: true,
 		output: __dirname + "/photo%d.jpg",
 		width: 3280,
@@ -143,7 +143,9 @@ setTimeout(function(){
         });
 
         //var filename = '/home/pi/test0.jpg';
-        fs.createReadStream(filename).pipe(stream);
+		setTimeout(function(){
+			fs.createReadStream(__dirname + "/" + filename).pipe(stream);
+		},300)
 
 
         console.log(filename + " : "+ (new Date()));
