@@ -104,10 +104,12 @@ io.on('connection', function (socket) {
 
             var scanner = getScannerByIp(ip);
             if(scanner){				
-                scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
+                updateScanner({
+                    ip: data.ip,
+                    thumb: thumbFileName + "?" + Math.round(Math.random() * 10000000)
+                });
             }
 
-            updateScanner(scanner.scanner);
         });
     });
 
