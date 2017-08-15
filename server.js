@@ -103,10 +103,11 @@ io.on('connection', function (socket) {
         stream.on('finish', function () {
 
             var scanner = getScannerByIp(ip);
-            if(scanner){				
+            if(scanner){
+                scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
                 updateScanner({
                     ip: data.ip,
-                    thumb: thumbFileName + "?" + Math.round(Math.random() * 10000000)
+                    thumb: scanner.scanner.thumb
                 });
             }
 
