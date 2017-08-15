@@ -114,7 +114,7 @@ io.on('connection', function (socket) {
 
 
     function getScannerByIp(ip){
-        return _.first(scanners, function(scan){
+        return _.find(scanners, function(scan){
             return scan.scanner.ip == ip;
         })
     }
