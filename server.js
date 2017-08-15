@@ -97,21 +97,19 @@ io.on('connection', function (socket) {
 		
 		var ip = data.ip;
 
-        var thumbFileName = "/preview/thumb_" + data.ip + ".jpg";
-        stream.pipe(fs.createWriteStream(__dirname + "/server" + thumbFileName));
+        var scanner = getScannerByIp(ip);
+        if(scanner){
+            var thumbFileName = "/preview/thumb_" + data.ip + ".jpg";
+            stream.pipe(fs.createWriteStream(__dirname + "/server" + thumbFileName));
+            scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
 
-        stream.on('finish', function () {
-
-            var scanner = getScannerByIp(ip);
-            if(scanner){
-                scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
+            stream.on('finish', function () {
                 updateScanner({
                     ip: data.ip,
                     thumb: scanner.scanner.thumb
                 });
-            }
-
-        });
+            });
+        }
     });
 
 
