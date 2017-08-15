@@ -122,21 +122,21 @@ setTimeout(function(){
 
         camera.stop();
 
-        var command = "";
+        var type = "";
         if(filename.indexOf('file-preview') > -1){
-            command = 'file-preview';			
+            type = 'file-preview';
         }
 		else if(filename.indexOf('file-thumb') > -1){
-            command = 'file-thumb';
+            type = 'file-thumb';
         }
 		else if(filename.indexOf('photo') > -1){
-            command = 'file';
+            type = 'file';
         }
 
-		console.log('read: ' + command);
+		console.log('read: ' + type);
 		
         var stream = ss.createStream();
-        ss(socket).emit(command, stream, {
+        ss(socket).emit(type, stream, {
             ip:rpiIp,
             numb: config.numb,
             index: "0"
@@ -145,7 +145,7 @@ setTimeout(function(){
         //var filename = '/home/pi/test0.jpg';
 		setTimeout(function(){
 			fs.createReadStream(__dirname + "/" + filename).pipe(stream);
-		},300)
+		},300);
 
 
         console.log(filename + " : "+ (new Date()));
@@ -232,7 +232,7 @@ setTimeout(function(){
 
 	gpio.on('change', function(channel, value) {
 		
-		if(channel == 7 && value == 1){
+		if(channel == 7 && value == 1 && command != ""){
 
 			console.log("execute command");
 
