@@ -56,7 +56,11 @@
         exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
 	  }
 
-	  
+	  vm.execShell = function(){
+		  
+		console.log("shell: " + vm.shellCommand);
+		exSocket.emit("shell", vm.shellCommand);
+	  }	  
 	  
 	  vm.softExecute = function(){
 		  

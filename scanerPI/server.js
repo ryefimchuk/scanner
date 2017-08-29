@@ -91,11 +91,11 @@ setTimeout(function(){
 
         //shell.exec(data);
 
-        socket.emit("shell", {
+/*        socket.emit("shell", {
             ip: rpiIp,
             numb: config.numb,
             result:[]
-        });
+        });*/
     });
 
     socket.on('set number', function(newNumber){
