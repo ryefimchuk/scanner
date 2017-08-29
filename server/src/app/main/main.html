@@ -1,0 +1,40 @@
+<div id="container">
+
+  <div ng-show="$root.setupMode" id="modeSetup">
+    <div id="setupCameras">
+      <div ng-repeat="camera in main.scannersData.notConfigured">
+        <div scanner-item item="camera.data"></div>
+      </div>
+    </div>
+  </div>
+
+  <div  ng-show="!$root.setupMode" id="modeStandBy">
+    <div id="standByCameras">
+      <table >
+        <tr class="scanners-row" ng-repeat="cameraRow in main.scannersData.grid">
+          <td ng-repeat="camera in cameraRow.cameras" >
+            <div scanner-item item="camera.data"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div ng-if="$root.preview" >
+  <div id="modeCameraPreview" ng-style="{'background-image': 'url(' + ($root.preview.preview ? $root.preview.preview : main.defaultImage) + ')'}">
+    <form ng-submit="main.submitChangeNumber($event, $root.preview)" id="numberEditorForm">
+      <div class="panel">
+        <div class="ip">{{$root.preview.ip}}</div>
+        <div class="numb">{{$root.preview.numb}}</div>
+        <input ng-model="$root.preview.numb"/>
+
+        <div ng-click="main.reloadPreview($root.preview)" id="reloadPreview">Reload</div>
+        <div ng-click="main.closePreview()" id="closePreview">Close</div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div control-panel ></div>

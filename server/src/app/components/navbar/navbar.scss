@@ -1,0 +1,22 @@
+header {
+  color: slategray;
+  background: #fafafa;
+  height: 40px;
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  border-bottom: 1px solid gray;
+
+  &>div {
+    display: flex;
+    line-height: 40px;
+    min-width: 200px;
+  }
+
+  h2 {
+    line-height: 40px;
+    margin: 0px;
+  }
+}
+

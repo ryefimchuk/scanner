@@ -1,0 +1,56 @@
+<div class="control-panel" ng-init="vm.panel = 'scanning'">
+  <div class="tabs">
+    <div class="tab"
+         ng-class="{'selected':vm.panel == 'scanning'}"
+         ng-click="vm.panel = 'scanning'">
+      Scanning
+    </div>
+    <div class="tab"
+         ng-class="{'selected':vm.panel == 'shell'}"
+         ng-click="vm.panel = 'shell'">
+      Shell
+    </div>
+  </div>
+  <div ng-show="vm.panel == 'scanning'">
+    <div class="option" ng-repeat="option in vm.options">
+      <div ng-if="option.type == 'int'">
+        <div class="title">{{option.label}}</div>
+        <input ng-change="vm.change()" type="number" ng-model="option.value" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+      </div>
+      <div ng-if="option.type == 'string'">
+        <div class="title">{{option.label}}</div>
+        <input  ng-change="vm.change()" type="text" ng-model="option.value" >
+      </div>
+      <div ng-if="option.type == 'list'">
+        <div class="title">{{option.label}}</div>
+        <select ng-change="vm.change()" type="text" ng-model="option.value">
+          <option ></option>
+          <option ng-repeat="item in option.list">{{item}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="commands">
+      <form>
+        <div class="group">
+          <div>Output command</div>
+          <textarea ng-model="vm.resultCommand" class="result" readonly></textarea>
+          <button id="setup">Setup config</button>
+          <button id="execute">Execute</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div  ng-show="vm.panel == 'shell'">
+    <div class="commands">
+      <form>
+        <div class="group">
+          <div class="title">Shell command</div>
+          <input ng-model="vm.shellCommand" autocomplete="off" />
+          <button id="shell">Shell</button>
+        </div>
+        <div class="group">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

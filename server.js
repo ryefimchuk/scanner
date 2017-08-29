@@ -7,8 +7,10 @@ var port = process.env.PORT || 80;
 var fs = require('fs');
 var ss = require('socket.io-stream');
 
+var API = '/api';
 
-app.use(express.static('server'));
+//app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(API, express.static('server'));
 /*app.use(express.static('preview'));
 app.use(express.static('photos'));*/
 
@@ -16,7 +18,6 @@ app.use(express.static('photos'));*/
 var scanners = [];
 var controllers = [];
 var mainTrigger = null;
-
 
 io.on('connection', function (socket) {
 
@@ -86,7 +87,7 @@ io.on('connection', function (socket) {
                 controllers[i].emit("file-preview", {
                     ip: data.ip,
                     numb: data.numb,
-                    preview: previewFileName + "?" + Math.round(Math.random() * 10000000)
+                    preview: API + previewFileName + "?" + Math.round(Math.random() * 10000000)
                 });
             }
         });
@@ -101,7 +102,7 @@ io.on('connection', function (socket) {
         if(scanner){
             var thumbFileName = "/preview/thumb_" + data.ip + ".jpg";
             stream.pipe(fs.createWriteStream(__dirname + "/server" + thumbFileName));
-            scanner.scanner.thumb = thumbFileName + "?" + Math.round(Math.random() * 10000000);
+            scanner.scanner.thumb = API + thumbFileName + "?" + Math.round(Math.random() * 10000000);
 
             stream.on('finish', function () {
                 updateScanner({
@@ -114,7 +115,8 @@ io.on('connection', function (socket) {
 
 
     function getScannerByIp(ip){
-        return _.find(scanners, function(scan){
+	var revScanners = scanners.reverse();
+        return _.find(revScanners, function(scan){
             return scan.scanner.ip == ip;
         })
     }

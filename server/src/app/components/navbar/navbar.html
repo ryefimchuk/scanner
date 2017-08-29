@@ -1,0 +1,13 @@
+<div>
+  <h2>3D Scanner</h2>
+</div>
+<div>
+  <span class="text-normal">Total Count: <span>{{vm.scannersData.allScanners.length}}</span></span>&nbsp;&nbsp;&nbsp;
+  <span class="text-warning">Not Configured: <span id="notConfigured">{{vm.scannersData.notConfigured.length}}</span></span>
+</div>
+<div>
+  <button ng-click="vm.rebootDevices()" id="rebootDevices">Reboot</button>
+  <button ng-click="vm.openSetupMode()" ng-disabled="$root.setupMode">Setup</button>
+  <button ng-click="vm.openStandbyMode()" ng-disabled="!$root.setupMode" >StandBy</button>
+</div>
+

@@ -1,0 +1,48 @@
+.control-panel {
+  position: fixed;
+/*  height: 100%;*/
+  right: 0px;
+  width: 400px;
+  background: #fafafa;
+  top: 40px;
+  bottom: 0px;
+  padding: 8px;
+
+  .option {
+    margin-top: 8px;
+  }
+
+  .group {
+    margin-top: 8px;
+
+    .result{
+      width: 384px;
+      height: 60px;
+    }
+  }
+
+  .title {
+    display: inline-block;
+    min-width: 150px;
+  }
+
+  .tabs{
+    height: 40px;
+    width: 100%;
+
+    .tab{
+
+      display: inline-block;
+      height: 30px;
+      width: 100px;
+      border: 1px solid lightgray;
+      line-height: 28px;
+      text-align: center;
+
+      &.selected{
+        background: gray;
+        color: white;
+      }
+    }
+  }
+}
