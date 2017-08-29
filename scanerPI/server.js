@@ -52,9 +52,18 @@ loadConfig();
 
 setTimeout(function(){
 
+    var opts = {
+        mode: "photo",
+        output: __dirname + "/photo%d.jpg",
+        width: 3280,
+        height: 2464
+    };
+
+    var camera = new RaspiCam(opts);
+
     var rpiIp = ip.address() // my ip address
 
-    var command = "";
+    var command = null;
     var socket = s('http://192.168.1.99');
 
     socket.on('connect', function(c){
@@ -72,11 +81,11 @@ setTimeout(function(){
     socket.on('shell', function(data){
         //data
         var args = data.split(" ");
-        var command = args [0];
+        var comm = args [0];
         args = args.splice(0, 1);
 
-        console.log(command + " | " +  args.join(" "));
-        child_process = spawn(command, args);
+        console.log(comm + " | " +  args.join(" "));
+        child_process = spawn(comm, args);
 
         PROCESS_RUNNING_FLAG = true;
 
@@ -95,25 +104,33 @@ setTimeout(function(){
     });
 
     socket.on('setup command', function(data){
-        command = data;
-        console.log("setup command:", data);
+		try{
+			command = JSON.parse(data);
+		
+		
+			if(command){
+				for(var op in camera.opts){
+					if(typeof (camera.opts[op]) != 'function'){
+						camera.opts[op] = undefined;
+					}
+				}			
+				
+				for(var op in command){
+					camera.opts[op] = command[op];
+				}
+			}
+
+		}
+		catch(ex){}
+        
+		console.log(JSON.stringify(camera.opts));
     });
 
     socket.on('disconnect', function(e){
         console.log("disconnected from server");
     });
 
-    var opts = {
-        mode: "photo",
-        /*tl: 300,*/
-        t: 500,
-        n: true,
-        output: __dirname + "/photo%d.jpg",
-        width: 3280,
-        height: 2464
-    };
 
-    var camera = new RaspiCam(opts);
 
     //listen for the "start" event triggered when the start method has been successfully initiated
     camera.on("start", function(){
@@ -177,6 +194,8 @@ setTimeout(function(){
                 camera.set('height', 90);
                 camera.set('output', __dirname + "/file-thumb.jpg");
 
+				camera.start();
+				
                 break;
             }
             case "preview":{
@@ -184,18 +203,24 @@ setTimeout(function(){
                 camera.set('height', 2464);
                 camera.set('output', __dirname + "/file-preview.jpg");
 
+				camera.start();
+				
                 break;
             }
             case "photo":{
-                camera.set('width', 3280);
-                camera.set('height', 2464);
-                camera.set('output', __dirname + "/photo%d.jpg");
+
+				if(command){
+					camera.opts.height = command.height;
+					camera.opts.width = command.width;
+					camera.opts.output = command.output;
+					
+					camera.start();
+				}			
 
                 break;
             }
         }
 
-        camera.start();
     }
 
 
@@ -211,7 +236,7 @@ setTimeout(function(){
 
     gpio.on('change', function(channel, value) {
         
-        if(channel == 7 && value == 1 && command != ""){
+        if(channel == 7 && value == 1 && command){
             console.log("take photo");
 
             takePhoto('photo');
@@ -221,6 +246,12 @@ setTimeout(function(){
             },300);     
         }
     });
+	
+	socket.on('soft trigger', function(data){
+        if(command){
+            takePhoto('photo');
+        }
+	})
 
 }, 10000);
 

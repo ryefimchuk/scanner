@@ -137,6 +137,15 @@ io.on('connection', function (socket) {
             //alert("Scanner")
         }
     });
+	
+	
+	
+    socket.on('soft trigger', function (cmd) {
+        for (var i = 0; i < scanners.length; i++) {
+            scanners[i].emit('soft trigger', cmd);
+        }
+        //reloadData();
+    });
 
 
     socket.on('setup command', function (cmd) {

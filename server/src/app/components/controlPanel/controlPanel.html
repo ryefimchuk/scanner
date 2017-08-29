@@ -34,8 +34,9 @@
         <div class="group">
           <div>Output command</div>
           <textarea ng-model="vm.resultCommand" class="result" readonly></textarea>
-          <button id="setup">Setup config</button>
-          <button id="execute">Execute</button>
+          <button ng-click="vm.setupConfig()" id="setup">Setup config</button>
+          <button ng-click="vm.execute()" id="execute">Execute</button>
+          <button ng-click="vm.softExecute()" id="execute">Execute (soft)</button>
         </div>
       </form>
     </div>

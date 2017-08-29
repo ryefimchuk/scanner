@@ -11,29 +11,29 @@
     var options = [
       {
         label: "height",
-        command: "-h",
+        command: "height",
         type: "int",
-        value: 1024,
+        value: 2464,
         rangeMin:1,
-        rangeMax:2240
+        rangeMax:2464
       },
       {
         label: "width",
-        command: "-w",
+        command: "width",
         type: "int",
-        value: 1920,
+        value: 3280,
         rangeMin:1,
-        rangeMax:3200
+        rangeMax:3280
       },
       {
         label: "file name",
-        command: "-o",
+        command: "output",
         type: "string",
-        value: "photo%04d.jpg"
+        value: "/home/pi/photo%04d.jpg"
       },
       {
         label: "timeout (in ms)[0 = off]",
-        command: "-t",
+        command: "timeout",
         type: "int",
         value: 500,
         rangeMin:0,
@@ -41,7 +41,7 @@
       },
       {
         label: "timelaps (in ms)",
-        command: "-tl",
+        command: "timelaps",
         type: "int",
         value: "",
         rangeMin:300,
@@ -50,7 +50,7 @@
 
       {
         label: "sharpness (-100 to 100)",
-        command: "-sh",
+        command: "sharpness",
         type: "int",
         value: "",
         rangeMin:-100,
@@ -58,7 +58,7 @@
       },
       {
         label: "contrast (-100 to 100)",
-        command: "-co",
+        command: "contrast",
         type: "int",
         value: "",
         rangeMin:-100,
@@ -66,7 +66,7 @@
       },
       {
         label: "brightness (0 to 100)",
-        command: "-br",
+        command: "brightness",
         type: "int",
         value: "",
         rangeMin:0,
@@ -74,7 +74,7 @@
       },
       {
         label: "ISO",
-        command: "-iso",
+        command: "ISO",
         type: "list",
         list:[
           "0",
@@ -91,7 +91,7 @@
       },
       {
         label: "Exposure",
-        command: "-ex",
+        command: "exposure",
         type: "list",
         list: [
           "off",
@@ -111,7 +111,7 @@
       },
       {
         label: "AWB",
-        command: "-awb",
+        command: "awb",
         type: "list",
         list: [
           "off",
@@ -128,7 +128,7 @@
       },
       {
         label: "Image Effect",
-        command: "-ifx",
+        command: "imxfx",
         type: "list",
         list: [
           "none",
@@ -154,8 +154,8 @@
         ]
       },
       {
-        label: "Matering",
-        command: "-mm",
+        label: "Metering",
+        command: "metering",
         type: "list",
         list: [
           "average",
@@ -166,7 +166,7 @@
       },
       {
         label: "DRC",
-        command: "-drc",
+        command: "drc",
         type: "list",
         list: [
           "off",

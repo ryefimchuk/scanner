@@ -21,7 +21,7 @@
     return directive;
 
     /** @ngInject */
-    function ControlPanelController(moment, optionsConfig) {
+    function ControlPanelController(moment, optionsConfig, exSocket) {
       var vm = this;
       vm.options = optionsConfig.getOptions();
 
@@ -30,7 +30,7 @@
       }
 
       vm.change = function(){
-        vm.resultCommand = "";
+        vm.resultCommand = {};
 
         for(var i = 0; i < vm.options.length; i++){
           var opt = vm.options[i];
@@ -42,12 +42,32 @@
             case "string":
             case "list":
               {
-                vm.resultCommand += (" " + opt.command + " " + opt.value);
+                vm.resultCommand[opt.command] = opt.value;
                 break;
               };
           }
         }
+		
+		vm.resultCommand['thumb'] = 'none'
+		vm.resultCommand['nopreview'] = true;
       }
+	  	  
+	  vm.setupConfig = function(){		  
+        exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
+	  }
+
+	  
+	  
+	  vm.softExecute = function(){
+		  
+        exSocket.emit("soft trigger", "");
+	  }
+	  
+	  vm.execute = function(){
+		  
+        //exSocket.emit("soft trigger", "");
+        exSocket.emit("start command", "");
+	  }
 
       vm.change();
     }
