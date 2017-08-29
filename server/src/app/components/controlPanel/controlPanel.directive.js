@@ -32,9 +32,13 @@
       vm.change = function(){
         vm.resultCommand = {};
 
+		
         for(var i = 0; i < vm.options.length; i++){
           var opt = vm.options[i];
-          if(!opt.value){
+		  
+		  
+		  
+          if(!opt.value || opt.value == ""){
             continue;
           }
           switch(opt.type){

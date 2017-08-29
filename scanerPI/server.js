@@ -111,7 +111,7 @@ setTimeout(function(){
 			if(command){
 				for(var op in camera.opts){
 					if(typeof (camera.opts[op]) != 'function'){
-						camera.opts[op] = undefined;
+						delete camera.opts[op];// = undefined;
 					}
 				}			
 				
