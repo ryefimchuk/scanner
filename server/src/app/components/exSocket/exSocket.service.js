@@ -8,7 +8,7 @@
   /** @ngInject */
   function exSocket($rootScope) {
 
-    var rootApi = "localhost";
+    var rootApi = "192.168.1.99";
     var socket = io.connect(rootApi);
 
     return {

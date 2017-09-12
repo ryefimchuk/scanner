@@ -28,6 +28,10 @@
 
       //// CONTROLS
       vm.openSetupMode = function() {
+
+        debugger;
+
+        ///alert("openSetupMode ")
         $rootScope.setupMode = true;
       }
 
@@ -36,7 +40,7 @@
       }
 
       vm.rebootDevices = function(){
-        exSocket.emit('shell', "sudo reboot");
+        //exSocket.emit('shell', "sudo reboot");
       }
 
       // "vm.creationDate" is available by directive option "bindToController: true"

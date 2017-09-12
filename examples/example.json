@@ -1,0 +1,10 @@
+{ 
+"scanid"	: "{{ID}}",
+"normaldir" 	: "c:\\example\\{{ID}}\\normal\\",
+"projectdir" 	: "c:\\example\\{{ID}}\\projection\\",
+"emptydir" 	: "c:\\example\\{{ID}}\\normal\\",
+"savedir" 	: "c:\\processed\\",
+"SKETCHFAB_DESCRIPTION" : "My scanned model",
+"SKETCHFAB_ENABLE" : "1"
+}
+ 

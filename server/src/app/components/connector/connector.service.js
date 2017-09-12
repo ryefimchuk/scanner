@@ -11,11 +11,16 @@
     var scanner_col = 20;
 
     var serviceData = {
+      shellFeedback:{
+        data:"",
+        code:""
+      },
       allScanners:[],
       configured:[],
       notConfigured:[],
       grid:[],
-      preview: null
+      preview: null,
+      session: null
     };
 
     function getScannerBy(ip){
@@ -64,11 +69,30 @@
     exSocket.on('load data', function (data) {
       serviceData.allScanners = data.scanners;
 
+
       $log.log("received full scanners data");
       //alert("new data")
       updateData();
     });
 
+
+    exSocket.on('update-session', function (session) {
+      serviceData.session = session;
+    });
+
+
+    exSocket.on('shell-feedback', function (data) {
+      if(data.result.data) {
+        serviceData.shellFeedback.data = data.result.data.replace(/\n/g, "<RTR>").split("<RTR>").map(function(item){
+          return {
+            item: item
+          };
+        });
+      }
+      else{
+        serviceData.shellFeedback.data = [];
+      }
+    });
 
     function loadScannerData(item){
       if(item.ip) {

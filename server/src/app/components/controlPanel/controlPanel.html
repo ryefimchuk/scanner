@@ -45,11 +45,30 @@
     <div class="commands">
       <form>
         <div class="group">
+          <div class="title">Update file</div>
+          <br>
+          <lable>URL</lable>
+          <input ng-model="vm.updateFileUrl" autocomplete="off" />
+          <br>
+          <lable>Destination</lable>
+          <input ng-model="vm.updateFileDest" autocomplete="off" />
+          <br>
+          <button ng-click="vm.updateFile()" id="shell">Update</button>
+        </div>
+        <div class="group">
           <div class="title">Shell command</div>
+          <br>
+          <lable>Command</lable>
           <input ng-model="vm.shellCommand" autocomplete="off" />
+          <br>
           <button ng-click="vm.execShell()" id="shell">Shell</button>
         </div>
         <div class="group">
+          <br>
+          <div>Result:</div>
+          <div>
+            <div ng-repeat="str in vm.shellFeedback.data">{{str.item}}</div>
+          </div>
         </div>
       </form>
     </div>

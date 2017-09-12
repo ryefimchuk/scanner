@@ -37,6 +37,7 @@ function browserSyncInit(baseDir, browser) {
 
   browserSync.instance = browserSync.init({
     startPath: '/',
+    ghostMode: false,
     server: server,
     browser: browser
   });

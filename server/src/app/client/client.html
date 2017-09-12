@@ -1,0 +1,31 @@
+<div>
+  <div class="commands" ng-show="!vm.data.session">
+      <div class="group">
+        <div class="title">User Data</div>
+        <br>
+        <lable>First Name</lable>
+        <input ng-model="vm.firstName" autocomplete="off" />
+        <br>
+        <lable>Last Name</lable>
+        <input ng-model="vm.lastName" autocomplete="off" />
+        <br>
+        <button ng-click="vm.saveSessionSettings()">Save</button>
+      </div>
+  </div>
+  <div class="commands" ng-show="vm.data.session">
+      <div class="group">
+        <div class="title">User Data</div>
+        <br>
+        <lable>Session ID</lable>
+        <span>{{vm.data.session.id}}</span>
+        <br>
+        <lable>First Name</lable>
+        <span>{{vm.firstName}}</span>
+        <br>
+        <lable>Last Name</lable>
+        <span>{{vm.lastName}}</span>
+        <br>
+        <button ng-click="vm.closeSession()">Close</button>
+      </div>
+  </div>
+</div>

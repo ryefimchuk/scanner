@@ -4,6 +4,7 @@
 <div>
   <span class="text-normal">Total Count: <span>{{vm.scannersData.allScanners.length}}</span></span>&nbsp;&nbsp;&nbsp;
   <span class="text-warning">Not Configured: <span id="notConfigured">{{vm.scannersData.notConfigured.length}}</span></span>
+  <span class="text-normal" ng-if="vm.scannersData.session">Session: {{vm.scannersData.session.id}}</span>
 </div>
 <div>
   <button ng-click="vm.rebootDevices()" id="rebootDevices">Reboot</button>

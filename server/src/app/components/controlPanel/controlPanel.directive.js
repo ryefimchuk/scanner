@@ -21,9 +21,13 @@
     return directive;
 
     /** @ngInject */
-    function ControlPanelController(moment, optionsConfig, exSocket) {
+    function ControlPanelController(moment, optionsConfig, exSocket, connector) {
       var vm = this;
       vm.options = optionsConfig.getOptions();
+      vm.updateFileUrl = '';
+      vm.updateFileDest = '/home/pi/server.js';
+
+      vm.shellFeedback = connector.getScanners().shellFeedback;
 
       vm.setupConfig = function(){
 
@@ -32,12 +36,12 @@
       vm.change = function(){
         vm.resultCommand = {};
 
-		
+
         for(var i = 0; i < vm.options.length; i++){
           var opt = vm.options[i];
-		  
-		  
-		  
+
+
+
           if(!opt.value || opt.value == ""){
             continue;
           }
@@ -51,28 +55,35 @@
               };
           }
         }
-		
-		vm.resultCommand['thumb'] = 'none'
-		vm.resultCommand['nopreview'] = true;
+
+        vm.resultCommand['thumb'] = 'none'
+        vm.resultCommand['nopreview'] = true;
       }
-	  	  
-	  vm.setupConfig = function(){		  
+
+	  vm.setupConfig = function(){
         exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
 	  }
 
+	  vm.updateFile = function() {
+       exSocket.emit("update-file", {
+         url: vm.updateFileUrl,
+         dest: vm.updateFileDest
+       });
+    }
+
 	  vm.execShell = function(){
-		  
-		console.log("shell: " + vm.shellCommand);
-		exSocket.emit("shell", vm.shellCommand);
-	  }	  
-	  
+
+		  console.log("shell: " + vm.shellCommand);
+		  exSocket.emit("shell", vm.shellCommand);
+	  }
+
 	  vm.softExecute = function(){
-		  
+
         exSocket.emit("soft trigger", "");
 	  }
-	  
+
 	  vm.execute = function(){
-		  
+
         //exSocket.emit("soft trigger", "");
         exSocket.emit("start command", "");
 	  }
