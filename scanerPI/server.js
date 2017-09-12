@@ -5,7 +5,7 @@ var s = require('socket.io-client');
 var fs = require('fs');
 var ss = require('socket.io-stream');
 var RaspiCam = require("raspicam");
-var {spawn, exec} = require("child_process");
+var exec = require("child_process").exec;
 var wget = require('node-wget');
 
 
@@ -129,7 +129,7 @@ setTimeout(function () {
       console.log(data);
 
       var args = data;
-      exec(args, (err, stdout, stderr) = > {
+      exec(args, function(err, stdout, stderr) {
         PROCESS_RUNNING_FLAG = false;
 
       if (err) {
@@ -313,6 +313,8 @@ setTimeout(function () {
 
   gpio.on('change', function (channel, value) {
 
+    console.log("chabge " + channel + " value " + value);
+  
     if (channel == 7 && value == 1 && command) {
       console.log("take photo");
 
@@ -329,14 +331,16 @@ setTimeout(function () {
       takePhoto('photo');
     }
   })
+  
+  gpio.setup(12, gpio.DIR_OUT, write);
+  gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
+
+
+	function write() {
+	  gpio.write(12, false);
+	}
+
 
 }, 10000);
 
 
-gpio.setup(12, gpio.DIR_OUT, write);
-gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
-
-
-function write() {
-  gpio.write(12, false);
-}

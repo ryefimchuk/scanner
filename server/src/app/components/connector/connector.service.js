@@ -7,8 +7,8 @@
 
   /** @ngInject */
   function connector($rootScope, exSocket, $timeout, $log) {
-    var scanner_row = 7;
-    var scanner_col = 20;
+    var scanner_row = 10;
+    var scanner_col = 24;
 
     var serviceData = {
       shellFeedback:{

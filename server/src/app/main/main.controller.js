@@ -36,11 +36,11 @@
         var _numb = parseInt(numb);
         if (!isNaN(_numb)){
 
-          if(_numb > 0 && _numb <= 140) {
+          if(_numb > 0 && _numb <= 240) {
             setNumb(_numb);
           }
           else{
-            alert("Range 1 - 140");
+            alert("Range 1 - 240");
           }
         }else{
           alert("Please enter number");
