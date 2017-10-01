@@ -296,6 +296,7 @@ function start() {
       switch (config) {
         case "thumb": {
           camera.set('nopreview', true);
+          camera.set('timeout', 300);
           camera.set('width', 160);
           camera.set('height', 90);
           camera.set('output', __dirname + "/file-thumb.jpg");
@@ -306,6 +307,7 @@ function start() {
         }
         case "preview": {
           camera.set('nopreview', true);
+          camera.set('timeout', 300);
           camera.set('width', 3280);
           camera.set('height', 2464);
           camera.set('output', __dirname + "/file-preview.jpg");
