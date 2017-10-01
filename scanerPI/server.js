@@ -17,6 +17,8 @@ var allowPhoto = true;
 
 var PROCESS_RUNNING_FLAG = false;
 
+var dirName = __dirname || "/home/pi";
+
 // Exit strategy to kill child process
 // (eg. for timelapse) on parent process exit
 process.on('exit', function () {
@@ -92,7 +94,7 @@ function start() {
       //console.log(data);
     },
     mode: "photo",
-    output: __dirname + "/photo%d.jpg",
+    output: dirName + "/photo%d.jpg",
     width: 3280,
     height: 2464
   };
@@ -247,7 +249,10 @@ function start() {
   });
 
   function uploadFiles() {
+	  console.log("uploadFiles")
+	  
     try {
+		
       for (var i = 0; i < Math.min(files.length, 2); i++) {
         var f = files[i];
 
@@ -258,9 +263,11 @@ function start() {
           index: i
         });
 
-        setTimeout(function () {
-          fs.createReadStream(__dirname + "/" + f.filename).pipe(stream);
-        }, 300);
+		//console.log("createReadStream: " + dirName + "/" + f.filename)
+		
+//        setTimeout(function () {
+          fs.createReadStream(dirName + "/" + f.filename).pipe(stream);
+//        }, 300);
 		
 		setTimeout(function(){
 			allowPhoto = true;
@@ -277,15 +284,14 @@ function start() {
   //listen for the "stop" event triggered when the stop method was called
   camera.on("stop", function () {
     console.log("camera stop");
-	setTimeout(function(){
-		uploadFiles();	
-	}, 5000);    
   });
 
   //listen for the process to exit when the timeout has been reached
   camera.on("exit", function () {
     console.log("camera exit");
-    //uploadFiles();
+	setTimeout(function(){
+		uploadFiles();	
+	}, 300);    
   });
 
   function takePhoto(config) { // "thumb", "preview", "photo"
@@ -306,7 +312,7 @@ function start() {
           camera.set('timeout', 300);
           camera.set('width', 160);
           camera.set('height', 90);
-          camera.set('output', __dirname + "/file-thumb.jpg");
+          camera.set('output', dirName + "/file-thumb.jpg");
 
           camera.start();
 
@@ -317,7 +323,7 @@ function start() {
           camera.set('timeout', 300);
           camera.set('width', 3280);
           camera.set('height', 2464);
-          camera.set('output', __dirname + "/file-preview.jpg");
+          camera.set('output', dirName + "/file-preview.jpg");
 
           camera.start();
 
