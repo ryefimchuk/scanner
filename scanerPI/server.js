@@ -13,6 +13,7 @@ var wget = require('node-wget');
 var configFile = '/home/pi/camera.json';
 
 var child_process = null;
+var allowPhoto = true;
 
 var PROCESS_RUNNING_FLAG = false;
 
@@ -260,6 +261,10 @@ function start() {
         setTimeout(function () {
           fs.createReadStream(__dirname + "/" + f.filename).pipe(stream);
         }, 300);
+		
+		setTimeout(function(){
+			allowPhoto = true;
+		}, 10 * 1000)
       }
 
       files = [];
@@ -272,13 +277,15 @@ function start() {
   //listen for the "stop" event triggered when the stop method was called
   camera.on("stop", function () {
     console.log("camera stop");
-    uploadFiles();
+	setTimeout(function(){
+		uploadFiles();	
+	}, 5000);    
   });
 
   //listen for the process to exit when the timeout has been reached
   camera.on("exit", function () {
     console.log("camera exit");
-    uploadFiles();
+    //uploadFiles();
   });
 
   function takePhoto(config) { // "thumb", "preview", "photo"
@@ -349,7 +356,8 @@ function start() {
 
     console.log("chabge " + channel + " value " + value);
   
-    if (channel == 7 && value == 1 && command) {
+    if (channel == 7 && value == 1 && command && allowPhoto) {
+		allowPhoto = false;
       console.log("take photo");
 
       takePhoto('photo');
