@@ -12,6 +12,8 @@
     </div>
   </div>
   <div ng-show="vm.panel == 'scanning'">
+    <br>
+    <label>Photo:</label>
     <div class="option" ng-repeat="option in vm.options">
       <div ng-if="option.type == 'int'">
         <div class="title">{{option.label}}</div>
@@ -27,6 +29,30 @@
           <option ></option>
           <option ng-repeat="item in option.list">{{item}}</option>
         </select>
+      </div>
+    </div>
+    <br>
+    <label>Lights:</label>
+    <div>
+      <div>
+        <div class="title">Start (ms):</div>
+        <input ng-change="vm.change()" type="number" ng-model="vm.light.lightStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+      </div>
+      <div>
+        <div class="title">Finish (ms):</div>
+        <input ng-change="vm.change()" type="number" ng-model="vm.light.lightFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+      </div>
+    </div>
+    <br>
+    <label>Projector:</label>
+    <div>
+      <div>
+        <div class="title">Start (ms):</div>
+        <input ng-change="vm.change()" type="number" ng-model="vm.light.projectorStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+      </div>
+      <div>
+        <div class="title">Finish (ms):</div>
+        <input ng-change="vm.change()" type="number" ng-model="vm.light.projectorFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
       </div>
     </div>
     <div class="commands">

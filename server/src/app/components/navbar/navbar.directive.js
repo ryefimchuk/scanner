@@ -29,7 +29,7 @@
       //// CONTROLS
       vm.openSetupMode = function() {
 
-        debugger;
+        //debugger;
 
         ///alert("openSetupMode ")
         $rootScope.setupMode = true;

@@ -61,7 +61,7 @@ setTimeout(function () {
 
   var opts = {
     log: function (data) {
-
+      //console.log(data);
     },
     mode: "photo",
     output: __dirname + "/photo%d.jpg",
@@ -161,23 +161,18 @@ setTimeout(function () {
       command = JSON.parse(data);
 
       if (command) {
-        for (var op in camera.opts) {
-          if (typeof (camera.opts[op]) != 'function') {
-            delete camera.opts[op];// = undefined;
-          }
-        }
-
         for (var op in command) {
-          camera.opts[op] = command[op];
+          camera.set(op, command[op]);
         }
       }
-
     }
+
     catch (ex) {
       console.log("Setup command error: " + ex.message);
     }
 
-    console.log(JSON.stringify(camera.opts));
+    console.log("setup config")
+    console.log(camera.opts);
   });
 
   socket.on('disconnect', function (e) {
@@ -189,6 +184,7 @@ setTimeout(function () {
   //listen for the "start" event triggered when the start method has been successfully initiated
   camera.on("start", function () {
     //do stuff
+    console.log("camera started");
     files = [];
   });
 
@@ -197,7 +193,7 @@ setTimeout(function () {
     try {
       console.log("current file name:" + filename)
 
-      camera.stop();
+      //camera.stop();
 
       var type = "";
       if (filename.indexOf('file-preview') > -1) {
@@ -224,15 +220,14 @@ setTimeout(function () {
 
   function uploadFiles() {
     try {
-
-      for (var i = 0; i < files.length; i++) {
+      for (var i = 0; i < Math.min(files.length, 2); i++) {
         var f = files[i];
 
         var stream = ss.createStream();
         ss(socket).emit(f.type, stream, {
           ip: rpiIp,
           numb: config.numb,
-          index: "0"
+          index: i
         });
 
         setTimeout(function () {
@@ -249,11 +244,13 @@ setTimeout(function () {
 
   //listen for the "stop" event triggered when the stop method was called
   camera.on("stop", function () {
+    console.log("camera stop");
     uploadFiles();
   });
 
   //listen for the process to exit when the timeout has been reached
   camera.on("exit", function () {
+    console.log("camera exit");
     uploadFiles();
   });
 
@@ -262,6 +259,11 @@ setTimeout(function () {
     try {
       console.log("takePhoto:" + config)
 
+      camera.opts = {
+        log: function(ms){
+          console.log(ms);
+        }
+      };
       camera.set('mode', 'photo');
 
       switch (config) {
@@ -284,11 +286,12 @@ setTimeout(function () {
           break;
         }
         case "photo": {
-
           if (command) {
-            camera.opts.height = command.height;
-            camera.opts.width = command.width;
-            camera.opts.output = command.output;
+            if (command) {
+              for (var op in command) {
+                camera.set(op, command[op]);
+              }
+            }
 
             camera.start();
           }

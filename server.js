@@ -22,6 +22,7 @@ app.use(API, express.static('server'));
 var session = null;
 var scanners = [];
 var controllers = [];
+//var projectors = [];
 var mainTrigger = null;
 
 io.on('connection', function (socket) {
@@ -46,6 +47,14 @@ io.on('connection', function (socket) {
 
     reloadData();
   });
+
+
+  /*socket.on('add projector', function (projector) {
+    //console.log("add projector");
+    socket.projector = projector;
+//    projectors.push(socket);
+    reloadData();
+  });*/
 
   socket.on('add scanner', function (scanner) {
     //console.log("add scanner");
@@ -77,13 +86,16 @@ io.on('connection', function (socket) {
   });
 
   ss(socket).on('file', function (stream, data) {
-
     if(session){
       var id = session.id || "not_configured_session";
 
       var newDir = __dirname + "/server/photos/" + id + "/";
       mkdirp(newDir, function(){
-        stream.pipe(fs.createWriteStream(newDir + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
+        var dir = newDir + ((data.index == 0) ? "normal/" : "projection/");
+
+        mkdirp(dir, function() {
+          stream.pipe(fs.createWriteStream(dir + (data.numb ? data.numb : data.ip) + ".jpg"));
+        })
       });
     } else {
       stream.pipe(fs.createWriteStream(__dirname + "/server/photos/" + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
@@ -213,7 +225,10 @@ io.on('connection', function (socket) {
     if (mainTrigger) {
       mainTrigger.emit('start command', cmd);
     }
-    //reloadData();
+
+/*    for (var i = 0; i < projectors.length; i++) {
+      projectors[i].emit('projector');
+    }*/
   });
 
   socket.on('update-file', function (cmd) {
@@ -258,6 +273,12 @@ function reloadData(controller) {
         data: scanner.scanner
       }
     }),
+/*    projectors: _.map(projectors, function (scanner) {
+      return {
+        id: scanner.id,
+        data: scanner.scanner
+      }
+    }),*/
     trigger: mainTrigger ? {
       id: mainTrigger.id,
       data: mainTrigger.trigger

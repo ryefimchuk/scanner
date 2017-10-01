@@ -40,8 +40,8 @@
         rangeMax:5000
       },
       {
-        label: "timelaps (in ms)",
-        command: "timelaps",
+        label: "timelapse (in ms)",
+        command: "timelapse",
         type: "int",
         value: "",
         rangeMin:300,

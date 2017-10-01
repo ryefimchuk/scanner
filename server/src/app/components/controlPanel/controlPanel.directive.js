@@ -20,27 +20,46 @@
 
     return directive;
 
+
     /** @ngInject */
     function ControlPanelController(moment, optionsConfig, exSocket, connector) {
       var vm = this;
       vm.options = optionsConfig.getOptions();
+
+      vm.light = {
+        lightStart:0,
+        lightFinish:500,
+        projectorStart:500,
+        projectorFinish:500
+      };
+
+      var _photo = null;
+      var _light = null;
+
+      try
+      {
+        _photo = JSON.parse(window.localStorage.photo);
+        _light = JSON.parse(window.localStorage.light);
+
+        vm.light = _light;
+
+        for(var i = 0; i < vm.options.length; i++){
+          var cmd = vm.options[i].command;
+          vm.options[i].value = _photo[cmd];
+        }
+      }
+      catch(e){}
+
       vm.updateFileUrl = '';
       vm.updateFileDest = '/home/pi/server.js';
 
       vm.shellFeedback = connector.getScanners().shellFeedback;
 
-      vm.setupConfig = function(){
-
-      }
-
       vm.change = function(){
         vm.resultCommand = {};
 
-
         for(var i = 0; i < vm.options.length; i++){
           var opt = vm.options[i];
-
-
 
           if(!opt.value || opt.value == ""){
             continue;
@@ -58,35 +77,34 @@
 
         vm.resultCommand['thumb'] = 'none'
         vm.resultCommand['nopreview'] = true;
+
+        window.localStorage.light = JSON.stringify(vm.light);
+        window.localStorage.photo = JSON.stringify(vm.resultCommand);
       }
 
-	  vm.setupConfig = function(){
-        exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
-	  }
+      vm.setupConfig = function(){
+          exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
+      }
 
-	  vm.updateFile = function() {
-       exSocket.emit("update-file", {
-         url: vm.updateFileUrl,
-         dest: vm.updateFileDest
-       });
-    }
+      vm.updateFile = function() {
+         exSocket.emit("update-file", {
+           url: vm.updateFileUrl,
+           dest: vm.updateFileDest
+         });
+      }
 
-	  vm.execShell = function(){
+      vm.execShell = function(){
+        console.log("shell: " + vm.shellCommand);
+        exSocket.emit("shell", vm.shellCommand);
+      }
 
-		  console.log("shell: " + vm.shellCommand);
-		  exSocket.emit("shell", vm.shellCommand);
-	  }
+      vm.softExecute = function(){
+          exSocket.emit("soft trigger", JSON.stringify(vm.light));
+      }
 
-	  vm.softExecute = function(){
-
-        exSocket.emit("soft trigger", "");
-	  }
-
-	  vm.execute = function(){
-
-        //exSocket.emit("soft trigger", "");
-        exSocket.emit("start command", "");
-	  }
+      vm.execute = function(){
+          exSocket.emit("start command", JSON.stringify(vm.light));
+      }
 
       vm.change();
     }
