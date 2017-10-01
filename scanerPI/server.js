@@ -1,3 +1,4 @@
+var os = require('os');
 var shell = require('shelljs');
 var gpio = require('rpi-gpio');
 var ip = require('ip');
@@ -57,8 +58,34 @@ function saveConfig() {
 
 loadConfig();
 
-setTimeout(function () {
+init();
 
+function init(){
+  function checkIP() {
+    var interfaces = os.networkInterfaces();
+    var addresses = [];
+    for (var k in interfaces) {
+      for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+          addresses.push(address.address);
+        }
+      }
+    }
+
+    return addresses.length > 0;
+  }
+
+  var interval = setInterval(function(){
+    if(checkIP()){
+      clearInterval(interval);
+      start();
+      interval = null;
+    }
+  }, 3000);
+}
+
+function start() {
   var opts = {
     log: function (data) {
       //console.log(data);
@@ -268,6 +295,7 @@ setTimeout(function () {
 
       switch (config) {
         case "thumb": {
+          camera.set('nopreview', true);
           camera.set('width', 160);
           camera.set('height', 90);
           camera.set('output', __dirname + "/file-thumb.jpg");
@@ -277,6 +305,7 @@ setTimeout(function () {
           break;
         }
         case "preview": {
+          camera.set('nopreview', true);
           camera.set('width', 3280);
           camera.set('height', 2464);
           camera.set('output', __dirname + "/file-preview.jpg");
@@ -334,16 +363,17 @@ setTimeout(function () {
       takePhoto('photo');
     }
   })
-  
-  gpio.setup(12, gpio.DIR_OUT, write);
-  gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
 
+  setTimeout(function(){
+    gpio.setup(12, gpio.DIR_OUT, write);
+    gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
+  }, 5000);
 
 	function write() {
 	  gpio.write(12, false);
 	}
 
 
-}, 10000);
+};
 
 
