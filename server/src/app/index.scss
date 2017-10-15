@@ -105,7 +105,7 @@ button[disabled]{
 
 div.scanner {
   height: 70px;
-  width: 125px;
+  width: 120px;
   border: 1px solid black;
   list-style: none;
   display: inline-block;
@@ -113,11 +113,8 @@ div.scanner {
   background-repeat: no-repeat;
   background-position: center center;
   position: relative;
-  //box-shadow: 3px 3px 7px 0px dimgrey;
   cursor: pointer;
-
-  margin: 29px -26px;
-  transform: rotate(90deg);
+  margin: 0px;
 
   input {
     position: absolute;

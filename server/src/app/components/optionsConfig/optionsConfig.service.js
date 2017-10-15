@@ -47,7 +47,14 @@
         rangeMin:300,
         rangeMax:5000
       },
-
+      {
+        label: "Skip frame (0 to 5)",
+        command: "skip",
+        type: "int",
+        value: "",
+        rangeMin:0,
+        rangeMax:5
+      },
       {
         label: "sharpness (-100 to 100)",
         command: "sharpness",
@@ -70,6 +77,14 @@
         type: "int",
         value: "",
         rangeMin:0,
+        rangeMax:100
+      },
+      {
+        label: "Saturation (-100 to 100)",
+        command: "sa",
+        type: "int",
+        value: "",
+        rangeMin:-100,
         rangeMax:100
       },
       {
@@ -163,6 +178,14 @@
           "backlit",
           "matrix"
         ]
+      },
+      {
+        label: "Shutter (μs) (0 to 10000)",
+        command: "ss",
+        type: "int",
+        value: "",
+        rangeMin:0,
+        rangeMax:10000
       },
       {
         label: "DRC",

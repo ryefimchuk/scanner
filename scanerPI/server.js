@@ -15,9 +15,13 @@ var configFile = '/home/pi/camera.json';
 var child_process = null;
 var allowPhoto = true;
 
+var SERVER_API = 'http://192.168.1.99';
+
 var PROCESS_RUNNING_FLAG = false;
 
 var dirName = __dirname || "/home/pi";
+var isBusy = true;
+
 
 // Exit strategy to kill child process
 // (eg. for timelapse) on parent process exit
@@ -27,12 +31,12 @@ process.on('exit', function () {
   }
 });
 
-
 var config = {
   numb: ""
 };
 
 var files = [];
+var skipFrame = 0;
 
 function loadConfig() {
   fs.readFile(configFile, function read(err, data) {
@@ -88,23 +92,22 @@ function init(){
   }, 3000);
 }
 
+
+
 function start() {
-  var opts = {
-    log: function (data) {
-      //console.log(data);
-    },
+  var defaultOptions = {
     mode: "photo",
     output: dirName + "/photo%d.jpg",
-    width: 3280,
-    height: 2464
+    width: 160,
+    height: 90
   };
 
-  var camera = new RaspiCam(opts);
+  var camera = new RaspiCam(defaultOptions);
 
   var rpiIp = ip.address() // my ip address
 
   var command = null;
-  var socket = s('http://192.168.1.99');
+  var socket = s(SERVER_API);
 
   socket.on('connect', function (c) {
     console.log("connected to server");
@@ -117,6 +120,15 @@ function start() {
 
     takePhoto('thumb');
   });
+
+  function updateBusyState(state) {
+    socket.emit("busy-state", {
+      ip: rpiIp,
+      numb: config.numb,
+      state: state
+    });
+  }
+
 
   function shellFeedback(result) {
     if (config.numb == 1) {
@@ -187,22 +199,15 @@ function start() {
   });
 
   socket.on('setup command', function (data) {
+    console.log("setup config");
+
     try {
       command = JSON.parse(data);
-
-      if (command) {
-        for (var op in command) {
-          camera.set(op, command[op]);
-        }
-      }
     }
 
     catch (ex) {
       console.log("Setup command error: " + ex.message);
     }
-
-    console.log("setup config")
-    console.log(camera.opts);
   });
 
   socket.on('disconnect', function (e) {
@@ -252,31 +257,51 @@ function start() {
 	  console.log("uploadFiles")
 	  
     try {
-		
-      for (var i = 0; i < Math.min(files.length, 2); i++) {
+      var promises = [];
+
+      for (var i = skipFrame; i < Math.min(files.length, skipFrame + 2); i++) {
         var f = files[i];
 
         var stream = ss.createStream();
         ss(socket).emit(f.type, stream, {
           ip: rpiIp,
           numb: config.numb,
-          index: i
+          index: i - skipFrame
         });
+        var pr = fs.createReadStream(dirName + "/" + f.filename).pipe(stream);
+        promises.push(pr);
+      }
 
-		//console.log("createReadStream: " + dirName + "/" + f.filename)
-		
-//        setTimeout(function () {
-          fs.createReadStream(dirName + "/" + f.filename).pipe(stream);
-//        }, 300);
-		
-		setTimeout(function(){
-			allowPhoto = true;
-		}, 10 * 1000)
+      function removeFromProm(pr){
+        var ind = promises.indexOf(pr)
+        if(ind != -1){
+          promises.splice(ind, 1)
+        }
+
+        if(promises.length == 0){
+          updateBusyState(false);
+        }
+      }
+
+      if(promises.length > 0){
+        for(var i = 0; i < promises.length; i++){
+          var pr = promises[i];
+          pr.on("end", function(res){
+            removeFromProm(this);
+          });
+          pr.on("error", function(res){
+            removeFromProm(this);
+          });
+        }
+      }
+      else {
+        updateBusyState(false);
       }
 
       files = [];
     }
     catch (e) {
+      updateBusyState(false);
       console.log("Error: Upload files to server: " + e.message);
     }
   }
@@ -284,32 +309,42 @@ function start() {
   //listen for the "stop" event triggered when the stop method was called
   camera.on("stop", function () {
     console.log("camera stop");
+//    uploadFiles();
   });
 
   //listen for the process to exit when the timeout has been reached
   camera.on("exit", function () {
     console.log("camera exit");
-	setTimeout(function(){
-		uploadFiles();	
-	}, 300);    
+    setTimeout(function () {
+      uploadFiles();
+    }, 500);
   });
+
+
+  function resetCameraParams() {
+    skipFrame = 0;
+    camera.opts = {
+      log: function(ms){
+        console.log(ms);
+      }
+    };
+  }
 
   function takePhoto(config) { // "thumb", "preview", "photo"
 
     try {
       console.log("takePhoto:" + config)
 
-      camera.opts = {
-        log: function(ms){
-          console.log(ms);
-        }
-      };
+      resetCameraParams();
+
+      updateBusyState(true);
+
       camera.set('mode', 'photo');
 
       switch (config) {
         case "thumb": {
           camera.set('nopreview', true);
-          camera.set('timeout', 300);
+          camera.set('timeout', 500);
           camera.set('width', 160);
           camera.set('height', 90);
           camera.set('output', dirName + "/file-thumb.jpg");
@@ -320,7 +355,7 @@ function start() {
         }
         case "preview": {
           camera.set('nopreview', true);
-          camera.set('timeout', 300);
+          camera.set('timeout', 500);
           camera.set('width', 3280);
           camera.set('height', 2464);
           camera.set('output', dirName + "/file-preview.jpg");
@@ -331,9 +366,17 @@ function start() {
         }
         case "photo": {
           if (command) {
+
+            console.log("command:", command);
+
             if (command) {
               for (var op in command) {
-                camera.set(op, command[op]);
+                if(op == "skip"){
+                  skipFrame = command[op] || 0;
+                }else{
+                  camera.set(op, command[op]);
+                }
+
               }
             }
 

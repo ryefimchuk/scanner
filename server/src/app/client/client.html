@@ -9,7 +9,7 @@
         <lable>Last Name</lable>
         <input ng-model="vm.lastName" autocomplete="off" />
         <br>
-        <button ng-click="vm.saveSessionSettings()">Save</button>
+        <button ng-if="!vm.data.isBusy" ng-click="vm.saveSessionSettings()">Save</button>
       </div>
   </div>
   <div class="commands" ng-show="vm.data.session">
@@ -25,7 +25,7 @@
         <lable>Last Name</lable>
         <span>{{vm.lastName}}</span>
         <br>
-        <button ng-click="vm.closeSession()">Close</button>
+        <button ng-if="!vm.data.isBusy" ng-click="vm.closeSession()">Close</button>
       </div>
   </div>
 </div>

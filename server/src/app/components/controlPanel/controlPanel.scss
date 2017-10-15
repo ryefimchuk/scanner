@@ -1,12 +1,13 @@
 .control-panel {
   position: fixed;
-/*  height: 100%;*/
   right: 0px;
   width: 400px;
   background: #fafafa;
   top: 40px;
   bottom: 0px;
   padding: 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .option {
     margin-top: 8px;

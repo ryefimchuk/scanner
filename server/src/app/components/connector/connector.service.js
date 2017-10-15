@@ -20,7 +20,8 @@
       notConfigured:[],
       grid:[],
       preview: null,
-      session: null
+      session: null,
+      isBusy: false
     };
 
     function getScannerBy(ip){
@@ -68,7 +69,7 @@
 
     exSocket.on('load data', function (data) {
       serviceData.allScanners = data.scanners;
-
+      serviceData.isBusy = data.isBusy;
 
       $log.log("received full scanners data");
       //alert("new data")
@@ -108,7 +109,7 @@
 
     function updateData(){
 
-      $log.log(serviceData.allScanners);
+      $log.log(serviceData);
 
       var _configured = serviceData.configured;
       var _notConfigured = serviceData.notConfigured;

@@ -1,4 +1,5 @@
 <div class="scanner" ng-click="vm.openPreview(vm.item)" ng-style="{'background-image': 'url({{vm.item.thumb ? vm.item.thumb : vm.defaultImage}})' }">
+  <div ng-if="vm.item.isBusy" class="busy">*</div>
   <div class="ip">{{vm.item.ip}}</div>
   &nbsp;
   <div class="numb">{{vm.item.numb}}</div>

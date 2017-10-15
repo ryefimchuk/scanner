@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = /*process.env.PORT || */8080;
+var port = /*process.env.PORT || */80;
 var fs = require('fs');
 var ss = require('socket.io-stream');
 var mkdirp = require('mkdirp');
@@ -141,7 +141,6 @@ io.on('connection', function (socket) {
     }
   });
 
-
   function getScannerByIp(ip) {
     var revScanners = scanners.reverse();
     return _.find(revScanners, function (scan) {
@@ -155,6 +154,15 @@ io.on('connection', function (socket) {
       scanner.scanner.numb = data.numb;
       scanner.emit('set number', data.numb);
     }
+  });
+
+  socket.on('busy-state', function (data) {
+    var scanner = getScannerByIp(data.ip);
+    if (scanner) {
+      scanner.scanner.isBusy = data.state;
+    }
+
+    reloadData();
   });
 
   socket.on('preview ip', function (data) {
@@ -211,24 +219,18 @@ io.on('connection', function (socket) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('soft trigger', cmd);
     }
-    //reloadData();
   });
 
   socket.on('setup command', function (cmd) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('setup command', cmd);
     }
-    //reloadData();
   });
 
   socket.on('start command', function (cmd) {
     if (mainTrigger) {
       mainTrigger.emit('start command', cmd);
     }
-
-/*    for (var i = 0; i < projectors.length; i++) {
-      projectors[i].emit('projector');
-    }*/
   });
 
   socket.on('update-file', function (cmd) {
@@ -266,7 +268,12 @@ function updateScanner(scanner) {
 
 function reloadData(controller) {
 
+  var isBusy = scanners.some(function(item){
+    return item.scanner.isBusy;
+  });
+
   var data = {
+    isBusy: isBusy,
     scanners: _.map(scanners, function (scanner) {
       return {
         id: scanner.id,
