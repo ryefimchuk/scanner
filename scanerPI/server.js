@@ -316,6 +316,7 @@ function start() {
   camera.on("exit", function () {
     console.log("camera exit");
     setTimeout(function () {
+	allowPhoto = true;
       uploadFiles();
     }, 500);
   });

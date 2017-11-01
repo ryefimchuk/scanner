@@ -44,12 +44,12 @@ setTimeout(function(){
 		
 		setTimeout(function(){
 			gpio.write(PHOTO_OUT, false);
-		}, 50);
+		}, 200);
 
     //// LIGHT
     setTimeout(function(){
 		console.log("start light");
-      gpio.write(LIGHT_OUT, false);
+      gpio.write(LIGHT_OUT, true);
 
       setTimeout(function(){
 		console.log("finish light");
@@ -60,7 +60,7 @@ setTimeout(function(){
     //// PROJ
     setTimeout(function(){
 		console.log("start proj");
-      gpio.write(PROJ_OUT, false);
+      gpio.write(PROJ_OUT, true);
 
       setTimeout(function(){
 		console.log("finish proj");
