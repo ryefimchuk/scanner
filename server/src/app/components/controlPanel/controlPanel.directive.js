@@ -83,7 +83,10 @@
       }
 
       vm.setupConfig = function(){
-          exSocket.emit("setup command", JSON.stringify(vm.resultCommand));
+          exSocket.emit("setup command",
+            JSON.stringify(vm.resultCommand),
+            JSON.stringify(vm.light),
+          );
       }
 
       vm.updateFile = function() {
@@ -99,11 +102,11 @@
       }
 
       vm.softExecute = function(){
-          exSocket.emit("soft trigger", JSON.stringify(vm.light));
+          exSocket.emit("soft trigger");
       }
 
       vm.execute = function(){
-          exSocket.emit("start command", JSON.stringify(vm.light));
+          exSocket.emit("start command");
       }
 
       vm.change();

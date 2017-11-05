@@ -12,6 +12,8 @@ var API = '/api';
 
 var srcFolder = "c:\\example\\";
 var destFolder = "c:\\example\\";
+var lightSettings = null;
+
 
 //app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(API, express.static('server'));
@@ -215,21 +217,25 @@ io.on('connection', function (socket) {
     }
   }
 
-  socket.on('soft trigger', function (cmd) {
-    for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('soft trigger', cmd);
+  socket.on('soft trigger', function () {
+    if(lightSettings){
+      for (var i = 0; i < scanners.length; i++) {
+        scanners[i].emit('soft trigger', lightSettings);
+	  }
     }
   });
 
-  socket.on('setup command', function (cmd) {
+  socket.on('setup command', function (cmd, light) {
+    lightSettings = light;
+
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('setup command', cmd);
     }
   });
 
-  socket.on('start command', function (cmd) {
-    if (mainTrigger) {
-      mainTrigger.emit('start command', cmd);
+  socket.on('start command', function () {
+    if (mainTrigger && lightSettings) {
+      mainTrigger.emit('start command', lightSettings);
     }
   });
 
