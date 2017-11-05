@@ -15,6 +15,10 @@ var destFolder = "c:\\example\\";
 var lightSettings = null;
 
 
+//var destinationFolder = __dirname + "/server/photos/";
+var destinationFolder = "c:/photos/";
+
+
 //app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(API, express.static('server'));
 /*app.use(express.static('preview'));
@@ -91,7 +95,7 @@ io.on('connection', function (socket) {
     if(session){
       var id = session.id || "not_configured_session";
 
-      var newDir = __dirname + "/server/photos/" + id + "/";
+      var newDir = destinationFolder + id + "/";
       mkdirp(newDir, function(){
         var dir = newDir + ((data.index == 0) ? "normal/" : "projection/");
 
@@ -100,7 +104,7 @@ io.on('connection', function (socket) {
         })
       });
     } else {
-      stream.pipe(fs.createWriteStream(__dirname + "/server/photos/" + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
+      stream.pipe(fs.createWriteStream(destinationFolder + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
     }
   });
 
@@ -197,7 +201,7 @@ io.on('connection', function (socket) {
     if(data) {
       var newConfig = getConfigJSON(data);
 
-      var newDir = __dirname + "/server/photos/" + data.id + "/";
+      var newDir = destinationFolder + data.id + "/";
       mkdirp(newDir, function() {
         fs.writeFile(newDir + "example.json", newConfig, function (err) {
           if (err) {
@@ -225,16 +229,19 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('setup command', function (cmd, light) {
-    lightSettings = light;
+  socket.on('setup command', function (cmd) {
+    lightSettings = cmd.light;
 
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('setup command', cmd);
+      scanners[i].emit('setup command', cmd.command);
     }
   });
 
   socket.on('start command', function () {
     if (mainTrigger && lightSettings) {
+
+	//console.log(lightSettings)
+
       mainTrigger.emit('start command', lightSettings);
     }
   });

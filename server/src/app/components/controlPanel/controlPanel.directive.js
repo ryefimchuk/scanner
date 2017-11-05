@@ -83,10 +83,10 @@
       }
 
       vm.setupConfig = function(){
-          exSocket.emit("setup command",
-            JSON.stringify(vm.resultCommand),
-            JSON.stringify(vm.light)
-          );
+        exSocket.emit("setup command", {
+          command: JSON.stringify(vm.resultCommand),
+          light: JSON.stringify(vm.light)
+        });
       }
 
       vm.updateFile = function() {
