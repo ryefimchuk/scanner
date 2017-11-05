@@ -85,7 +85,7 @@
       vm.setupConfig = function(){
           exSocket.emit("setup command",
             JSON.stringify(vm.resultCommand),
-            JSON.stringify(vm.light),
+            JSON.stringify(vm.light)
           );
       }
 
