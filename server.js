@@ -12,18 +12,17 @@ var API = '/api';
 
 var srcFolder = "c:\\example\\";
 var destFolder = "c:\\example\\";
-var lightSettings = null;
 
-
-//var destinationFolder = __dirname + "/server/photos/";
 var destinationFolder = "c:/photos/";
 
-
-//app.use('/static', express.static(path.join(__dirname, 'public')))
+//app.use('/firmware', express.static('scanerPI'));
 app.use(API, express.static('server'));
-/*app.use(express.static('preview'));
- app.use(express.static('photos'));*/
 
+
+var lightSettings = null;
+var photoSettings = null;
+var presets = [];
+var selectedPreset = '';
 
 var session = null;
 var scanners = [];
@@ -31,13 +30,46 @@ var controllers = [];
 //var projectors = [];
 var mainTrigger = null;
 
+
+var configFile = 'settings.json';
+
+function loadConfig() {
+  fs.readFile(configFile, function read(err, data) {
+    if (err) {return;}
+
+    try {
+      var config = JSON.parse(data);
+      lightSettings = config.lightSettings || null;
+      photoSettings = config.photoSettings || null;
+      presets = config.presets || [];
+      selectedPreset = config.selectedPreset || '';
+    }
+    catch (ex) {
+      // console.log('Error settings.json');
+    }
+  });
+}
+
+function saveConfig() {
+  var data = JSON.stringify({
+    photoSettings: photoSettings,
+    lightSettings: lightSettings,
+    presets: presets,
+    selectedPreset: selectedPreset
+  });
+
+  fs.writeFile(configFile, data, function (err) {
+    if (err) {
+      //return console.log(err);
+      return;
+    }
+  });
+}
+
+loadConfig();
+
 io.on('connection', function (socket) {
-
-  // add clients
-
   socket.on('disconnect', function () {
-
-
     var pos = scanners.indexOf(socket);
     if (pos != -1) {
       scanners.splice(pos, 1);
@@ -54,41 +86,47 @@ io.on('connection', function (socket) {
     reloadData();
   });
 
-
-  /*socket.on('add projector', function (projector) {
-    //console.log("add projector");
-    socket.projector = projector;
-//    projectors.push(socket);
-    reloadData();
-  });*/
-
   socket.on('add scanner', function (scanner) {
     //console.log("add scanner");
     socket.scanner = scanner;
     scanners.push(socket);
+
+    if(photoSettings) {
+      socket.emit('setup command', JSON.stringify(photoSettings));
+    }
+
     reloadData();
   });
 
-  socket.on('update scanner', function (scanner) {
-    /*        socket.scanner = scanner;
-     scanners.push(socket);
-     reloadData();*/
-  });
-
   socket.on('add controller', function (controller) {
-
     socket.controller = controller;
     controllers.push(socket);
 
+    //if(photoSettings) {
+      socket.emit('current settings', {
+        photoSettings: photoSettings,
+        lightSettings: lightSettings,
+        presets: presets,
+        selectedPreset: selectedPreset
+      });
+    //}
+
     reloadData(socket);
+  });
+
+  socket.on('save preset', function (data) {
+    presets = data.presets;
+    selectedPreset = data.selectedPreset;
+    lightSettings = data.lightSettings;
+    photoSettings = data.photoSettings;
+    
+    saveConfig();
   });
 
   socket.on('add trigger', function (trigger) {
     socket.trigger = trigger;
     mainTrigger = socket;
     reloadData();
-
-    //io.emit('chat message', msg);
   });
 
   ss(socket).on('file', function (stream, data) {
@@ -109,9 +147,6 @@ io.on('connection', function (socket) {
   });
 
   ss(socket).on('file-preview', function (stream, data) {
-
-    //console.log("~~~~file-preview");
-
     var previewFileName = "/preview/preview_" + data.ip + ".jpg";
     stream.pipe(fs.createWriteStream(__dirname + "/server" + previewFileName));
 
@@ -225,23 +260,25 @@ io.on('connection', function (socket) {
     if(lightSettings){
       for (var i = 0; i < scanners.length; i++) {
         scanners[i].emit('soft trigger', lightSettings);
-	  }
+	    }
     }
   });
 
-  socket.on('setup command', function (cmd) {
+  socket.on('setup settings', function (cmd) {
+
     lightSettings = cmd.light;
+    photoSettings = cmd.photo;
+    selectedPreset =  cmd.selectedPreset;
+
+    saveConfig();
 
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('setup command', cmd.command);
+      scanners[i].emit('setup command', JSON.stringify(cmd.photo));
     }
   });
 
   socket.on('start command', function () {
     if (mainTrigger && lightSettings) {
-
-	//console.log(lightSettings)
-
       mainTrigger.emit('start command', lightSettings);
     }
   });
@@ -293,12 +330,6 @@ function reloadData(controller) {
         data: scanner.scanner
       }
     }),
-/*    projectors: _.map(projectors, function (scanner) {
-      return {
-        id: scanner.id,
-        data: scanner.scanner
-      }
-    }),*/
     trigger: mainTrigger ? {
       id: mainTrigger.id,
       data: mainTrigger.trigger

@@ -13,8 +13,23 @@
   </div>
   <div ng-show="vm.panel == 'scanning'">
     <br>
+    <label>Presets:</label>
+    <div>
+      <div class="title">Select preset</div>
+      <select ng-change="vm.changePreset()" type="text" ng-model="vm.data.selectedPreset">
+        <option ></option>
+        <option ng-repeat="item in vm.data.presets">{{item.name}}</option>
+      </select>
+    </div>
+    <br>
+    <div>
+      <div class="title">New preset</div>
+      <input type="text" ng-model="vm.newPreset" >
+      <input type="button" ng-click="vm.saveNewPreset()" value="Save" >
+    </div>
+    <br>
     <label>Photo:</label>
-    <div class="option" ng-repeat="option in vm.options">
+    <div class="option" ng-repeat="option in vm.data.options">
       <div ng-if="option.type == 'int'">
         <div class="title">{{option.label}}</div>
         <input ng-change="vm.change()" type="number" ng-model="option.value" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
@@ -36,11 +51,11 @@
     <div>
       <div>
         <div class="title">Start (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.light.lightStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.lightStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
       </div>
       <div>
         <div class="title">Finish (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.light.lightFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.lightFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
       </div>
     </div>
     <br>
@@ -48,18 +63,17 @@
     <div>
       <div>
         <div class="title">Start (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.light.projectorStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.projectorStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
       </div>
       <div>
         <div class="title">Finish (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.light.projectorFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.projectorFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
       </div>
     </div>
     <div class="commands">
       <form>
         <div class="group">
           <div>Output command</div>
-          <textarea ng-model="vm.resultCommand" class="result" readonly></textarea>
           <button ng-click="vm.setupConfig()" id="setup">Setup config</button>
           <button ng-click="vm.execute()" id="execute">Execute</button>
           <button ng-click="vm.softExecute()" id="execute">Execute (soft)</button>

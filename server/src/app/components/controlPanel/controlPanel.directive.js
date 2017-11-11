@@ -24,42 +24,61 @@
     /** @ngInject */
     function ControlPanelController(moment, optionsConfig, exSocket, connector) {
       var vm = this;
-      vm.options = optionsConfig.getOptions();
-
-      vm.light = {
-        lightStart:0,
-        lightFinish:500,
-        projectorStart:500,
-        projectorFinish:500
-      };
-
-      var _photo = null;
-      var _light = null;
-
-      try
-      {
-        _photo = JSON.parse(window.localStorage.photo);
-        _light = JSON.parse(window.localStorage.light);
-
-        vm.light = _light;
-
-        for(var i = 0; i < vm.options.length; i++){
-          var cmd = vm.options[i].command;
-          vm.options[i].value = _photo[cmd];
-        }
-      }
-      catch(e){}
+      vm.data = optionsConfig.getOptions();
 
       vm.updateFileUrl = '';
       vm.updateFileDest = '/home/pi/server.js';
 
       vm.shellFeedback = connector.getScanners().shellFeedback;
 
-      vm.change = function(){
-        vm.resultCommand = {};
+      vm.newPreset = '';
 
-        for(var i = 0; i < vm.options.length; i++){
-          var opt = vm.options[i];
+      vm.changePreset = function(){
+
+        var preset = vm.data.presets.find(function(item){
+          return item.name === vm.data.selectedPreset;
+        });
+
+        if(preset){
+          vm.data.photoSettings = preset.photoSettings;
+          vm.data.lightSettings = preset.lightSettings;
+
+          for(var i = 0; i < vm.data.options.length; i++){
+            var cmd = vm.data.options[i].command;
+            vm.data.options[i].value = vm.data.photoSettings[cmd];
+          }
+        }
+      }
+
+      vm.saveNewPreset = function(){
+
+        debugger;
+        vm.data.presets.push({
+          name: vm.newPreset,
+          lightSettings: vm.data.lightSettings,
+          photoSettings: vm.data.photoSettings,
+        });
+
+        vm.data.selectedPreset = vm.newPreset;
+
+        exSocket.emit("save preset", {
+          lightSettings: vm.data.lightSettings,
+          photoSettings: vm.data.photoSettings,
+          presets: vm.data.presets,
+          selectedPreset: vm.data.selectedPreset
+        });
+
+        vm.newPreset = '';
+      }
+
+      vm.change = function(){
+
+        vm.data.selectedPreset = '';
+
+        var resultCommand = {};
+
+        for(var i = 0; i < vm.data.options.length; i++){
+          var opt = vm.data.options[i];
 
           if(!opt.value || opt.value == ""){
             continue;
@@ -69,23 +88,23 @@
             case "string":
             case "list":
               {
-                vm.resultCommand[opt.command] = opt.value;
+                resultCommand[opt.command] = opt.value;
                 break;
               };
           }
         }
 
-        vm.resultCommand['thumb'] = 'none'
-        vm.resultCommand['nopreview'] = true;
+        resultCommand['thumb'] = 'none'
+        resultCommand['nopreview'] = true;
 
-        window.localStorage.light = JSON.stringify(vm.light);
-        window.localStorage.photo = JSON.stringify(vm.resultCommand);
+        vm.data.photoSettings = resultCommand;
       }
 
       vm.setupConfig = function(){
-        exSocket.emit("setup command", {
-          command: JSON.stringify(vm.resultCommand),
-          light: JSON.stringify(vm.light)
+        exSocket.emit("setup settings", {
+          selectedPreset: vm.data.selectedPreset,
+          photo: vm.data.photoSettings,
+          light: vm.data.lightSettings
         });
       }
 
