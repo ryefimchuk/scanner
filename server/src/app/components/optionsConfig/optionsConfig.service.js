@@ -82,7 +82,7 @@
         },
         {
           label: "Saturation (-100 to 100)",
-          command: "sa",
+          command: "saturation",
           type: "int",
           value: "",
           rangeMin: -100,
