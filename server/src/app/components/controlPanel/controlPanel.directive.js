@@ -52,7 +52,7 @@
 
       vm.saveNewPreset = function(){
 
-        debugger;
+        //debugger;
         vm.data.presets.push({
           name: vm.newPreset,
           lightSettings: vm.data.lightSettings,

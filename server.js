@@ -279,7 +279,7 @@ io.on('connection', function (socket) {
 
   socket.on('start command', function () {
     if (mainTrigger && lightSettings) {
-      mainTrigger.emit('start command', lightSettings);
+      mainTrigger.emit('start command', JSON.stringify(lightSettings));
     }
   });
 
