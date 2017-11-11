@@ -52,7 +52,11 @@
 
       vm.saveNewPreset = function(){
 
-        //debugger;
+        if(vm.newPreset == ''){
+          alert('Enter preset name');
+          return;
+        }
+
         vm.data.presets.push({
           name: vm.newPreset,
           lightSettings: vm.data.lightSettings,
