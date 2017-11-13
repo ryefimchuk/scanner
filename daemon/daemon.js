@@ -2,17 +2,23 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 
 
-var initJSONLocation = "c:\\example.json"
-var doneJSONLocation = "c:\\example.json.done"
+var initJSONLocation = "c:\\monitor\\example.json"
+var doneJSONLocation = "c:\\monitor\\example.json.done"
 
 
 var inputJSONName = "example.json"
-var inputFolder = "D:\\projects\\scanner3D\\server\\photos\\"
+var inputFolder = "c:\\example\\"
 
 var searching = false;
 
 function searchNewData(){
   fs.readdir(inputFolder, function(err, items){
+
+
+    if(err){
+    	console.log("Error daemon", err)
+		return;
+    }
 
     console.log("try to search new JSON")
     for(var i = 0; i < items.length; i++){
