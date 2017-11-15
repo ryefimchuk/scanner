@@ -33,6 +33,66 @@
 
       vm.newPreset = '';
 
+      vm.deletePreset = function(oldName) {
+        if (!oldName) return;
+
+
+        var item = vm.data.presets.find(function (item) {
+          return item.name === oldName;
+        });
+
+        var pos = vm.data.presets.indexOf(item);
+        vm.data.presets.splice(pos, 1);
+
+        if(vm.data.presets.length){
+          vm.data.selectedPreset = vm.data.presets[0].name;
+        } else {
+          vm.data.selectedPreset = '';
+        }
+
+        exSocket.emit("save preset", {
+          lightSettings: vm.data.lightSettings,
+          photoSettings: vm.data.photoSettings,
+          presets: vm.data.presets,
+          selectedPreset: vm.data.selectedPreset
+        });
+
+      };
+
+      vm.renamePreset = function(oldName){
+        if(!oldName) return;
+
+        var newName = prompt("Please rename preset", oldName);
+
+        if(newName){
+          var item = vm.data.presets.find(function(item){
+            return item.name === oldName;
+          });
+
+          var duplicate = vm.data.presets.find(function(item){
+            return item.name == newName;
+          });
+
+          if(duplicate){
+            alert('Enter new name');
+            return;
+          }
+
+
+          if(item){
+            item.name = newName;
+            vm.data.selectedPreset = newName;
+
+            exSocket.emit("save preset", {
+              lightSettings: vm.data.lightSettings,
+              photoSettings: vm.data.photoSettings,
+              presets: vm.data.presets,
+              selectedPreset: vm.data.selectedPreset
+            });
+          }
+        }
+      }
+
       vm.changePreset = function(){
 
         var preset = vm.data.presets.find(function(item){
@@ -57,7 +117,17 @@
           return;
         }
 
+        var duplicate = vm.data.presets.find(function(item){
+          return item.name == vm.newPreset;
+        });
+
+        if(duplicate){
+          alert('Enter new name');
+          return;
+        }
+
         vm.data.presets.push({
+          id: (new Date()).getTime(),
           name: vm.newPreset,
           lightSettings: vm.data.lightSettings,
           photoSettings: vm.data.photoSettings,

@@ -18,8 +18,11 @@
       <div class="title">Select preset</div>
       <select ng-change="vm.changePreset()" type="text" ng-model="vm.data.selectedPreset">
         <option ></option>
-        <option ng-repeat="item in vm.data.presets">{{item.name}}</option>
+        <option ng-repeat="item in vm.data.presets track by item.id">{{item.name}}</option>
       </select>
+      <input type="button" ng-click="vm.renamePreset(vm.data.selectedPreset)" value="Rename" >
+      <input type="button" ng-click="vm.deletePreset(vm.data.selectedPreset)" value="Delete" >
+
     </div>
     <br>
     <div>

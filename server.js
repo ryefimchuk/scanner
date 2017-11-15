@@ -3,23 +3,28 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = /*process.env.PORT || */80;
+var port = /*process.env.PORT || */ 80;
 var fs = require('fs');
 var ss = require('socket.io-stream');
 var mkdirp = require('mkdirp');
 
 var API = '/api';
 
-var srcFolder = "c:\\example\\";
-var destFolder = "c:\\example\\";
+var srcFolder = 'c:\\example\\';
+var destFolder = 'c:\\example\\';
 
-var destinationFolder = "c:/photos/";
+var destinationFolder = 'c:/photos/';
 
 //app.use('/firmware', express.static('scanerPI'));
 app.use(API, express.static('server'));
 
+var lightSettings = {
+  lightStart: 0,
+  lightFinish: 500,
+  projectorStart: 500,
+  projectorFinish: 500,
+};
 
-var lightSettings = null;
 var photoSettings = null;
 var presets = [];
 var selectedPreset = '';
@@ -30,21 +35,21 @@ var controllers = [];
 //var projectors = [];
 var mainTrigger = null;
 
-
 var configFile = 'settings.json';
 
 function loadConfig() {
   fs.readFile(configFile, function read(err, data) {
-    if (err) {return;}
+    if (err) {
+      return;
+    }
 
     try {
       var config = JSON.parse(data);
-      lightSettings = config.lightSettings || null;
+      lightSettings = config.lightSettings || lightSettings;
       photoSettings = config.photoSettings || null;
       presets = config.presets || [];
       selectedPreset = config.selectedPreset || '';
-    }
-    catch (ex) {
+    } catch (ex) {
       // console.log('Error settings.json');
     }
   });
@@ -55,10 +60,10 @@ function saveConfig() {
     photoSettings: photoSettings,
     lightSettings: lightSettings,
     presets: presets,
-    selectedPreset: selectedPreset
+    selectedPreset: selectedPreset,
   });
 
-  fs.writeFile(configFile, data, function (err) {
+  fs.writeFile(configFile, data, function(err) {
     if (err) {
       //return console.log(err);
       return;
@@ -68,8 +73,8 @@ function saveConfig() {
 
 loadConfig();
 
-io.on('connection', function (socket) {
-  socket.on('disconnect', function () {
+io.on('connection', function(socket) {
+  socket.on('disconnect', function() {
     var pos = scanners.indexOf(socket);
     if (pos != -1) {
       scanners.splice(pos, 1);
@@ -86,97 +91,136 @@ io.on('connection', function (socket) {
     reloadData();
   });
 
-  socket.on('add scanner', function (scanner) {
+  socket.on('add scanner', function(scanner) {
     //console.log("add scanner");
     socket.scanner = scanner;
     scanners.push(socket);
 
-    if(photoSettings) {
+    if (photoSettings) {
       socket.emit('setup command', JSON.stringify(photoSettings));
     }
 
     reloadData();
   });
 
-  socket.on('add controller', function (controller) {
+  socket.on('add controller', function(controller) {
     socket.controller = controller;
     controllers.push(socket);
 
-    //if(photoSettings) {
-      socket.emit('current settings', {
-        photoSettings: photoSettings,
-        lightSettings: lightSettings,
-        presets: presets,
-        selectedPreset: selectedPreset
-      });
-    //}
+    socket.emit('current settings', {
+      photoSettings: photoSettings,
+      lightSettings: lightSettings,
+      presets: presets,
+      selectedPreset: selectedPreset,
+    });
 
-    reloadData(socket);
+    reloadData();
   });
 
-  socket.on('save preset', function (data) {
+  socket.on('apply settings', function(presetName) {
+    var preset = presets.find(function(item) {
+      return item.name == presetName;
+    });
+
+    if (!preset) {
+      return;
+    }
+
+    lightSettings = preset.lightSettings;
+    photoSettings = preset.photoSettings;
+    selectedPreset = presetName;
+
+    saveConfig();
+
+    socket.emit('current settings', {
+      photoSettings: photoSettings,
+      lightSettings: lightSettings,
+      presets: presets,
+      selectedPreset: selectedPreset,
+    });
+
+    for (var i = 0; i < scanners.length; i++) {
+      scanners[i].emit('setup command', JSON.stringify(cmd.photo));
+    }
+  });
+
+  socket.on('save preset', function(data) {
     presets = data.presets;
     selectedPreset = data.selectedPreset;
     lightSettings = data.lightSettings;
     photoSettings = data.photoSettings;
-    
+
     saveConfig();
   });
 
-  socket.on('add trigger', function (trigger) {
+  socket.on('add trigger', function(trigger) {
     socket.trigger = trigger;
     mainTrigger = socket;
     reloadData();
   });
 
-  ss(socket).on('file', function (stream, data) {
-    if(session){
-      var id = session.id || "not_configured_session";
+  ss(socket).on('file', function(stream, data) {
+    if (session) {
+      var id = session.id || 'not_configured_session';
 
-      var newDir = destinationFolder + id + "/";
-      mkdirp(newDir, function(){
-        var dir = newDir + ((data.index == 0) ? "normal/" : "projection/");
+      var newDir = destinationFolder + id + '/';
+      mkdirp(newDir, function() {
+        var dir = newDir + (data.index == 0 ? 'normal/' : 'projection/');
 
         mkdirp(dir, function() {
-          stream.pipe(fs.createWriteStream(dir + (data.numb ? data.numb : data.ip) + ".jpg"));
-        })
+          stream.pipe(
+            fs.createWriteStream(
+              dir + (data.numb ? data.numb : data.ip) + '.jpg'
+            )
+          );
+        });
       });
     } else {
-      stream.pipe(fs.createWriteStream(destinationFolder + (data.numb ? data.numb : data.ip) + "_" + data.index + ".jpg"));
+      stream.pipe(
+        fs.createWriteStream(
+          destinationFolder +
+            (data.numb ? data.numb : data.ip) +
+            '_' +
+            data.index +
+            '.jpg'
+        )
+      );
     }
   });
 
-  ss(socket).on('file-preview', function (stream, data) {
-    var previewFileName = "/preview/preview_" + data.ip + ".jpg";
-    stream.pipe(fs.createWriteStream(__dirname + "/server" + previewFileName));
+  ss(socket).on('file-preview', function(stream, data) {
+    var previewFileName = '/preview/preview_' + data.ip + '.jpg';
+    stream.pipe(fs.createWriteStream(__dirname + '/server' + previewFileName));
 
-    stream.on('finish', function () {
+    stream.on('finish', function() {
       for (var i = 0; i < controllers.length; i++) {
-        controllers[i].emit("file-preview", {
+        controllers[i].emit('file-preview', {
           ip: data.ip,
           numb: data.numb,
-          preview: API + previewFileName + "?" + Math.round(Math.random() * 10000000)
+          preview:
+            API + previewFileName + '?' + Math.round(Math.random() * 10000000),
         });
       }
     });
   });
 
-  ss(socket).on('file-thumb', function (stream, data) {
+  ss(socket).on('file-thumb', function(stream, data) {
     //console.log("~~~~file-thumb:" + data.ip);
 
     var ip = data.ip;
 
     var scanner = getScannerByIp(ip);
     if (scanner) {
-      var thumbFileName = "/preview/thumb_" + data.ip + ".jpg";
-      stream.pipe(fs.createWriteStream(__dirname + "/server" + thumbFileName));
-      scanner.scanner.thumb = API + thumbFileName + "?" + Math.round(Math.random() * 10000000);
+      var thumbFileName = '/preview/thumb_' + data.ip + '.jpg';
+      stream.pipe(fs.createWriteStream(__dirname + '/server' + thumbFileName));
+      scanner.scanner.thumb =
+        API + thumbFileName + '?' + Math.round(Math.random() * 10000000);
 
-      stream.on('finish', function () {
+      stream.on('finish', function() {
         updateScanner({
           ip: data.ip,
           numb: scanner.scanner.numb,
-          thumb: scanner.scanner.thumb
+          thumb: scanner.scanner.thumb,
         });
       });
     }
@@ -184,12 +228,12 @@ io.on('connection', function (socket) {
 
   function getScannerByIp(ip) {
     var revScanners = scanners.reverse();
-    return _.find(revScanners, function (scan) {
+    return _.find(revScanners, function(scan) {
       return scan.scanner.ip == ip;
-    })
+    });
   }
 
-  socket.on('set number', function (data) {
+  socket.on('set number', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
       scanner.scanner.numb = data.numb;
@@ -197,7 +241,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('busy-state', function (data) {
+  socket.on('busy-state', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
       scanner.scanner.isBusy = data.state;
@@ -206,7 +250,7 @@ io.on('connection', function (socket) {
     reloadData();
   });
 
-  socket.on('preview ip', function (data) {
+  socket.on('preview ip', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
       scanner.emit('preview', data);
@@ -216,29 +260,28 @@ io.on('connection', function (socket) {
   });
 
   function getConfigJSON(data) {
-
     var cfg = {
-      "scanid"	: data.id,
-      "normaldir" 	: srcFolder + data.id + "\\normal\\",
-      "projectdir" 	: srcFolder + data.id + "\\projection\\",
-      "emptydir" 	: srcFolder + data.id + "\\normal\\",
-      "savedir" 	: destFolder,
-      "firstName" : data.firstName,
-      "lastName" : data.lastName
-    }
+      scanid: data.id,
+      normaldir: srcFolder + data.id + '\\normal\\',
+      projectdir: srcFolder + data.id + '\\projection\\',
+      emptydir: srcFolder + data.id + '\\normal\\',
+      savedir: destFolder,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    };
 
     return JSON.stringify(cfg);
   }
 
-  socket.on('set-session', function (data) {
+  socket.on('set-session', function(data) {
     session = data;
 
-    if(data) {
+    if (data) {
       var newConfig = getConfigJSON(data);
 
-      var newDir = destinationFolder + data.id + "/";
+      var newDir = destinationFolder + data.id + '/';
       mkdirp(newDir, function() {
-        fs.writeFile(newDir + "example.json", newConfig, function (err) {
+        fs.writeFile(newDir + 'example.json', newConfig, function(err) {
           if (err) {
             //return console.log(err);
             return;
@@ -250,25 +293,24 @@ io.on('connection', function (socket) {
     updateSession();
   });
 
-  function updateSession(){
+  function updateSession() {
     for (var i = 0; i < controllers.length; i++) {
-      controllers[i].emit("update-session", session);
+      controllers[i].emit('update-session', session);
     }
   }
 
-  socket.on('soft trigger', function () {
-    if(lightSettings){
+  socket.on('soft trigger', function() {
+    if (lightSettings) {
       for (var i = 0; i < scanners.length; i++) {
         scanners[i].emit('soft trigger', lightSettings);
-	    }
+      }
     }
   });
 
-  socket.on('setup settings', function (cmd) {
-
+  socket.on('setup settings', function(cmd) {
     lightSettings = cmd.light;
     photoSettings = cmd.photo;
-    selectedPreset =  cmd.selectedPreset;
+    selectedPreset = cmd.selectedPreset;
 
     saveConfig();
 
@@ -277,37 +319,36 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('start command', function () {
+  socket.on('start command', function() {
     if (mainTrigger && lightSettings) {
       mainTrigger.emit('start command', JSON.stringify(lightSettings));
     }
   });
 
-  socket.on('update-file', function (cmd) {
+  socket.on('update-file', function(cmd) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('update-file', cmd);
     }
     //reloadData();
   });
 
-  socket.on('shell', function (cmd) {
+  socket.on('shell', function(cmd) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('shell', cmd);
     }
     //reloadData();
   });
 
-  socket.on('shell-feedback', function (cmd) {
+  socket.on('shell-feedback', function(cmd) {
     //reloadData();
     for (var i = 0; i < controllers.length; i++) {
       controllers[i].emit('shell-feedback', cmd);
     }
   });
 
-  socket.on('get-data', function (cmd) {
+  socket.on('get-data', function(cmd) {
     reloadData();
   });
-
 });
 
 function updateScanner(scanner) {
@@ -316,41 +357,32 @@ function updateScanner(scanner) {
   }
 }
 
-function reloadData(controller) {
-
-  var isBusy = scanners.some(function(item){
+function reloadData() {
+  var isBusy = scanners.some(function(item) {
     return item.scanner.isBusy;
   });
 
   var data = {
     isBusy: isBusy,
-    scanners: _.map(scanners, function (scanner) {
+    scanners: _.map(scanners, function(scanner) {
       return {
         id: scanner.id,
-        data: scanner.scanner
-      }
+        data: scanner.scanner,
+      };
     }),
-    trigger: mainTrigger ? {
-      id: mainTrigger.id,
-      data: mainTrigger.trigger
-    } : null
+    trigger: mainTrigger
+      ? {
+          id: mainTrigger.id,
+          data: mainTrigger.trigger,
+        }
+      : null,
   };
 
-  if (controller) {
-    controller.emit('load data', data);
-  }
-  else {
-    for (var i = 0; i < controllers.length; i++) {
-      controllers[i].emit('load data', data);
-    }
+  for (var i = 0; i < controllers.length; i++) {
+    controllers[i].emit('load data', data);
   }
 }
 
-
-http.listen(port, function () {
+http.listen(port, function() {
   ///console.log("connected")
 });
-
-
-
-
