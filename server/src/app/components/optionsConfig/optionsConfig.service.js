@@ -181,12 +181,12 @@
           ]
         },
         {
-          label: "Shutter (μs) (0 to 10000)",
-          command: "ss",
+          label: "Shutter (μs) (0 to 10000000000)",
+          command: "shutter",
           type: "int",
           value: "",
           rangeMin: 0,
-          rangeMax: 10000
+          rangeMax: 10000000000
         },
         {
           label: "DRC",

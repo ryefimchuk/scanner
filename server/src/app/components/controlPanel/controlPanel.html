@@ -1,14 +1,13 @@
-<div class="control-panel" ng-init="vm.panel = 'scanning'">
+<div class="control-panel"
+  ng-init="vm.panel = 'scanning'">
   <div class="tabs">
     <div class="tab"
-         ng-class="{'selected':vm.panel == 'scanning'}"
-         ng-click="vm.panel = 'scanning'">
-      Scanning
+      ng-class="{'selected':vm.panel == 'scanning'}"
+      ng-click="vm.panel = 'scanning'">Scanning
     </div>
     <div class="tab"
-         ng-class="{'selected':vm.panel == 'shell'}"
-         ng-click="vm.panel = 'shell'">
-      Shell
+      ng-class="{'selected':vm.panel == 'shell'}"
+      ng-click="vm.panel = 'shell'">Shell
     </div>
   </div>
   <div ng-show="vm.panel == 'scanning'">
@@ -16,35 +15,53 @@
     <label>Presets:</label>
     <div>
       <div class="title">Select preset</div>
-      <select ng-change="vm.changePreset()" type="text" ng-model="vm.data.selectedPreset">
-        <option ></option>
-        <option ng-repeat="item in vm.data.presets track by item.id">{{item.name}}</option>
+      <select ng-change="vm.changePreset()"
+        type="text"
+        ng-model="vm.data.selectedPreset">
+        <option />
+        <option ng-repeat="item in vm.data.presets track by item.id">{{item.name}}
+        </option>
       </select>
-      <input type="button" ng-click="vm.renamePreset(vm.data.selectedPreset)" value="Rename" >
-      <input type="button" ng-click="vm.deletePreset(vm.data.selectedPreset)" value="Delete" >
-
+      <input type="button"
+        ng-click="vm.renamePreset(vm.data.selectedPreset)"
+        value="Rename">
+      <input type="button"
+        ng-click="vm.deletePreset(vm.data.selectedPreset)"
+        value="Delete">
     </div>
     <br>
     <div>
       <div class="title">New preset</div>
-      <input type="text" ng-model="vm.newPreset" >
-      <input type="button" ng-click="vm.saveNewPreset()" value="Save" >
+      <input type="text"
+        ng-model="vm.newPreset">
+      <input type="button"
+        ng-click="vm.saveNewPreset()"
+        value="Save">
     </div>
     <br>
     <label>Photo:</label>
-    <div class="option" ng-repeat="option in vm.data.options">
+    <div class="option"
+      ng-repeat="option in vm.data.options">
       <div ng-if="option.type == 'int'">
         <div class="title">{{option.label}}</div>
-        <input ng-change="vm.change()" type="number" ng-model="option.value" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()"
+          type="number"
+          ng-model="option.value"
+          min="{{option.rangeMin}}"
+          max="{{option.rangeMax}}">
       </div>
       <div ng-if="option.type == 'string'">
         <div class="title">{{option.label}}</div>
-        <input  ng-change="vm.change()" type="text" ng-model="option.value" >
+        <input ng-change="vm.change()"
+          type="text"
+          ng-model="option.value">
       </div>
       <div ng-if="option.type == 'list'">
         <div class="title">{{option.label}}</div>
-        <select ng-change="vm.change()" type="text" ng-model="option.value">
-          <option ></option>
+        <select ng-change="vm.change()"
+          type="text"
+          ng-model="option.value">
+          <option />
           <option ng-repeat="item in option.list">{{item}}</option>
         </select>
       </div>
@@ -54,11 +71,19 @@
     <div>
       <div>
         <div class="title">Start (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.lightStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()"
+          type="number"
+          ng-model="vm.data.lightSettings.lightStart"
+          min="{{option.rangeMin}}"
+          max="{{option.rangeMax}}">
       </div>
       <div>
         <div class="title">Finish (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.lightFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()"
+          type="number"
+          ng-model="vm.data.lightSettings.lightFinish"
+          min="{{option.rangeMin}}"
+          max="{{option.rangeMax}}">
       </div>
     </div>
     <br>
@@ -66,11 +91,19 @@
     <div>
       <div>
         <div class="title">Start (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.projectorStart" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()"
+          type="number"
+          ng-model="vm.data.lightSettings.projectorStart"
+          min="{{option.rangeMin}}"
+          max="{{option.rangeMax}}">
       </div>
       <div>
         <div class="title">Finish (ms):</div>
-        <input ng-change="vm.change()" type="number" ng-model="vm.data.lightSettings.projectorFinish" min="{{option.rangeMin}}" max="{{option.rangeMax}}" >
+        <input ng-change="vm.change()"
+          type="number"
+          ng-model="vm.data.lightSettings.projectorFinish"
+          min="{{option.rangeMin}}"
+          max="{{option.rangeMax}}">
       </div>
     </div>
     <div class="commands">
@@ -79,22 +112,26 @@
           <div>Output command</div>
           <button ng-click="vm.setupConfig()" id="setup">Setup config</button>
           <button ng-click="vm.execute()" id="execute">Execute</button>
-          <button ng-click="vm.softExecute()" id="execute">Execute (soft)</button>
+          <button ng-click="vm.softExecute()"
+            id="execute">Execute (soft)
+          </button>
         </div>
       </form>
     </div>
   </div>
-  <div  ng-show="vm.panel == 'shell'">
+  <div ng-show="vm.panel == 'shell'">
     <div class="commands">
       <form>
         <div class="group">
           <div class="title">Update file</div>
           <br>
           <lable>URL</lable>
-          <input ng-model="vm.updateFileUrl" autocomplete="off" />
+          <input ng-model="vm.updateFileUrl"
+            autocomplete="off">
           <br>
           <lable>Destination</lable>
-          <input ng-model="vm.updateFileDest" autocomplete="off" />
+          <input ng-model="vm.updateFileDest"
+            autocomplete="off">
           <br>
           <button ng-click="vm.updateFile()" id="shell">Update</button>
         </div>
@@ -102,7 +139,8 @@
           <div class="title">Shell command</div>
           <br>
           <lable>Command</lable>
-          <input ng-model="vm.shellCommand" autocomplete="off" />
+          <input ng-model="vm.shellCommand"
+            autocomplete="off">
           <br>
           <button ng-click="vm.execShell()" id="shell">Shell</button>
         </div>
