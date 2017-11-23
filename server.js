@@ -140,7 +140,7 @@ io.on('connection', function(socket) {
     });
 
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('setup command', JSON.stringify(cmd.photo));
+      scanners[i].emit('setup command', JSON.stringify(photoSettings));
     }
   });
 
