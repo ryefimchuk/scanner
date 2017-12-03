@@ -13,7 +13,7 @@ var API = '/api';
 var srcFolder = 'c:\\example\\';
 var destFolder = 'c:\\example\\';
 
-var destinationFolder = 'd:/photos/';
+var destinationFolder = 'c:/photos/';
 
 
 var systemBusy = false;

@@ -2,7 +2,7 @@ var fs = require('fs');
 var ftpClient = require('ftp-client');
 
 
-var inputFolder = 'd:/photos',
+var inputFolder = 'c:/photos',
   destFolder = '/',
   config = {
     host: '193.107.104.81',
