@@ -13,7 +13,10 @@ var API = '/api';
 var srcFolder = 'c:\\example\\';
 var destFolder = 'c:\\example\\';
 
-var destinationFolder = 'c:/photos/';
+var destinationFolder = 'd:/photos/';
+
+
+var systemBusy = false;
 
 //app.use('/firmware', express.static('scanerPI'));
 app.use(API, express.static('server'));
@@ -72,6 +75,14 @@ function saveConfig() {
 }
 
 loadConfig();
+
+
+function updateSession() {
+  for (var i = 0; i < controllers.length; i++) {
+    controllers[i].emit('update-session', session);
+  }
+}
+
 
 io.on('connection', function(socket) {
   socket.on('disconnect', function() {
@@ -293,13 +304,9 @@ io.on('connection', function(socket) {
     updateSession();
   });
 
-  function updateSession() {
-    for (var i = 0; i < controllers.length; i++) {
-      controllers[i].emit('update-session', session);
-    }
-  }
-
   socket.on('soft trigger', function() {
+    systemBusy = true;
+
     if (lightSettings) {
       for (var i = 0; i < scanners.length; i++) {
         scanners[i].emit('soft trigger', lightSettings);
@@ -320,6 +327,8 @@ io.on('connection', function(socket) {
   });
 
   socket.on('start command', function() {
+    systemBusy = true;
+
     if (mainTrigger && lightSettings) {
       mainTrigger.emit('start command', JSON.stringify(lightSettings));
     }
@@ -329,14 +338,12 @@ io.on('connection', function(socket) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('update-file', cmd);
     }
-    //reloadData();
   });
 
   socket.on('shell', function(cmd) {
     for (var i = 0; i < scanners.length; i++) {
       scanners[i].emit('shell', cmd);
     }
-    //reloadData();
   });
 
   socket.on('shell-feedback', function(cmd) {
@@ -361,6 +368,19 @@ function reloadData() {
   var isBusy = scanners.some(function(item) {
     return item.scanner.isBusy;
   });
+
+  console.log('reloadData', {
+    systemBusy: systemBusy,
+    isBusy: isBusy
+  })
+
+  if(systemBusy && !isBusy){
+    // reset session
+    session = null;
+    updateSession();
+  }
+
+  systemBusy = isBusy;
 
   var data = {
     isBusy: isBusy,

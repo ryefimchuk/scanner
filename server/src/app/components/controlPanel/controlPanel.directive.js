@@ -36,6 +36,10 @@
       vm.deletePreset = function(oldName) {
         if (!oldName) return;
 
+        var answer = confirm('Do you want to remove preset: ' + oldName + '?')
+        if(!answer){
+          return;
+        }
 
         var item = vm.data.presets.find(function (item) {
           return item.name === oldName;
@@ -57,12 +61,15 @@
           selectedPreset: vm.data.selectedPreset
         });
 
+        vm.changePreset();
       };
 
-      vm.renamePreset = function(oldName){
-        if(!oldName) return;
+      vm.renamePreset = function(name){
+        var oldName = name.trim();
+        if(!oldName.trim()) return;
 
-        var newName = prompt("Please rename preset", oldName);
+        var result = prompt("Please rename preset", oldName);
+        var newName = result ? result.trim() : "";
 
         if(newName){
           var item = vm.data.presets.find(function(item){
@@ -94,9 +101,8 @@
       }
 
       vm.changePreset = function(){
-
         var preset = vm.data.presets.find(function(item){
-          return item.name === vm.data.selectedPreset;
+          return item.name === vm.data.selectedPreset.trim();
         });
 
         if(preset){
@@ -111,6 +117,8 @@
       }
 
       vm.saveNewPreset = function(){
+
+        vm.newPreset = vm.newPreset.trim();
 
         if(vm.newPreset == ''){
           alert('Enter preset name');

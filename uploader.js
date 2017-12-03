@@ -39,8 +39,32 @@ function start() {
 }
 
 function copyFolder(foldersList) {
+
+  foldersList = foldersList.filter(function(directory){
+
+    var now = (new Date()).getTime();
+    var shiftedTime = now - 1000 * 60 * 10;
+
+    console.log({
+      now: now,
+      shiftedTime: shiftedTime
+    })
+
+    try{
+      var dt = (new Date(parseInt(directory))).getTime();
+
+      if(dt < shiftedTime){
+        return true;
+      }
+    }catch(ex){
+    }
+
+    return false;
+  });
+
   if (foldersList.length > 0) {
-    var folderName = foldersList[0];
+
+    folderName = foldersList[0];
 
     var src = inputFolder + '/' + folderName;
     var dst = '/';
@@ -69,9 +93,13 @@ function copyFolder(foldersList) {
         copySubfolders(srcFolder, dst, function() {
           console.log("Remove: " + src);
           deleteFolderRecursive(src);
+
+          process.exit();
         });
       });
     });
+  }else{
+    process.exit();
   }
 }
 
