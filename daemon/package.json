@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Scanner 3d daemon",
   "dependencies": {
+    "ftp-client": "^0.2.2",
     "mkdirp": "^0.5.1"
   },
   "scripts": {

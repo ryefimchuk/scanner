@@ -1,0 +1,107 @@
+var fs = require('fs');
+var ftpClient = require('ftp-client');
+
+
+var inputFolder = 'd:/photos',
+  destFolder = '/',
+  config = {
+    host: '193.107.104.81',
+    port: 41,
+    user: 'admin',
+    password: 'S314c241',
+  },
+  options = {
+    logging: 'basic',
+  },
+  client = new ftpClient(config, options);
+
+////////////////////////////////////////////
+client.connect(function(err) {
+  console.log('FTP Client Connected');
+  start();
+});
+
+////////////////////////////////////////////
+function start() {
+  fs.readdir(inputFolder, function(err, items) {
+    if (err) {
+      console.log('Error daemon', err);
+      return;
+    }
+
+    if(items.length == 0){
+      process.exit();
+      //return;
+    }
+
+    copyFolder(items);
+  });
+}
+
+function copyFolder(foldersList) {
+  if (foldersList.length > 0) {
+    var folderName = foldersList[0];
+
+    var src = inputFolder + '/' + folderName;
+    var dst = '/';
+
+    client.ftp.mkdir(folderName, function (err) {
+      if(err && err.code != 550){
+        console.log("Can''t create folder on FTP", err)
+        return;
+      }
+
+      fs.readdir(src, function(err, items) {
+        if (err) {
+          console.log('Error read directory', err);
+          return;
+        }
+
+        var srcFolder = items
+          .map(function(item) {
+            if (item.indexOf('.json') === -1) {
+              return src + '/' + item + '/**';
+            } else {
+              return src + '/' + item;
+            }
+          }).sort().reverse();
+
+        copySubfolders(srcFolder, dst, function() {
+          console.log("Remove: " + src);
+          deleteFolderRecursive(src);
+        });
+      });
+    });
+  }
+}
+
+function copySubfolders(folders, dst, callback) {
+  console.log(folders);
+    client.upload(
+      folders,
+      dst,
+      {
+        baseDir: inputFolder,
+        overwrite: 'all',
+      },
+      function(result) {
+        callback(result);
+      }
+    );
+
+};
+
+
+function deleteFolderRecursive(path) {
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach(function(file, index){
+      var curPath = path + "/" + file;
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};

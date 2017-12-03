@@ -4,6 +4,7 @@
   "description": "Scanner 3d app",
   "dependencies": {
     "express": "^4.15.2",
+    "ftp-client": "^0.2.2",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "socket.io": "^1.7.3",
