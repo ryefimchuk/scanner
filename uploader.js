@@ -5,8 +5,8 @@ var ftpClient = require('ftp-client');
 var inputFolder = 'c:/photos',
   destFolder = '/',
   config = {
-    host: '193.107.104.81',
-    port: 41,
+    host: '192.168.10.112',
+    port: 21,
     user: 'admin',
     password: 'S314c241',
   },
@@ -28,6 +28,16 @@ function start() {
       console.log('Error daemon', err);
       return;
     }
+
+    for(var i = 0; i < items.length; i++){
+      var path = inputFolder + '//' + items[i];
+
+      if(!fs.lstatSync(path).isDirectory()){
+          items.splice(i, 1);
+          i--;
+      };
+    }
+
 
     if(items.length == 0){
       process.exit();
