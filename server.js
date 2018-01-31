@@ -176,7 +176,7 @@ io.on('connection', function(socket) {
 
       var newDir = destinationFolder + id + '/';
       mkdirp(newDir, function() {
-        var dir = newDir + (data.index == 0 ? 'normal/' : 'projection/');
+        var dir = newDir + (data.index == 0 ? 'projection/' : 'normal/');
 
         mkdirp(dir, function() {
           stream.pipe(
