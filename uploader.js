@@ -1,5 +1,7 @@
 var fs = require('fs');
 var ftpClient = require('ftp-client');
+var exists = require('fs-exists-sync');
+
 
 
 var inputFolder = 'c:/photos',
@@ -79,38 +81,65 @@ function copyFolder(foldersList) {
     var src = inputFolder + '/' + folderName;
     var dst = '/';
 
-    client.ftp.mkdir(folderName, function (err) {
-      if(err && err.code != 550){
-        console.log("Can''t create folder on FTP", err)
-        return;
-      }
-
-      fs.readdir(src, function(err, items) {
-        if (err) {
-          console.log('Error read directory', err);
-          return;
+    if(isFolderNotEmpty(src)) {
+  
+      client.ftp.mkdir(folderName, function (err) {
+        if (err && err.code != 550) {
+            console.log("Can''t create folder on FTP", err)
+            return;
         }
-
-        var srcFolder = items
-          .map(function(item) {
-            if (item.indexOf('.json') === -1) {
-              return src + '/' + item + '/**';
-            } else {
-              return src + '/' + item;
+    
+        fs.readdir(src, function (err, items) {
+            if (err) {
+                console.log('Error read directory', err);
+                return;
             }
-          }).sort().reverse();
-
-        copySubfolders(srcFolder, dst, function() {
-          console.log("Remove: " + src);
-          deleteFolderRecursive(src);
-
-          process.exit();
+        
+            var srcFolder = items
+                .map(function (item) {
+                    if (item.indexOf('.json') === -1) {
+                        return src + '/' + item + '/**';
+                    } else {
+                        return src + '/' + item;
+                    }
+                }).sort().reverse();
+        
+            copySubfolders(srcFolder, dst, function () {
+                console.log("Remove: " + src);
+                deleteFolderRecursive(src);
+            
+                process.exit();
+            });
         });
       });
-    });
+    }
+    else{
+      deleteFolderRecursive(src);
+    }
   }else{
     process.exit();
   }
+}
+
+function isFolderNotEmpty(src){
+  var proj = src + "/projection";
+  var norm = src + "/normal";
+    projFiles = [];
+    normFiles = [];
+
+  if(exists(proj)){
+    projFiles = fs.readdirSync(proj);
+  }
+
+  if(exists(norm)){
+    normFiles = fs.readdirSync(norm);
+  }
+
+  if(normFiles.length === 0 && projFiles.length === 0){
+    return false;
+  }
+
+  return true;
 }
 
 function copySubfolders(folders, dst, callback) {
