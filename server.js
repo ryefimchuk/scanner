@@ -277,8 +277,11 @@ io.on('connection', function(socket) {
       projectdir: srcFolder + data.id + '\\projection\\',
       emptydir: srcFolder + data.id + '\\normal\\',
       savedir: destFolder,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      firstName: "", //data.firstName,
+      lastName: "", //data.lastName,
+      comments: data.comments,
+      size: data.size,
+      city: data.city
     };
 
     return JSON.stringify(cfg);
@@ -311,7 +314,12 @@ io.on('connection', function(socket) {
       for (var i = 0; i < scanners.length; i++) {
         scanners[i].emit('soft trigger', lightSettings);
       }
+
+      if (mainTrigger) {
+          mainTrigger.emit('soft trigger', JSON.stringify(lightSettings));
+      }
     }
+
   });
 
   socket.on('setup settings', function(cmd) {

@@ -238,6 +238,14 @@
       return data;
     }
 
+    function getCities(){
+      return [
+        'Frankfurt',
+        'Berlin'
+      ];
+    }
+
+    this.getCities = getCities;
     this.getOptions = getOptions;
   }
 

@@ -10,7 +10,6 @@ var LIGHT_OUT = 11;
 var PROJ_OUT = 12;
 
 
-
 gpio.setup(PHOTO_OUT, gpio.DIR_OUT, write);
 gpio.setup(LIGHT_OUT, gpio.DIR_OUT);
 gpio.setup(PROJ_OUT, gpio.DIR_OUT);
@@ -34,40 +33,48 @@ setTimeout(function(){
 		});
 	});
 
+    socket.on('soft trigger', function(data) {
+        console.log("soft trigger");
+        var tm = JSON.parse(data);
+
+        executeLight(tm);
+    });
+
 	socket.on('start command', function(data){
 		console.log("start command");
-
-    var tm = JSON.parse(data);
+		var tm = JSON.parse(data);
 
 		//// PHOTO
 		gpio.write(PHOTO_OUT, true);
-		
 		setTimeout(function(){
 			gpio.write(PHOTO_OUT, false);
 		}, 200);
 
-    //// LIGHT
-    setTimeout(function(){
-		console.log("start light");
-      gpio.write(LIGHT_OUT, true);
+        executeLight(tm);
+	});
 
-      setTimeout(function(){
-		console.log("finish light");
-        gpio.write(LIGHT_OUT, false);
-      }, tm.lightFinish);
-    }, tm.lightStart);
+	function executeLight(tm){
+        //// LIGHT
+        setTimeout(function(){
+            console.log("start light");
+            gpio.write(LIGHT_OUT, true);
 
-    //// PROJ
-    setTimeout(function(){
-		console.log("start proj");
-      gpio.write(PROJ_OUT, true);
+            setTimeout(function(){
+                console.log("finish light");
+                gpio.write(LIGHT_OUT, false);
+            }, tm.lightFinish);
+        }, tm.lightStart);
 
-      setTimeout(function(){
-		console.log("finish proj");
-        gpio.write(PROJ_OUT, false);
-      }, tm.projectorFinish);
-    }, tm.projectorStart);
+        //// PROJ
+        setTimeout(function(){
+            console.log("start proj");
+            gpio.write(PROJ_OUT, true);
 
-  });
+            setTimeout(function(){
+                console.log("finish proj");
+                gpio.write(PROJ_OUT, false);
+            }, tm.projectorFinish);
+        }, tm.projectorStart);
+    }
 
 }, 10000);

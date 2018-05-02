@@ -2,8 +2,10 @@
   <h2>3D Scanner</h2>
 </div>
 <div>
+  <span ng-if="vm.scannersData.trigger" class="text-normal">Trigger/light is ready</span>&nbsp;&nbsp;&nbsp;
+  <span ng-if="!vm.scannersData.trigger" class="text-warning">Trigger/light is not ready</span>&nbsp;&nbsp;&nbsp;
   <span class="text-normal">Total Count: <span>{{vm.scannersData.allScanners.length}}</span></span>&nbsp;&nbsp;&nbsp;
-  <span class="text-warning">Not Configured: <span id="notConfigured">{{vm.scannersData.notConfigured.length}}</span></span>
+  <span ng-if="vm.scannersData.notConfigured.length > 0" class="text-warning">Not Configured: <span id="notConfigured">{{vm.scannersData.notConfigured.length}}</span></span>
   <span class="text-normal" ng-if="vm.scannersData.session">Session: {{vm.scannersData.session.id}}</span>
 </div>
 <div>

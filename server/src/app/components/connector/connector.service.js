@@ -16,6 +16,7 @@
         code:""
       },
       allScanners:[],
+      trigger: null,
       configured:[],
       notConfigured:[],
       grid:[],
@@ -69,6 +70,7 @@
 
     exSocket.on('load data', function (data) {
       serviceData.allScanners = data.scanners;
+      serviceData.trigger = data.trigger;
       serviceData.isBusy = data.isBusy;
 
       $log.log("received full scanners data");
