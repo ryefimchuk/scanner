@@ -239,10 +239,7 @@
     }
 
     function getCities(){
-      return [
-        'Frankfurt',
-        'Berlin'
-      ];
+      return "DO K FFM HH HB B S".split(" ");
     }
 
     this.getCities = getCities;
