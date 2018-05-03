@@ -23,7 +23,14 @@
         city: vm.city,
         id: (new Date()).getTime()
       });
+    }
 
+    vm.execute = function(){
+      exSocket.emit('start command', {});
+    }
+
+    vm.executeSoft = function(){
+      exSocket.emit('soft trigger', {});
     }
 
     vm.closeSession = function(){

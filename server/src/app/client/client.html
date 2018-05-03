@@ -40,7 +40,8 @@
         <span>{{vm.size}}</span>
         <br>
 
-
+        <button ng-if="!vm.data.isBusy" ng-click="vm.execute()">Execute</button>
+        <button ng-if="!vm.data.isBusy" ng-click="vm.executeSoft()">Execute Soft</button>
         <button ng-if="!vm.data.isBusy" ng-click="vm.closeSession()">Close</button>
       </div>
   </div>
