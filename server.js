@@ -349,8 +349,17 @@ io.on('connection', function(socket) {
   });
 
   socket.on('shell', function(cmd) {
-    for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('shell', cmd);
+    if(cmd.target) {
+      var scanner = scanners.find(function(scanner){
+        return scanner.ip == cmd.target;
+      });
+      if(scanner){
+      	scanner.emit('shell', cmd.shellCommand);
+      }
+    } else {
+      for (var i = 0; i < scanners.length; i++) {
+        scanners[i].emit('shell', cmd.shellCommand);
+      }
     }
   });
 

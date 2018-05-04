@@ -26,10 +26,13 @@
       var vm = this;
       vm.data = optionsConfig.getOptions();
 
+      vm.target = "";
+
       vm.updateFileUrl = '';
       vm.updateFileDest = '/home/pi/server.js';
-
-      vm.shellFeedback = connector.getScanners().shellFeedback;
+      var scannerService  = connector.getScanners()
+      vm.shellFeedback = scannerService.shellFeedback;
+      vm.allScanners = scannerService.allScanners;
 
       vm.newPreset = '';
 
@@ -199,7 +202,12 @@
 
       vm.execShell = function(){
         console.log("shell: " + vm.shellCommand);
-        exSocket.emit("shell", vm.shellCommand);
+
+        //vm.target
+        exSocket.emit("shell", {
+          shellCommand: vm.shellCommand,
+          target: vm.target || null
+        });
       }
 
       vm.softExecute = function(){

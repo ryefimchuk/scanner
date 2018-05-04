@@ -134,6 +134,13 @@
           <button ng-click="vm.updateFile()" id="shell">Update</button>
         </div>
         <div class="group">
+          <div class="title">Target</div>
+          <select ng-change="vm.changeTarget()"
+                  ng-model="vm.target">
+            <option value="">All cameras</option>
+            <option ng-repeat="item in vm.allScanners track by item.data.ip">{{item.data.ip}} - {{item.data.numb}}</option>
+          </select>
+          <br>
           <div class="title">Shell command</div>
           <br>
           <lable>Command</lable>
