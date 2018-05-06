@@ -40,7 +40,10 @@
       }
 
       vm.rebootDevices = function(){
-        exSocket.emit('shell', "sudo reboot");
+        exSocket.emit('shell', {
+          shellCommand: "sudo reboot",
+          target: null
+        });
       }
 
       // "vm.creationDate" is available by directive option "bindToController: true"

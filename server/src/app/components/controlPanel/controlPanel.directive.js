@@ -1,6 +1,8 @@
 (function() {
   'use strict';
 
+  var streamCommand = "raspivid -o - -t 0 -hf -w 1920 -h 1080 -fps 25 -n | cvlc -vvv stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8080' :demux=h264";
+
   angular
     .module('sc2')
     .directive('controlPanel', ControlPanel);
@@ -30,9 +32,9 @@
 
       vm.updateFileUrl = '';
       vm.updateFileDest = '/home/pi/server.js';
-      var scannerService  = connector.getScanners()
-      vm.shellFeedback = scannerService.shellFeedback;
-      vm.allScanners = scannerService.allScanners;
+      vm.scannerService  = connector.getScanners()
+      //vm.shellFeedback = scannerService.shellFeedback;
+      //vm.allScanners = scannerService.allScanners;
 
       vm.newPreset = '';
 
@@ -208,6 +210,15 @@
           shellCommand: vm.shellCommand,
           target: vm.target || null
         });
+      }
+
+      vm.execStream = function(){
+        if(vm.target) {
+          exSocket.emit("shell", {
+            shellCommand: streamCommand,
+            target: vm.target
+          });
+        }
       }
 
       vm.softExecute = function(){

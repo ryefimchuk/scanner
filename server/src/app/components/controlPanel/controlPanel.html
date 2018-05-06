@@ -138,7 +138,7 @@
           <select ng-change="vm.changeTarget()"
                   ng-model="vm.target">
             <option value="">All cameras</option>
-            <option ng-repeat="item in vm.allScanners track by item.data.ip">{{item.data.ip}} - {{item.data.numb}}</option>
+            <option ng-repeat="item in vm.scannerService.allScanners track by item.data.ip"  value="{{item.data.ip}}">{{item.data.ip}} - {{item.data.numb}}</option>
           </select>
           <br>
           <div class="title">Shell command</div>
@@ -148,6 +148,8 @@
             autocomplete="off">
           <br>
           <button ng-click="vm.execShell()" id="shell">Shell</button>
+          <br>
+          <button ng-click="vm.execStream()" id="shell">Start Stream</button>
         </div>
         <div class="group">
           <br>

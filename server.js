@@ -351,7 +351,7 @@ io.on('connection', function(socket) {
   socket.on('shell', function(cmd) {
     if(cmd.target) {
       var scanner = scanners.find(function(scanner){
-        return scanner.ip == cmd.target;
+        return scanner.scanner.ip == cmd.target;
       });
       if(scanner){
       	scanner.emit('shell', cmd.shellCommand);

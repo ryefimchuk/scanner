@@ -95,31 +95,36 @@ function init(){
 
 
 function start() {
-  var defaultOptions = {
-    mode: "photo",
-    output: dirName + "/photo%d.jpg",
-    width: 160,
-    height: 90
-  };
+  try {
+    var defaultOptions = {
+      mode: "photo",
+      output: dirName + "/photo%d.jpg",
+      width: 160,
+      height: 90
+    };
 
-  var camera = new RaspiCam(defaultOptions);
+    var camera = new RaspiCam(defaultOptions);
 
-  var rpiIp = ip.address() // my ip address
+    var rpiIp = ip.address() // my ip address
 
-  var command = null;
-  var socket = s(SERVER_API);
+    var command = null;
+    var socket = s(SERVER_API);
 
-  socket.on('connect', function (c) {
-    console.log("connected to server");
+    socket.on('connect', function (c) {
+      console.log("connected to server");
 
-    socket.emit("add scanner", {
-      ip: rpiIp,
-      numb: config.numb,
-      files: []
+      socket.emit("add scanner", {
+        ip: rpiIp,
+        numb: config.numb,
+        files: []
+      });
+
+      takePhoto('thumb');
     });
-
-    takePhoto('thumb');
-  });
+  }
+  catch(ex){
+    console.log("Error: ", ex);
+  }
 
   function updateBusyState(state) {
     socket.emit("busy-state", {
