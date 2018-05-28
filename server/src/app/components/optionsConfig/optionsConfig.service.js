@@ -26,28 +26,28 @@
           rangeMin: 1,
           rangeMax: 3280
         },
-        {
+        /*{
           label: "file name",
           command: "output",
           type: "string",
           value: "/home/pi/photo%04d.jpg"
-        },
+        },*/
         {
           label: "timeout (in ms)[0 = off]",
           command: "timeout",
           type: "int",
           value: 500,
           rangeMin: 0,
-          rangeMax: 5000
+          rangeMax: 50000
         },
-        {
+        /*{
           label: "timelapse (in ms)",
           command: "timelapse",
           type: "int",
           value: "",
           rangeMin: 300,
           rangeMax: 5000
-        },
+        },*/
         {
           label: "Skip frame (0 to 5)",
           command: "skip",

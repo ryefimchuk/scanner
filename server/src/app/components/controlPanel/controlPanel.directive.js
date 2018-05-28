@@ -181,7 +181,7 @@
           }
         }
 
-        resultCommand['thumb'] = 'none'
+        //resultCommand['thumb'] = 'none'
         resultCommand['nopreview'] = true;
 
         vm.data.photoSettings = resultCommand;

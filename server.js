@@ -81,6 +81,10 @@ function updateSession() {
   for (var i = 0; i < controllers.length; i++) {
     controllers[i].emit('update-session', session);
   }
+
+  for (var i = 0; i < scanners.length; i++) {
+    scanners[i].emit('update-session', session);
+  }
 }
 
 
@@ -299,12 +303,15 @@ io.on('connection', function(socket) {
           if (err) {
             //return console.log(err);
             return;
+          } else {
+            updateSession();
           }
         });
       });
     }
-
-    updateSession();
+    else{
+      updateSession();
+    }
   });
 
   socket.on('soft trigger', function() {
