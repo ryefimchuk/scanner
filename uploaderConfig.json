@@ -1,0 +1,13 @@
+{
+  "input": "c:/photos",
+  "ftp": {
+    "host": "192.168.10.112",
+    "port": 21,
+    "user": "admin",
+    "password": "S314c241"
+  }
+}
+
+
+
+

@@ -1,21 +1,18 @@
 var fs = require('fs');
 var ftpClient = require('ftp-client');
 var exists = require('fs-exists-sync');
+var config = require('uploaderConfig');
 
 
 
-var inputFolder = 'c:/photos',
+var inputFolder = config.input,
   destFolder = '/',
-  config = {
-    host: '192.168.10.112',
-    port: 21,
-    user: 'admin',
-    password: 'S314c241',
-  },
-  options = {
+  config = config.ftp,
+  currentPass: 0,
+  maxPasses: 10,
+  client = new ftpClient(config, {
     logging: 'basic',
-  },
-  client = new ftpClient(config, options);
+  });
 
 ////////////////////////////////////////////
 client.connect(function(err) {
@@ -32,7 +29,7 @@ function start() {
     }
 
     for(var i = 0; i < items.length; i++){
-      var path = inputFolder + '//' + items[i];
+      var path = inputFolder + '/' + items[i];
 
       if(!fs.lstatSync(path).isDirectory()){
           items.splice(i, 1);
@@ -86,12 +83,14 @@ function copyFolder(foldersList) {
       client.ftp.mkdir(folderName, function (err) {
         if (err && err.code != 550) {
             console.log("Can''t create folder on FTP", err)
+            process.exit();
             return;
         }
     
         fs.readdir(src, function (err, items) {
             if (err) {
                 console.log('Error read directory', err);
+                process.exit();
                 return;
             }
         
@@ -105,10 +104,18 @@ function copyFolder(foldersList) {
                 }).sort().reverse();
         
             copySubfolders(srcFolder, dst, function () {
+              var errorFiles = Object.keys(result.errors);
+              if(errorFiles.length){
+                console.log("Errors: " + src);
+                fs.rename(src, addFolderPrefix(src), function(err){
+                  process.exit();
+                });
+              }else{
                 console.log("Remove: " + src);
                 deleteFolderRecursive(src);
-            
+
                 process.exit();
+              }
             });
         });
       });
@@ -119,6 +126,12 @@ function copyFolder(foldersList) {
   }else{
     process.exit();
   }
+}
+
+function addFolderPrefix(folder){
+  var folders = folder.split('/');
+  folders[folders.length-1] = "not_uploaded_" + folders[folders.length-1];
+  return folders.join('/');
 }
 
 function isFolderNotEmpty(src){
@@ -143,19 +156,27 @@ function isFolderNotEmpty(src){
 }
 
 function copySubfolders(folders, dst, callback) {
-  console.log(folders);
-    client.upload(
-      folders,
-      dst,
-      {
-        baseDir: inputFolder,
-        overwrite: 'all',
-      },
-      function(result) {
-        callback(result);
-      }
-    );
+  console.log('Input folders: ' + folders);
+  currentPass++;
 
+  client.upload(
+    folders,
+    dst,
+    {
+      baseDir: inputFolder,
+      overwrite: currentPass === 1 ? 'all' : 'older',
+    },
+    function(result) {
+      var errorFiles = Object.keys(result.errors);
+      if(errorFiles.length && currentPass <= maxPasses) {
+          copySubfolders(folders, dst, callback);
+          //copySubfolders(errorFiles, dst, callback);
+        } else {
+          callback(result);
+        }
+      }
+    }
+  );
 };
 
 
