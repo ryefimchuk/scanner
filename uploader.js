@@ -164,7 +164,7 @@ function copySubfolders(folders, dst, callback) {
     dst,
     {
       baseDir: inputFolder,
-      overwrite: currentPass === 1 ? 'all' : 'older',
+      overwrite: currentPass === 1 ? 'all' : 'none',
     },
     function(result) {
       var errorFiles = Object.keys(result.errors);
