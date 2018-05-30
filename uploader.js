@@ -7,10 +7,10 @@ var config = require('uploaderConfig');
 
 var inputFolder = config.input,
   destFolder = '/',
-  config = config.ftp,
-  currentPass: 0,
-  maxPasses: 10,
-  client = new ftpClient(config, {
+  ftp = config.ftp,
+  currentPass = 0,
+  maxPasses = 10,
+  client = new ftpClient(ftp, {
     logging: 'basic',
   });
 
@@ -169,11 +169,10 @@ function copySubfolders(folders, dst, callback) {
     function(result) {
       var errorFiles = Object.keys(result.errors);
       if(errorFiles.length && currentPass <= maxPasses) {
-          copySubfolders(folders, dst, callback);
-          //copySubfolders(errorFiles, dst, callback);
-        } else {
-          callback(result);
-        }
+        copySubfolders(folders, dst, callback);
+        //copySubfolders(errorFiles, dst, callback);
+      } else {
+        callback(result);
       }
     }
   );
