@@ -1,7 +1,7 @@
 var fs = require('fs');
 var ftpClient = require('ftp-client');
 var exists = require('fs-exists-sync');
-var config = require('uploaderConfig');
+var config = require('./uploaderConfig');
 
 
 
@@ -14,6 +14,11 @@ var inputFolder = config.input,
     logging: 'basic',
   });
 
+
+process.on('uncaughtException', function(err){
+  console.log(err);
+  process.exit()
+})
 ////////////////////////////////////////////
 client.connect(function(err) {
   console.log('FTP Client Connected');
@@ -103,7 +108,7 @@ function copyFolder(foldersList) {
                     }
                 }).sort().reverse();
         
-            copySubfolders(srcFolder, dst, function () {
+            copySubfolders(srcFolder, dst, function (result) {
               var errorFiles = Object.keys(result.errors);
               if(errorFiles.length){
                 console.log("Errors: " + src);
@@ -164,9 +169,10 @@ function copySubfolders(folders, dst, callback) {
     dst,
     {
       baseDir: inputFolder,
-      overwrite: currentPass === 1 ? 'all' : 'none',
+      overwrite: currentPass === 1 ? 'older' : 'none',
     },
     function(result) {
+      console.log('End of uploading')
       var errorFiles = Object.keys(result.errors);
       if(errorFiles.length && currentPass <= maxPasses) {
         copySubfolders(folders, dst, callback);
