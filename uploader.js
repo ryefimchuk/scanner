@@ -57,7 +57,7 @@ function copyFolder(foldersList) {
   foldersList = foldersList.filter(function(directory){
 
     var now = (new Date()).getTime();
-    var shiftedTime = now - 1000 * 60 * 10;
+    var shiftedTime = now - 1000 * 60 * 20;
 
     console.log({
       now: now,
@@ -169,7 +169,7 @@ function copySubfolders(folders, dst, callback) {
     dst,
     {
       baseDir: inputFolder,
-      overwrite: currentPass === 1 ? 'older' : 'none',
+      overwrite: currentPass === 1 ? 'all' : 'all',
     },
     function(result) {
       console.log('End of uploading')
