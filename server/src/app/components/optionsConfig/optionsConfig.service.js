@@ -139,8 +139,15 @@
             "fluorescent",
             "incandescent",
             "flash",
-            "horison"
+            "horizon"
           ]
+        },
+        {
+          label: "R-gain, B-gain (1.0,1.0)",
+          command: "awbg",
+          type: "string",
+          value: "1.0,1.0",
+          dependency: "awb:off"
         },
         {
           label: "Image Effect",

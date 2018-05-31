@@ -39,29 +39,31 @@
     <br>
     <label>Photo:</label>
     <div class="option"
-      ng-repeat="option in vm.data.options">
-      <div ng-if="option.type == 'int'">
-        <div class="title">{{option.label}}</div>
-        <input ng-change="vm.change()"
-          type="number"
-          ng-model="option.value"
-          min="{{option.rangeMin}}"
-          max="{{option.rangeMax}}">
-      </div>
-      <div ng-if="option.type == 'string'">
-        <div class="title">{{option.label}}</div>
-        <input ng-change="vm.change()"
-          type="text"
-          ng-model="option.value">
-      </div>
-      <div ng-if="option.type == 'list'">
-        <div class="title">{{option.label}}</div>
-        <select ng-change="vm.change()"
-          type="text"
-          ng-model="option.value">
-          <option />
-          <option ng-repeat="item in option.list">{{item}}</option>
-        </select>
+      ng-repeat="option in vm.data.options" >
+      <div ng-if="!option.isHidden">
+        <div ng-if="option.type == 'int'">
+          <div class="title">{{option.label}}</div>
+          <input ng-change="vm.change()"
+            type="number"
+            ng-model="option.value"
+            min="{{option.rangeMin}}"
+            max="{{option.rangeMax}}">
+        </div>
+        <div ng-if="option.type == 'string'">
+          <div class="title">{{option.label}}</div>
+          <input ng-change="vm.change()"
+            type="text"
+            ng-model="option.value">
+        </div>
+        <div ng-if="option.type == 'list'">
+          <div class="title">{{option.label}}</div>
+          <select ng-change="vm.change()"
+            type="text"
+            ng-model="option.value">
+            <option />
+            <option ng-repeat="item in option.list">{{item}}</option>
+          </select>
+        </div>
       </div>
     </div>
     <br>

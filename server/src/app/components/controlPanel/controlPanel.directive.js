@@ -8,7 +8,7 @@
     .directive('controlPanel', ControlPanel);
 
   /** @ngInject */
-  function ControlPanel($log, $rootScope, exSocket, connector) {
+  function ControlPanel($log, $rootScope, exSocket, $timeout, connector) {
     var directive = {
       restrict: 'EA',
       templateUrl: 'app/components/controlPanel/controlPanel.html',
@@ -119,6 +119,7 @@
             vm.data.options[i].value = vm.data.photoSettings[cmd];
           }
         }
+        updateCommands();
       }
 
       vm.saveNewPreset = function(){
@@ -162,6 +163,13 @@
 
         vm.data.selectedPreset = '';
 
+
+        updateCommands();
+
+      }
+
+
+      function updateCommands(){
         var resultCommand = {};
 
         for(var i = 0; i < vm.data.options.length; i++){
@@ -174,17 +182,33 @@
             case "int":
             case "string":
             case "list":
-              {
-                resultCommand[opt.command] = opt.value;
-                break;
-              };
+            {
+              resultCommand[opt.command] = opt.value;
+              break;
+            };
           }
         }
 
+        for(var i = 0; i < vm.data.options.length; i++) {
+          var opt = vm.data.options[i];
+          if(opt.dependency){
+            var pair = opt.dependency.split(':'),
+              depField = pair[0],
+              depVal = pair[1];
+
+            if(resultCommand[depField] == depVal){
+              opt.isHidden = false;
+            }else{
+              opt.isHidden = true;
+              delete resultCommand[opt.command];
+            }
+          }
+        }
         resultCommand['thumb'] = 'none'
         resultCommand['nopreview'] = true;
 
         vm.data.photoSettings = resultCommand;
+        //return resultCommand;
       }
 
       vm.setupConfig = function(){
@@ -229,7 +253,10 @@
           exSocket.emit("start command");
       }
 
-      vm.change();
+      $timeout(function(){
+        updateCommands();
+        //vm.change();
+      }, 200)
     }
   }
 
