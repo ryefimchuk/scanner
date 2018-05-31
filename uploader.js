@@ -173,7 +173,15 @@ function copySubfolders(folders, dst, callback) {
     },
     function(result) {
       console.log('End of uploading')
-      var errorFiles = Object.keys(result.errors);
+      var errorFiles = Object.keys(result.errors).filter(function(item){
+        var fld = item.split('/');
+        var lastFolderName = fld[fld.length - 1];
+        if(lastFolderName === "projection" || lastFolderName === "normal"){
+          return false;
+        }
+        return true;
+      });
+
       if(errorFiles.length && currentPass <= maxPasses) {
         copySubfolders(folders, dst, callback);
         //copySubfolders(errorFiles, dst, callback);

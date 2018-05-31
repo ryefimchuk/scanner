@@ -144,7 +144,7 @@
         },
         {
           label: "R-gain, B-gain (1.0,1.0)",
-          command: "awbg",
+          command: "awbgains",
           type: "string",
           value: "1.0,1.0",
           dependency: "awb:off"
