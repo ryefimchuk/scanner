@@ -1,13 +1,7 @@
 {
-  "input": "c:/photos",
-  "ftp": {
-    "host": "192.168.10.112",
-    "port": 21,
-    "user": "admin",
-    "password": "S314c241"
-  }
+  "cityid": "dba40f30-5b1f-444d-9468-5c215de685f1",
+  "baseurl": "http://localhost:3000/upload/",
+  "basepath": "c:/photos/"
 }
-
-
 
 
