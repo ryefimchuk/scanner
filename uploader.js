@@ -162,13 +162,13 @@ function copyFile(filename, callback){
   var ws = request.post(url);
 
   ws.on('drain', function () {
-    //console.log('drain', new Date());
+    //console.log('drain');
     rs.resume();
   });
 
   rs.on('end', function () {
-    //console.log('file uploaded');
-    callback(true);
+    //console.log('file end');
+    //callback(true);
   });
 
   ws.on('error', function (err) {
@@ -177,16 +177,12 @@ function copyFile(filename, callback){
   });
 
   ws.on('end', function (err) {
-    rs.close();
     setTimeout(function(){
       callback(true);
     }, 100);
   });
 
-  ws.on('connect', function () {
-    console.log('Connected to server');
-    rs.pipe(ws);
-  });
+  rs.pipe(ws);
 }
 
 function addFolderPrefix(folder){
@@ -215,8 +211,6 @@ function isFolderNotEmpty(src){
 
   return true;
 }
-
-
 
 
 function deleteFolderRecursive(path) {

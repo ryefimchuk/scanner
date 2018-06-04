@@ -72,7 +72,7 @@ function uploadFile(req, res){
   var dst = fs.createWriteStream(filepath + '\\' + filename);
   req.pipe(dst);
   dst.on('drain', function() {
-    console.log('drain', new Date());
+    //console.log('drain', new Date());
     req.resume();
   });
   req.on('error', function (err) {
