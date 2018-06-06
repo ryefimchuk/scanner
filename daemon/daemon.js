@@ -1,7 +1,7 @@
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 
-var inputFolder = 'c:\\example\\';
+var inputRootFolder = 'c:\\example\\';
 var monitorFolder = 'c:\\monitor\\';
 
 var inputJSONName = 'example.json';
@@ -13,32 +13,43 @@ var doneJSONLocation = monitorFolder + doneJSONName;
 var searching = false;
 
 function searchNewData() {
-  fs.readdir(inputFolder, function(err, items) {
+
+  fs.readdir(inputRootFolder, function(err, cityFolders) {
     if (err) {
       console.log('Error daemon', err);
       return;
     }
 
-    var newData = false;
-    console.log('try to found new JSON');
-    for (var i = 0; i < items.length; i++) {
-      var folder = inputFolder + items[i] + '\\';
-      var newJSON = folder + inputJSONName;
-      var doneJSON = folder + doneJSONName;
+    for(for j = 0; j < cityFolders.length; j++) {
+      var cityFolder = cityFolders[j];
+      fs.readdir(inputRootFolder + cityFolder, function (err, items) {
+        if (err) {
+          console.log('Error daemon', err);
+          return;
+        }
 
-      if (fs.existsSync(newJSON) && !fs.existsSync(doneJSON)) {
-        newData = true;
-        console.log('New JSON is found');
-        copyJSON(newJSON, folder);
-        break;
-      }
-    }
+        var newData = false;
+        console.log('try to found new JSON');
+        for (var i = 0; i < items.length; i++) {
+          var folder = inputRootFolder + cityFolder + '\\' + items[i] + '\\';
+          var newJSON = folder + inputJSONName;
+          var doneJSON = folder + doneJSONName;
 
-    if (!newData) {
-      searching = false;
-      console.log('New data not found');
+          if (fs.existsSync(newJSON) && !fs.existsSync(doneJSON)) {
+            newData = true;
+            console.log('New JSON is found');
+            copyJSON(newJSON, folder);
+            break;
+          }
+        }
+
+        if (!newData) {
+          searching = false;
+          console.log('New data not found');
+        }
+      });
     }
-  });
+  }
 }
 
 function copyJSON(newJSON, folder) {
