@@ -7,18 +7,29 @@ var port = /*process.env.PORT || */ 80;
 var fs = require('fs');
 var ss = require('socket.io-stream');
 var mkdirp = require('mkdirp');
-
+var net = require('net');
 var API = '/api';
 
 var srcFolder = 'c:\\example\\';
 var destFolder = 'c:\\example\\';
 
 var destinationFolder = 'c:/photos/';
-
-
 var systemBusy = false;
 
-//app.use('/firmware', express.static('scanerPI'));
+
+var CODE_ADD_SCANNER = 1000;
+var CODE_TAKE_THUMB = 1001;
+var CODE_TAKE_PREVIEW = 1002;
+var CODE_TAKE_PHOTO = 1003;
+var CODE_SET_PHOTO_SETTINGS = 1004;
+var CODE_UPLOAD_THUMB = 1005;
+var CODE_UPLOAD_PREVIEW = 1006;
+var CODE_UPLOAD_PHOTO1 = 1007;
+var CODE_UPLOAD_PHOTO2 = 1008;
+var CODE_SET_SCANNER_NUMBER = 1009;
+var CODE_EXECUTE_SHELL = 1010
+
+
 app.use(API, express.static('server'));
 
 var lightSettings = {
@@ -84,12 +95,220 @@ function updateSession() {
 }
 
 
-io.on('connection', function(socket) {
-  socket.on('disconnect', function() {
+function scannerSend(socket, operation, data){
+  var buffer = Buffer.allocUnsafe(8);
+  buffer.writeUInt32BE(operation);
+  buffer.writeUInt32BE(data ? data.length : 0, 4);
+  socket.write(buffer);
+  if(data) {
+    socket.write(data);
+  }
+}
+
+
+function scannerMessage(socket, operation, data){
+  switch(operation){
+    case CODE_ADD_SCANNER: {
+      socket.scanner = JSON.parse(data.toString());
+      scanners.push(socket);
+      console.log('Scanner registered. ip:' + socket.scanner.ip);
+      reloadData();
+
+      if (photoSettings) {
+        scannerSend(socket, CODE_SET_PHOTO_SETTINGS, JSON.stringify(photoSettings));
+        scannerSend(socket, CODE_TAKE_THUMB)
+      }
+      break;
+    }
+  }
+}
+
+
+var server = net.createServer(function(socket) {
+  console.log('Scanner connected')
+  var length = 0;
+  var operation = 0;
+  var payload = []
+  var payloadLength = 0;
+  var fileStream = null;
+  var piping = false;
+
+  socket.on('close', function() {
+    console.log('Scanner disconnected');
     var pos = scanners.indexOf(socket);
     if (pos != -1) {
       scanners.splice(pos, 1);
     }
+    reloadData();
+  });
+
+  socket.on("readable", function(){
+    //console.log("readable");
+    readStream();
+  });
+
+  function makeDir(newDir){
+    try {
+      fs.statSync(newDir);
+    }
+    catch(err) {
+      fs.mkdirSync(newDir);
+    }
+  }
+
+  function readStream(){
+    var dataCompleted = false;
+    while(!dataCompleted) {
+      var data;
+      if (operation === 0) {
+        data = socket.read(8);
+        if(!data){
+          dataCompleted = true;
+          return;
+        }
+        console.log('Read header');
+        operation = data.readUInt32BE(0);
+        length = data.readUInt32BE(4);
+        payloadLength = 0;
+        payload = [];
+        fileStream = null;
+        piping = false;
+
+        if (length === 0) {
+          scannerMessage(socket, operation);
+          console.log('Message without payload is received: ' + operation)
+          operation = 0;
+          return;
+        }
+
+        if (operation === CODE_UPLOAD_THUMB) {
+          console.log('Uploading thumb');
+          piping = true;
+          var thumbFileName = '/preview/thumb_' + socket.scanner.ip + '.jpg';
+          fileStream = fs.openSync(__dirname + '/server' + thumbFileName, 'w');
+
+          socket.scanner.thumb =
+            API + thumbFileName + '?' + Math.round(Math.random() * 10000000);
+        }
+        if (operation === CODE_UPLOAD_PREVIEW) {
+          console.log('Uploading preview')
+          piping = true;
+          var previewFileName = '/preview/preview_' + socket.scanner.ip + '.jpg';
+          fileStream = fs.openSync(__dirname + '/server' + previewFileName, 'w');
+        }
+        if (operation === CODE_UPLOAD_PHOTO1) {
+          console.log('Uploading photo 1')
+          piping = true;
+          if (session) {
+            var id = session.id || 'not_configured_session';
+            var newDir = destinationFolder + id + '/';
+            makeDir(newDir);
+            var projDir = newDir + 'projection/'
+            makeDir(projDir);
+            fileStream = fs.openSync(
+              projDir + (socket.scanner.numb ? socket.scanner.numb : socket.scanner.ip) + '.jpg',
+              'w'
+            )
+          } else {
+            fileStream = fs.openSync(
+              destinationFolder + (socket.scanner.numb ? socket.scanner.numb : socket.scanner.ip) + '_' + 0 + '.jpg',
+              'w'
+            )
+          }
+        }
+        if (operation === CODE_UPLOAD_PHOTO2) {
+          console.log('Uploading photo 2');
+          piping = true;
+          if (session) {
+            var id = session.id || 'not_configured_session';
+            var newDir = destinationFolder + id + '/';
+            makeDir(newDir);
+            var normalDir = newDir + 'normal/';
+            makeDir(normalDir);
+            fileStream = fs.openSync(
+              normalDir + (socket.scanner.numb ? socket.scanner.numb : socket.scanner.ip) + '.jpg',
+              'w'
+            )
+          } else {
+            fileStream = fs.openSync(
+              destinationFolder + (socket.scanner.numb ? socket.scanner.numb : socket.scanner.ip) + '_' + 1 + '.jpg',
+              'w'
+            )
+          }
+        }
+      }
+
+      if (piping) {
+        var readableSize = Math.min(length - payloadLength, 1024 * 4);
+        data = socket.read(readableSize);
+        if(!data){
+          dataCompleted = true;
+          return;
+        }
+
+        payloadLength += data.length;
+
+        fs.writeSync(fileStream, data);
+
+        if (payloadLength === length) {
+          piping = false;
+          fs.closeSync(fileStream);
+          console.log('File received. Length: ' + payloadLength);
+
+          if (operation === CODE_UPLOAD_THUMB) {
+            updateScanner({
+              ip: socket.scanner.ip,
+              numb: socket.scanner.numb,
+              thumb: socket.scanner.thumb
+            });
+
+          }
+          if (operation === CODE_UPLOAD_PREVIEW) {
+            var previewFileName = '/preview/preview_' + socket.scanner.ip + '.jpg';
+            for (var i = 0; i < controllers.length; i++) {
+              controllers[i].emit('file-preview', {
+                ip: socket.scanner.ip,
+                numb: socket.scanner.numb,
+                preview: API + previewFileName + '?' + Math.round(Math.random() * 10000000)
+              });
+            }
+          }
+
+          operation = 0;
+          length = 0;
+          payloadLength = 0;
+          payload = [];
+        }
+      } else {
+        data = socket.read(Math.min(length - payloadLength, 1024 * 4));
+        if(!data){
+          dataCompleted = true;
+          return;
+        }
+
+        console.log('Payload receiving: ' + data.length);
+        payloadLength += data.length;
+        payload.push(data);
+
+        if (payloadLength === length) {
+          var payloadData = Buffer.concat(payload, payloadLength);
+          scannerMessage(socket, operation, payloadData);
+          console.log('Message is received: ' + operation);
+          operation = 0
+        }
+      }
+    }
+  }
+
+  socket.on('error', function(err) {
+    console.log(err);
+  });
+});
+
+server.listen(port + 1);
+
+io.on('connection', function(socket) {
+  socket.on('disconnect', function() {
     var pos = controllers.indexOf(socket);
     if (pos != -1) {
       controllers.splice(pos, 1);
@@ -97,18 +316,6 @@ io.on('connection', function(socket) {
 
     if (mainTrigger === socket) {
       mainTrigger = null;
-    }
-
-    reloadData();
-  });
-
-  socket.on('add scanner', function(scanner) {
-    //console.log("add scanner");
-    socket.scanner = scanner;
-    scanners.push(socket);
-
-    if (photoSettings) {
-      socket.emit('setup command', JSON.stringify(photoSettings));
     }
 
     reloadData();
@@ -151,7 +358,7 @@ io.on('connection', function(socket) {
     });
 
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('setup command', JSON.stringify(photoSettings));
+      scannerSend(scanners[i], CODE_SET_PHOTO_SETTINGS, JSON.stringify(photoSettings))
     }
   });
 
@@ -170,73 +377,6 @@ io.on('connection', function(socket) {
     reloadData();
   });
 
-  ss(socket).on('file', function(stream, data) {
-    if (session) {
-      var id = session.id || 'not_configured_session';
-
-      var newDir = destinationFolder + id + '/';
-      mkdirp(newDir, function() {
-        var dir = newDir + (data.index == 0 ? 'projection/' : 'normal/');
-
-        mkdirp(dir, function() {
-          stream.pipe(
-            fs.createWriteStream(
-              dir + (data.numb ? data.numb : data.ip) + '.jpg'
-            )
-          );
-        });
-      });
-    } else {
-      stream.pipe(
-        fs.createWriteStream(
-          destinationFolder +
-            (data.numb ? data.numb : data.ip) +
-            '_' +
-            data.index +
-            '.jpg'
-        )
-      );
-    }
-  });
-
-  ss(socket).on('file-preview', function(stream, data) {
-    var previewFileName = '/preview/preview_' + data.ip + '.jpg';
-    stream.pipe(fs.createWriteStream(__dirname + '/server' + previewFileName));
-
-    stream.on('finish', function() {
-      for (var i = 0; i < controllers.length; i++) {
-        controllers[i].emit('file-preview', {
-          ip: data.ip,
-          numb: data.numb,
-          preview:
-            API + previewFileName + '?' + Math.round(Math.random() * 10000000),
-        });
-      }
-    });
-  });
-
-  ss(socket).on('file-thumb', function(stream, data) {
-    //console.log("~~~~file-thumb:" + data.ip);
-
-    var ip = data.ip;
-
-    var scanner = getScannerByIp(ip);
-    if (scanner) {
-      var thumbFileName = '/preview/thumb_' + data.ip + '.jpg';
-      stream.pipe(fs.createWriteStream(__dirname + '/server' + thumbFileName));
-      scanner.scanner.thumb =
-        API + thumbFileName + '?' + Math.round(Math.random() * 10000000);
-
-      stream.on('finish', function() {
-        updateScanner({
-          ip: data.ip,
-          numb: scanner.scanner.numb,
-          thumb: scanner.scanner.thumb,
-        });
-      });
-    }
-  });
-
   function getScannerByIp(ip) {
     var revScanners = scanners.reverse();
     return _.find(revScanners, function(scan) {
@@ -248,7 +388,7 @@ io.on('connection', function(socket) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
       scanner.scanner.numb = data.numb;
-      scanner.emit('set number', data.numb);
+      scannerSend(scanner, CODE_SET_SCANNER_NUMBER, JSON.stringify(data.numb))
     }
   });
 
@@ -264,7 +404,7 @@ io.on('connection', function(socket) {
   socket.on('preview ip', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
-      scanner.emit('preview', data);
+      scannerSend(scanner, CODE_TAKE_PREVIEW)
     } else {
       //alert("Scanner")
     }
@@ -312,7 +452,7 @@ io.on('connection', function(socket) {
 
     if (lightSettings) {
       for (var i = 0; i < scanners.length; i++) {
-        scanners[i].emit('soft trigger', lightSettings);
+        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings))
       }
 
       if (mainTrigger) {
@@ -330,7 +470,7 @@ io.on('connection', function(socket) {
     saveConfig();
 
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('setup command', JSON.stringify(cmd.photo));
+      scannerSend(scanners[i], CODE_SET_PHOTO_SETTINGS, JSON.stringify(cmd.photo))
     }
   });
 
@@ -344,7 +484,9 @@ io.on('connection', function(socket) {
 
   socket.on('update-file', function(cmd) {
     for (var i = 0; i < scanners.length; i++) {
-      scanners[i].emit('update-file', cmd);
+        // todo
+      //scannerSend(scanners[i], CODE_SET_PHOTO_SETTINGS, JSON.stringify(cmd.photo))
+      //scanners[i].emit('update-file', cmd);
     }
   });
 
@@ -354,11 +496,11 @@ io.on('connection', function(socket) {
         return scanner.scanner.ip == cmd.target;
       });
       if(scanner){
-      	scanner.emit('shell', cmd.shellCommand);
+        scannerSend(scanner, CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand))
       }
     } else {
       for (var i = 0; i < scanners.length; i++) {
-        scanners[i].emit('shell', cmd.shellCommand);
+        scannerSend(scanners[i], CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand))
       }
     }
   });
