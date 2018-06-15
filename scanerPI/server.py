@@ -9,7 +9,13 @@ import picamera.array
 import atexit
 
 
+configFile = '/home/pi/camera.json';
+
+
+
 HOST = '192.168.1.99'
+#HOST = '192.168.10.2'
+
 PORT = 81
 
 
@@ -42,11 +48,18 @@ def get_ip_address(ifname):
 		return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', bytes(ifname[:15], 'utf-8')))[20:24])
 	except IOError as e:
 		return '';
-		
-current_ip = get_ip_address('eth0')
-if current_ip == '':
-	current_ip = get_ip_address('wlan0')
 
+while True:		
+	current_ip = get_ip_address('eth0')
+	if len(current_ip) > 2:
+		break
+	
+	current_ip = get_ip_address('wlan0')
+	if len(current_ip) > 2:
+		break
+	time.sleep(2)
+	
+		
 print("Current IP: ", current_ip )
 
 
@@ -58,8 +71,11 @@ class SocketHandler:
 	lastOpCode = 0
 	lastLength = 0
 
+	config = {}
+	config['numb'] = ""
 
 	def __init__(self):
+		self.getScannerNumber()	
 		self.camera.resolution = MAX_RES
 		self.camera.framerate = 15
 		self.camera.ISO = 200
@@ -90,6 +106,14 @@ class SocketHandler:
 		except ConnectionRefusedError as e: 
 			print ("ConnectionRefused error({0}): {1}".format(e.errno, e.strerror))			
 			return False
+			
+	def addScanner(self):
+		scanner = {}
+		scanner['ip'] = current_ip
+		scanner['numb'] = self.config['numb']
+		scanner['files'] = []
+		self.sendJSON(CODE_ADD_SCANNER, scanner)
+		
 
 	def setHeader(self, opCode, length):
 		print("OpCode: ", opCode)
@@ -160,32 +184,61 @@ class SocketHandler:
 			self.setPhotoSettings(self.payload)
 			
 		if self.lastOpCode == CODE_SET_SCANNER_NUMBER:
-			self.setScannerNumber(self.payload)	
+			
+			self.config['numb'] = self.payload
+			self.setScannerNumber()	
 			
 
 		self.lastOpCode = 0
 		self.lastLength = 0
 		self.payload = ''
 		
-
+		
+	def getScannerNumber(self):	
+		try:
+			file = open(configFile,"r") 
+			jdata = json.loads(file.read())
+			self.config['numb'] = jdata['numb']
+			file.close()
+		except: 
+			print("File doesn't exist")
+	
 
 		
-	def setScannerNumber(self, data):
-		number = json.loads(data)
-		print(number)
-
+	def setScannerNumber(self):		
+		file = open(configFile,"w") 
+		file.write(json.dumps(self.config))
+		file.close()
 		
 		
 		
 	def setPhotoSettings(self, data):
 		settings = json.loads(data)
 		
-		if settings['awb']:
-		
-			self.camera.awb_mode = settings['awb'];
-			#self.camera.awb_mode = settings['awb'];
-			#if settings['awb'] == 'off'
+		try:		
+			self.camera.awb_mode = settings.get('awb');
+			
+			if settings.get('awbgains') and settings.get('awb') == 'off':
+				g = settings.get('awbgains').split(',')
+				self.camera.awb_gains = (float(g[0]), float(g[1]))		
 				
+				print(g[0] + " - " + g[1])
+			else:
+				self.camera.awb_gains = (1.0, 1.0)
+
+			self.camera.exposure_mode = settings.get('exposure')
+			
+			self.camera.sharpness = int(settings.get('sharpness') or 0)
+			self.camera.contrast = int(settings.get('contrast') or 0)
+			self.camera.brightness = int(settings.get('brightness') or 50)
+			self.camera.saturation = int(settings.get('saturation') or 0)
+			self.camera.shutter_speed = int(settings.get('shutter') or 0)
+			self.camera.iso = int(settings.get('ISO') or 100)
+			self.camera.meter_mode = settings.get('metering')
+				
+				
+		except ValueError as e:
+			print ("Value error({0}): {1}".format(e.errno, e.strerror))		
 	
 			
 	def takeThumb(self):
@@ -237,28 +290,24 @@ def exit_handler():
 atexit.register(exit_handler)
 
 
-
 while True:
 
 	try:
 		s.initSocket()
 		if s.connect(HOST, PORT):
-
-			scanner = {}
-			scanner['ip'] = current_ip
-			scanner['numb'] = 10
-			scanner['files'] = []
-
-			s.sendJSON(CODE_ADD_SCANNER, scanner)
-
+			s.addScanner()
 			while True:
 				s.receive()
-				
+
 	except TimeoutError as e:
 		print('Timeout Error: ', e)
 		
 	except ConnectionResetError as e:
 		print('Connection Reset Error: ', e)
+		
+	except IOError as e:
+		print('IOError: ', e)
+		
 
-	time.sleep(2)
+	time.sleep(3)
 

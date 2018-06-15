@@ -10,7 +10,7 @@
 
     var data = {
       options: [
-        {
+       /* {
           label: "height",
           command: "height",
           type: "int",
@@ -55,7 +55,7 @@
           value: "",
           rangeMin: 0,
           rangeMax: 5
-        },
+        },*/
         {
           label: "sharpness (-100 to 100)",
           command: "sharpness",
@@ -132,8 +132,8 @@
           list: [
             "off",
             "auto",
-            "sun",
-            "cloud",
+            "sunlight",
+            "cloudy",
             "shade",
             "tungsten",
             "fluorescent",
@@ -149,7 +149,7 @@
           value: "1.0,1.0",
           dependency: "awb:off"
         },
-        {
+   /*     {
           label: "Image Effect",
           command: "imxfx",
           type: "list",
@@ -175,7 +175,7 @@
             "colourbalance",
             "cartoon"
           ]
-        },
+        },*/
         {
           label: "Metering",
           command: "metering",
