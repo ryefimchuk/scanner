@@ -117,11 +117,14 @@ function scannerSend(socket, operation, data, forceFlush){
       }
     }
 
-    process.nextTick(function(){
+    for(var i = 0; i < socket.length; i++) {
+      socket[i].uncork();
+    }
+/*    process.nextTick(function(){
       for(var i = 0; i < socket.length; i++) {
         socket[i].uncork();
       }
-    });
+    });*/
   } else {
     if (forceFlush) {
       socket.cork();
