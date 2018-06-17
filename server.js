@@ -27,7 +27,8 @@ var CODE_UPLOAD_PREVIEW = 1006;
 var CODE_UPLOAD_PHOTO1 = 1007;
 var CODE_UPLOAD_PHOTO2 = 1008;
 var CODE_SET_SCANNER_NUMBER = 1009;
-var CODE_EXECUTE_SHELL = 1010
+var CODE_EXECUTE_SHELL = 1010;
+var CODE_UPDATE_BUSY_STATE = 1011;
 
 
 app.use(API, express.static('server'));
@@ -100,7 +101,7 @@ function scannerSend(socket, operation, data){
   buffer.writeUInt32BE(operation);
   buffer.writeUInt32BE(data ? data.length : 0, 4);
   socket.write(buffer);
-  if(data) {
+  if(data && data.length) {
     socket.write(data);
   }
 }
@@ -108,6 +109,13 @@ function scannerSend(socket, operation, data){
 
 function scannerMessage(socket, operation, data){
   switch(operation){
+    case CODE_UPDATE_BUSY_STATE: {
+      console.log("CODE_UPDATE_BUSY_STATE", data.toString())
+      var scanner = JSON.parse(data.toString());
+      socket.scanner.isBusy = scanner.isBusy;
+      reloadData();
+      break;
+    }
     case CODE_ADD_SCANNER: {
       socket.scanner = JSON.parse(data.toString());
       scanners.push(socket);
@@ -155,6 +163,7 @@ var server = net.createServer(function(socket) {
       fs.mkdirSync(newDir);
     }
   }
+
 
   function readStream(){
     var dataCompleted = false;
@@ -392,15 +401,6 @@ io.on('connection', function(socket) {
     }
   });
 
-  socket.on('busy-state', function(data) {
-    var scanner = getScannerByIp(data.ip);
-    if (scanner) {
-      scanner.scanner.isBusy = data.state;
-    }
-
-    reloadData();
-  });
-
   socket.on('preview ip', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {
@@ -531,7 +531,7 @@ function reloadData() {
   console.log('reloadData', {
     systemBusy: systemBusy,
     isBusy: isBusy
-  })
+  });
 
   if(systemBusy && !isBusy){
     // reset session

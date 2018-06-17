@@ -33,6 +33,8 @@ CODE_UPLOAD_PHOTO1 = 1007
 CODE_UPLOAD_PHOTO2 = 1008
 
 CODE_SET_SCANNER_NUMBER = 1009
+CODE_EXECUTE_SHELL = 1010
+CODE_UPDATE_BUSY_STATE = 1011
 
 
 MAX_RES = (3280, 2464)
@@ -113,6 +115,12 @@ class SocketHandler:
 		scanner['numb'] = self.config['numb']
 		scanner['files'] = []
 		self.sendJSON(CODE_ADD_SCANNER, scanner)
+		
+	def updateBusyState(self, state):
+		print("Update state: " + str(state))
+		scanner = {}
+		scanner['isBusy'] = state		
+		self.sendJSON(CODE_UPDATE_BUSY_STATE, scanner)		
 		
 
 	def setHeader(self, opCode, length):
@@ -245,18 +253,22 @@ class SocketHandler:
 		print("Take thumb")
 		thumbFileName = './thumb.jpg'
 		self.camera.resolution = (160, 90)
+		self.updateBusyState(True)
 		self.camera.capture_sequence([thumbFileName], 'jpeg', use_video_port=True)
 		time.sleep(1)
 		self.sendFile(CODE_UPLOAD_THUMB, thumbFileName)
+		self.updateBusyState(False)
 
 		
 	def takePreview(self):
 		print("Take preview")
 		previewFileName = './preview.jpg'
 		self.camera.resolution = MAX_RES
+		self.updateBusyState(True)
 		self.camera.capture_sequence([previewFileName], 'jpeg', use_video_port=True)
 		time.sleep(1)
 		self.sendFile(CODE_UPLOAD_PREVIEW, previewFileName)
+		self.updateBusyState(False)
 
 		
 		
@@ -269,13 +281,16 @@ class SocketHandler:
 		print('Captured %d frames at %.2ffps' % (self.frames, self.frames / (finish - start)))
 		print('Timing: %.3f' % (finish - start))
 
+		self.updateBusyState(True)
 		time.sleep(1)
 		
 		counter = 0
 		for filesName in self.filenames():
 			self.sendFile(CODE_UPLOAD_PHOTO1 + counter, filesName)
-			counter = counter +1
-			#sleep(1)
+			counter = counter + 1
+			
+		#time.sleep(5)
+		self.updateBusyState(False)
 		
 
 

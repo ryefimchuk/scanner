@@ -104,7 +104,7 @@ button[disabled]{
 
 
 div.scanner {
-  height: 70px;
+  height: 69px;
   width: 120px;
   border: 1px solid black;
   list-style: none;
@@ -134,8 +134,13 @@ div.scanner {
   }
 }
 
+div.scanner.busy {
+  border: 1px solid red;
+  opacity: 0.5;
+}
+
 #cameras {
-  margin-bottom: 40px
+  margin-bottom: 40px;
 
   li:nth-child(odd) {
     background: #eee;
