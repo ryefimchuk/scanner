@@ -1,3 +1,4 @@
+import subprocess
 import os
 import socket
 import fcntl
@@ -67,7 +68,6 @@ print("Current IP: ", current_ip )
 
 class SocketHandler:
 	frames = 2
-	camera = picamera.PiCamera()
 
 	payload = ''
 	lastOpCode = 0
@@ -78,15 +78,6 @@ class SocketHandler:
 
 	def __init__(self):
 		self.getScannerNumber()	
-		self.camera.resolution = MAX_RES
-		self.camera.framerate = 15
-		self.camera.ISO = 200
-		self.camera.awb_mode = 'off'
-		self.camera.awb_gains = (1.8, 1.5)
-		self.camera.shutter_speed = 60000
-		self.camera.exposure_mode = 'off'
-		self.camera.start_preview()
-		time.sleep(2)
 			
 	def initSocket(self):
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)				
@@ -96,8 +87,6 @@ class SocketHandler:
 		while frame < self.frames:
 			yield './image%02d.jpg' % frame
 			frame += 1
-
-
 			
 	def connect(self, host, port):
 		try:
@@ -191,17 +180,27 @@ class SocketHandler:
 		if self.lastOpCode == CODE_SET_PHOTO_SETTINGS:
 			self.setPhotoSettings(self.payload)
 			
-		if self.lastOpCode == CODE_SET_SCANNER_NUMBER:
-			
+		if self.lastOpCode == CODE_SET_SCANNER_NUMBER:			
 			self.config['numb'] = self.payload
 			self.setScannerNumber()	
 			
+			
+		if self.lastOpCode == CODE_EXECUTE_SHELL:			
+			self.executeShell(self.payload)	
 
 		self.lastOpCode = 0
 		self.lastLength = 0
 		self.payload = ''
-		
-		
+
+	def executeShell(self, data):
+		cmd = json.loads(data)
+		try:
+			process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+			for line in process.stdout:
+				print(line.decode('utf-8'))
+		except Exception as e:
+			print ("Error execute shell({0}): {1}".format(e.errno, e.strerror))		
+			
 	def getScannerNumber(self):	
 		try:
 			file = open(configFile,"r") 
@@ -221,8 +220,10 @@ class SocketHandler:
 		
 		
 	def setPhotoSettings(self, data):
-		settings = json.loads(data)
+		self.settings = json.loads(data)
 		
+	def applySettings(self):
+		settings = self.settings		
 		try:		
 			self.camera.awb_mode = settings.get('awb');
 			
@@ -252,29 +253,36 @@ class SocketHandler:
 	def takeThumb(self):
 		print("Take thumb")
 		thumbFileName = './thumb.jpg'
+		self.camera = picamera.PiCamera()
+		self.applySettings()
 		self.camera.resolution = (160, 90)
 		self.updateBusyState(True)
 		self.camera.capture_sequence([thumbFileName], 'jpeg', use_video_port=True)
 		time.sleep(1)
 		self.sendFile(CODE_UPLOAD_THUMB, thumbFileName)
 		self.updateBusyState(False)
+		self.camera.close()
 
 		
 	def takePreview(self):
 		print("Take preview")
 		previewFileName = './preview.jpg'
+		self.camera = picamera.PiCamera()
+		self.applySettings()
 		self.camera.resolution = MAX_RES
 		self.updateBusyState(True)
 		self.camera.capture_sequence([previewFileName], 'jpeg', use_video_port=True)
 		time.sleep(1)
 		self.sendFile(CODE_UPLOAD_PREVIEW, previewFileName)
 		self.updateBusyState(False)
-
+		self.camera.close()
 		
 		
 	def takePhoto(self):
 		print("Take photo")
 		start = time.time()
+		self.camera = picamera.PiCamera()
+		self.applySettings()
 		self.camera.resolution = MAX_RES
 		self.camera.capture_sequence(self.filenames(), 'jpeg', use_video_port=True)
 		finish = time.time()
@@ -291,7 +299,7 @@ class SocketHandler:
 			
 		#time.sleep(5)
 		self.updateBusyState(False)
-		
+		self.camera.close()
 
 
 #### SocketHandler instance
@@ -300,7 +308,7 @@ s = SocketHandler()
 
 
 def exit_handler():
-    s.camera.close()
+    print('Close')
 
 atexit.register(exit_handler)
 
