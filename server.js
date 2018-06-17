@@ -401,6 +401,14 @@ io.on('connection', function(socket) {
     }
   });
 
+
+  socket.on('remove-camera', function(data) {
+    var scanner = getScannerByIp(data.ip);
+    if (scanner) {
+      scanner.destroy();
+    }
+  });
+
   socket.on('preview ip', function(data) {
     var scanner = getScannerByIp(data.ip);
     if (scanner) {

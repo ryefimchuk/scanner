@@ -21,9 +21,15 @@
       $rootScope.preview = null;
     }
 
+
+    vm.removeCamera = function(item){
+      connector.removeCamera(item);
+      vm.closePreview();
+    };
+
     vm.reloadPreview = function(item){
       connector.loadPreview(item);
-    }
+    };
 
     vm.submitChangeNumber = function(evt, item){
 

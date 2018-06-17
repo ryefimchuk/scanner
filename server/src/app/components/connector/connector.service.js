@@ -164,6 +164,17 @@
 //      window.scrollTo(0, document.body.scrollHeight);
     }
 
+    function removeCamera(item){
+      if(!item){
+        return;
+      }
+
+      var data = {
+        ip: item.ip
+      };
+
+      exSocket.emit('remove-camera', data);
+    }
 
     function loadPreview(item){
       if(!item){
@@ -187,6 +198,7 @@
 
     this.updateData = updateData;
     this.loadPreview = loadPreview;
+    this.removeCamera = removeCamera;
     this.getScannerBy = getScannerBy;
     this.getScannerByNumber = getScannerByNumber;
     this.getScanners = getScanners;
