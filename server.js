@@ -70,6 +70,13 @@ function loadConfig() {
   });
 }
 
+function forceGC(){
+  if (global.gc) {
+    global.gc();
+  } else {
+    console.warn('No GC hook! Start your program as `node --expose-gc file.js`.');
+  }
+}
 function saveConfig() {
   var data = JSON.stringify({
     photoSettings: photoSettings,
@@ -100,18 +107,35 @@ function scannerSend(socket, operation, data, forceFlush){
   buffer.writeUInt32BE(operation);
   buffer.writeUInt32BE(data ? data.length : 0, 4);
 
-  if(forceFlush) {
-    socket.cork();
-    socket.write(buffer);
-    if (data && data.length) {
-      socket.write(data);
+
+  if(socket.length){
+    for(var i = 0; i < socket.length; i++){
+      socket[i].cork();
+      socket[i].write(buffer);
+      if (data && data.length) {
+        socket[i].write(data);
+      }
     }
-    socket.uncork();
-  }
-  else{
-    socket.write(buffer);
-    if (data && data.length) {
-      socket.write(data);
+
+    process.nextTick(function(){
+      for(var i = 0; i < socket.length; i++) {
+        socket[i].uncork();
+      }
+    });
+  } else {
+    if (forceFlush) {
+      socket.cork();
+      socket.write(buffer);
+      if (data && data.length) {
+        socket.write(data);
+      }
+      socket.uncork();
+    }
+    else {
+      socket.write(buffer);
+      if (data && data.length) {
+        socket.write(data);
+      }
     }
   }
 }
@@ -468,6 +492,8 @@ io.on('connection', function(socket) {
   socket.on('soft trigger', function() {
     systemBusy = true;
 
+    forceGC();
+
     if (lightSettings) {
       if (mainTrigger) {
         mainTrigger.emit('soft trigger', JSON.stringify(lightSettings));
@@ -482,9 +508,10 @@ io.on('connection', function(socket) {
       console.log('Timeout: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
 
       time = process.hrtime();
-      for (var i = 0; i < scanners.length; i++) {
-        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings), true)
-      }
+      scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings));
+/*      for (var i = 0; i < scanners.length; i++) {
+        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings))
+      }*/
       diff = process.hrtime(time);
       console.log('Take photo: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
     }
@@ -589,6 +616,7 @@ function reloadData() {
   for (var i = 0; i < controllers.length; i++) {
     controllers[i].emit('load data', data);
   }
+  forceGC();
 }
 
 http.listen(port, function() {
