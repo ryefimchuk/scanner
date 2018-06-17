@@ -235,7 +235,7 @@ class SocketHandler:
 				self.camera.awb_gains = (1.0, 1.0)
 
 			self.camera.exposure_mode = settings.get('exposure')
-			
+			self.camera.framerate = int(settings.get('framerate') or 15)			
 			self.camera.sharpness = int(settings.get('sharpness') or 0)
 			self.camera.contrast = int(settings.get('contrast') or 0)
 			self.camera.brightness = int(settings.get('brightness') or 50)

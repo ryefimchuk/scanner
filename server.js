@@ -95,15 +95,19 @@ function updateSession() {
   }
 }
 
-
-function scannerSend(socket, operation, data){
+function scannerSend(socket, operation, data, forceFlush){
   var buffer = Buffer.allocUnsafe(8);
   buffer.writeUInt32BE(operation);
   buffer.writeUInt32BE(data ? data.length : 0, 4);
+
+  socket.cork();
   socket.write(buffer);
   if(data && data.length) {
     socket.write(data);
   }
+  process.nextTick(function(){
+    socket.uncork()
+  });
 }
 
 
@@ -459,13 +463,24 @@ io.on('connection', function(socket) {
     systemBusy = true;
 
     if (lightSettings) {
-      for (var i = 0; i < scanners.length; i++) {
-        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings))
-      }
-
       if (mainTrigger) {
-          mainTrigger.emit('soft trigger', JSON.stringify(lightSettings));
+        mainTrigger.emit('soft trigger', JSON.stringify(lightSettings));
       }
+      var time = process.hrtime();
+
+      var timeout = 1000 * 10;
+      while(timeout){
+        timeout--;
+      }
+      var diff = process.hrtime(time);
+      console.log('Timeout: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
+
+      time = process.hrtime();
+      for (var i = 0; i < scanners.length; i++) {
+        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings), true)
+      }
+      diff = process.hrtime(time);
+      console.log('Take photo: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
     }
 
   });

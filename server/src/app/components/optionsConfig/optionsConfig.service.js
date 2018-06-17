@@ -57,6 +57,14 @@
           rangeMax: 5
         },*/
         {
+          label: "framerate (1 to 30)",
+          command: "framerate",
+          type: "int",
+          value: 15,
+          rangeMin: 1,
+          rangeMax: 30
+        },
+        {
           label: "sharpness (-100 to 100)",
           command: "sharpness",
           type: "int",
