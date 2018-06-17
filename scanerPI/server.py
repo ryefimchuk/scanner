@@ -195,7 +195,7 @@ class SocketHandler:
 	def executeShell(self, data):
 		cmd = json.loads(data)
 		try:
-			process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+			process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 			for line in process.stdout:
 				print(line.decode('utf-8'))
 		except Exception as e:
