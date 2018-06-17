@@ -100,14 +100,20 @@ function scannerSend(socket, operation, data, forceFlush){
   buffer.writeUInt32BE(operation);
   buffer.writeUInt32BE(data ? data.length : 0, 4);
 
-  socket.cork();
-  socket.write(buffer);
-  if(data && data.length) {
-    socket.write(data);
+  if(forceFlush) {
+    socket.cork();
+    socket.write(buffer);
+    if (data && data.length) {
+      socket.write(data);
+    }
+    socket.uncork();
   }
-  process.nextTick(function(){
-    socket.uncork()
-  });
+  else{
+    socket.write(buffer);
+    if (data && data.length) {
+      socket.write(data);
+    }
+  }
 }
 
 
