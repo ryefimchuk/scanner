@@ -17,6 +17,8 @@ HOST = '192.168.1.99'
 
 PORT = 81
 
+CODE_PING_PONG = 100
+
 CODE_ADD_SCANNER = 1000
 
 CODE_TAKE_THUMB = 1001
@@ -170,6 +172,9 @@ class SocketHandler:
         if self.lastOpCode == CODE_TAKE_PHOTO:
             self.takePhoto(self.timer)
 
+        if self.lastOpCode == CODE_PING_PONG:
+            print("Ping")
+
         if self.lastOpCode == CODE_ADD_SCANNER:
             print(self.payload)
 
@@ -276,8 +281,9 @@ class SocketHandler:
 
         print("Timer %d" % timer)
         if timer != 0:
-            print(float(timer) - time.time())
-            time.sleep(float(timer) - time.time())
+            time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
+            print(time_shift)
+            time.sleep(time_shift)
 
         print(datetime.datetime.utcnow().isoformat())
 		

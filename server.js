@@ -16,6 +16,8 @@ var destFolder = 'c:\\example\\';
 var destinationFolder = 'c:/photos/';
 var systemBusy = false;
 
+var CODE_PING_PONG = 100;
+
 var CODE_ADD_PROJECTOR = 999;
 var CODE_ADD_SCANNER = 1000;
 var CODE_TAKE_THUMB = 1001;
@@ -109,7 +111,7 @@ function scannerSend(socket, operation, data, timer){
   buffer.writeUInt32BE(timer, 4);
   buffer.writeUInt32BE(data ? data.length : 0, 8);
 
-  if(socket.length){
+  if(typeof(socket.length) !== 'undefined'){
     for(var i = 0; i < socket.length; i++){
       socket[i].write(buffer);
       if (data && data.length) {
@@ -150,7 +152,18 @@ function scannerMessage(socket, operation, data){
     }
     case CODE_ADD_SCANNER: {
       socket.scanner = JSON.parse(data.toString());
-      scanners.push(socket);
+
+      var scan = scanners.find(function(scan){
+        return scan.scanner.ip == socket.scanner.ip
+      });
+
+      if(scan){
+        var pos = scanners.indexOf(scan);
+        scanners[pos] = socket;
+      } else {
+        scanners.push(socket);
+      }
+
       console.log('Scanner registered. ip:' + socket.scanner.ip);
       reloadData();
 
@@ -623,5 +636,13 @@ function reloadData() {
 }
 
 http.listen(port, function() {
-  ///console.log("connected")
+  console.log("Server started!")
+
+  setInterval(function(){
+    if(!systemBusy){
+      scannerSend(scanners, CODE_PING_PONG)
+    }
+  }, 1000 * 60);
+
+
 });

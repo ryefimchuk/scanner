@@ -105,10 +105,12 @@ class SocketHandler:
         #print("Receive operation: " + str(self.lastOpCode) + " with length: " + str(self.lastLength))
         if code == 0:
             if timer != 0:
-                time.sleep(float(timer) - time.time() - 0.02)
+                time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
+                print(time_shift)
+                time.sleep(time_shift)
 
             self.enableProjector(True)
-            time.sleep(0.3)
+            time.sleep(0.2)
             self.enableProjector(False)
 
 
