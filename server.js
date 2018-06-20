@@ -16,7 +16,7 @@ var destFolder = 'c:\\example\\';
 var destinationFolder = 'c:/photos/';
 var systemBusy = false;
 
-
+var CODE_ADD_PROJECTOR = 999;
 var CODE_ADD_SCANNER = 1000;
 var CODE_TAKE_THUMB = 1001;
 var CODE_TAKE_PREVIEW = 1002;
@@ -47,7 +47,7 @@ var selectedPreset = '';
 var session = null;
 var scanners = [];
 var controllers = [];
-//var projectors = [];
+var projector = null;
 var mainTrigger = null;
 
 var configFile = 'settings.json';
@@ -102,44 +102,33 @@ function updateSession() {
   }
 }
 
-function scannerSend(socket, operation, data, forceFlush){
-  var buffer = Buffer.allocUnsafe(8);
+function scannerSend(socket, operation, data, timer){
+  timer = timer || 0;
+  var buffer = Buffer.allocUnsafe(12);
   buffer.writeUInt32BE(operation);
-  buffer.writeUInt32BE(data ? data.length : 0, 4);
-
+  buffer.writeUInt32BE(timer, 4);
+  buffer.writeUInt32BE(data ? data.length : 0, 8);
 
   if(socket.length){
     for(var i = 0; i < socket.length; i++){
-      socket[i].cork();
       socket[i].write(buffer);
       if (data && data.length) {
         socket[i].write(data);
       }
     }
-
-    for(var i = 0; i < socket.length; i++) {
-      socket[i].uncork();
-    }
-/*    process.nextTick(function(){
-      for(var i = 0; i < socket.length; i++) {
-        socket[i].uncork();
-      }
-    });*/
   } else {
-    if (forceFlush) {
-      socket.cork();
-      socket.write(buffer);
-      if (data && data.length) {
-        socket.write(data);
-      }
-      socket.uncork();
+    socket.write(buffer);
+    if (data && data.length) {
+      socket.write(data);
     }
-    else {
-      socket.write(buffer);
-      if (data && data.length) {
-        socket.write(data);
-      }
-    }
+  }
+
+  if(operation == CODE_TAKE_PHOTO && !!projector){
+    var buf = Buffer.alloc(12);
+    buf.writeUInt32BE(0);
+    buf.writeUInt32BE(timer, 4);
+    buf.writeUInt32BE(0, 8);
+    projector.write(buf);
   }
 }
 
@@ -150,6 +139,12 @@ function scannerMessage(socket, operation, data){
       console.log("CODE_UPDATE_BUSY_STATE", data.toString())
       var scanner = JSON.parse(data.toString());
       socket.scanner.isBusy = scanner.isBusy;
+      reloadData();
+      break;
+    }
+    case CODE_ADD_PROJECTOR: {
+      projector = socket;
+      console.log('Projector connected');
       reloadData();
       break;
     }
@@ -170,10 +165,10 @@ function scannerMessage(socket, operation, data){
 
 
 var server = net.createServer(function(socket) {
-  console.log('Scanner connected')
+  console.log('New connection');
   var length = 0;
   var operation = 0;
-  var payload = []
+  var payload = [];
   var payloadLength = 0;
   var fileStream = null;
   var piping = false;
@@ -364,6 +359,10 @@ io.on('connection', function(socket) {
       mainTrigger = null;
     }
 
+    if (projector === socket) {
+      projector = null;
+    }
+
     reloadData();
   });
 
@@ -511,10 +510,10 @@ io.on('connection', function(socket) {
       console.log('Timeout: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
 
       time = process.hrtime();
-      scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings));
-/*      for (var i = 0; i < scanners.length; i++) {
-        scannerSend(scanners[i], CODE_TAKE_PHOTO, JSON.stringify(lightSettings))
-      }*/
+      var dt = new Date();
+      var timer = parseInt(dt.getTime() / 1000.0) + 2;
+      console.log("Timer: " + timer);
+      scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
       diff = process.hrtime(time);
       console.log('Take photo: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
     }
@@ -602,6 +601,7 @@ function reloadData() {
 
   var data = {
     isBusy: isBusy,
+    projector: !!projector,
     scanners: _.map(scanners, function(scanner) {
       return {
         id: scanner.id,
