@@ -250,8 +250,8 @@ var server = net.createServer(function(socket) {
           var previewFileName = '/preview/preview_' + socket.scanner.ip + '.jpg';
           fileStream = fs.openSync(__dirname + '/server' + previewFileName, 'w');
         }
-        if (operation === CODE_UPLOAD_PHOTO1) {
-          console.log('Uploading photo 1')
+        if (operation === CODE_UPLOAD_PHOTO2) {
+          console.log('Uploading photo 2')
           piping = true;
           if (session) {
             var id = session.id || 'not_configured_session';
@@ -270,8 +270,8 @@ var server = net.createServer(function(socket) {
             )
           }
         }
-        if (operation === CODE_UPLOAD_PHOTO2) {
-          console.log('Uploading photo 2');
+        if (operation === CODE_UPLOAD_PHOTO1) {
+          console.log('Uploading photo 1');
           piping = true;
           if (session) {
             var id = session.id || 'not_configured_session';
@@ -642,7 +642,7 @@ http.listen(port, function() {
     if(!systemBusy){
       scannerSend(scanners, CODE_PING_PONG)
     }
-  }, 1000 * 60);
+  }, 1000 * 20);
 
 
 });

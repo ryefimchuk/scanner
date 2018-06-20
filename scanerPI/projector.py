@@ -4,6 +4,14 @@ import struct
 import time
 import pygame
 import atexit
+import RPi.GPIO as GPIO
+
+GPIO_PORT 11
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+GPIO.setup(GPIO_PORT, GPIO.OUT, initial=GPIO.HIGH)
 
 
 HOST = '192.168.1.99'
@@ -105,12 +113,14 @@ class SocketHandler:
         #print("Receive operation: " + str(self.lastOpCode) + " with length: " + str(self.lastLength))
         if code == 0:
             if timer != 0:
-                time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
-                print(time_shift)
+                time_shift = max(min(float(timer) - time.time() - 0.035, 5.0), 0.0)
+                #print(time_shift)
                 time.sleep(time_shift)
 
+            GPIO.output(GPIO_PORT, GPIO.LOW)
             self.enableProjector(True)
-            time.sleep(0.2)
+            time.sleep(0.5)
+            GPIO.output(GPIO_PORT, GPIO.HIGH)
             self.enableProjector(False)
 
 
@@ -135,12 +145,12 @@ while True:
                 s.receive()
 
     except TimeoutError as e:
-        print('Timeout Error: ', e)
-
+        #print('Timeout Error: ', e)
+        time.sleep(3)
     except ConnectionResetError as e:
-        print('Connection Reset Error: ', e)
-
+        #print('Connection Reset Error: ', e)
+        time.sleep(3)
     except IOError as e:
-        print('IOError: ', e)
-
+        #print('IOError: ', e)
+        time.sleep(3)
     time.sleep(3)
