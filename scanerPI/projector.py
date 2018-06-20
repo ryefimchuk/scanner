@@ -6,7 +6,15 @@ import pygame
 import atexit
 import RPi.GPIO as GPIO
 
-GPIO_PORT 11
+
+
+
+SHIFT_LIGHT = 0.03
+SHIFT_PROJECTOR = -0.03
+
+
+
+GPIO_PORT=11
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -113,12 +121,12 @@ class SocketHandler:
         #print("Receive operation: " + str(self.lastOpCode) + " with length: " + str(self.lastLength))
         if code == 0:
             if timer != 0:
-                time_shift = max(min(float(timer) - time.time() - 0.035, 5.0), 0.0)
+                time_shift = max(min((float(timer) - time.time()) + SHIFT_PROJECTOR, 5.0), 0.0)
                 #print(time_shift)
                 time.sleep(time_shift)
-
-            GPIO.output(GPIO_PORT, GPIO.LOW)
             self.enableProjector(True)
+            time.sleep(SHIFT_LIGHT - SHIFT_PROJECTOR)
+            GPIO.output(GPIO_PORT, GPIO.LOW)
             time.sleep(0.5)
             GPIO.output(GPIO_PORT, GPIO.HIGH)
             self.enableProjector(False)
