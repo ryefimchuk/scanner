@@ -1,0 +1,19 @@
+# Configuration for NTP clients:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/ntp/ntp.conf --output /etc/ntp.conf && sudo reboot
+
+
+# Configuration for NTP server:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/ntp.server/ntp.conf --output /etc/ntp.conf && sudo reboot
+
+
+#download new scanner:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/server.py --output /home/pi/server.py && sudo reboot
+
+
+
+#update loader for new scanner:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/loader/rc.local --output /etc/rc.local && sudo reboot
+
+
+#force NTP sync:
+sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start
