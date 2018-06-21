@@ -146,7 +146,7 @@ function scannerMessage(socket, operation, data){
     }
     case CODE_ADD_PROJECTOR: {
       projector = socket;
-      console.log('Projector connected');
+      console.log('Projector and light connected');
       reloadData();
       break;
     }
@@ -178,7 +178,7 @@ function scannerMessage(socket, operation, data){
 
 
 var server = net.createServer(function(socket) {
-  console.log('New connection');
+  //console.log('New connection');
   var length = 0;
   var operation = 0;
   var payload = [];
@@ -220,7 +220,7 @@ var server = net.createServer(function(socket) {
           dataCompleted = true;
           return;
         }
-        console.log('Read header');
+        //console.log('Read header');
         operation = data.readUInt32BE(0);
         length = data.readUInt32BE(4);
         payloadLength = 0;
@@ -230,13 +230,13 @@ var server = net.createServer(function(socket) {
 
         if (length === 0) {
           scannerMessage(socket, operation);
-          console.log('Message without payload is received: ' + operation)
+          //console.log('Message without payload is received: ' + operation)
           operation = 0;
           return;
         }
 
         if (operation === CODE_UPLOAD_THUMB) {
-          console.log('Uploading thumb');
+          //console.log('Uploading thumb');
           piping = true;
           var thumbFileName = '/preview/thumb_' + socket.scanner.ip + '.jpg';
           fileStream = fs.openSync(__dirname + '/server' + thumbFileName, 'w');
@@ -245,13 +245,13 @@ var server = net.createServer(function(socket) {
             API + thumbFileName + '?' + Math.round(Math.random() * 10000000);
         }
         if (operation === CODE_UPLOAD_PREVIEW) {
-          console.log('Uploading preview')
+          //console.log('Uploading preview')
           piping = true;
           var previewFileName = '/preview/preview_' + socket.scanner.ip + '.jpg';
           fileStream = fs.openSync(__dirname + '/server' + previewFileName, 'w');
         }
         if (operation === CODE_UPLOAD_PHOTO2) {
-          console.log('Uploading photo 2')
+          //console.log('Uploading photo 2')
           piping = true;
           if (session) {
             var id = session.id || 'not_configured_session';
@@ -271,7 +271,7 @@ var server = net.createServer(function(socket) {
           }
         }
         if (operation === CODE_UPLOAD_PHOTO1) {
-          console.log('Uploading photo 1');
+          //console.log('Uploading photo 1');
           piping = true;
           if (session) {
             var id = session.id || 'not_configured_session';
@@ -307,7 +307,7 @@ var server = net.createServer(function(socket) {
         if (payloadLength === length) {
           piping = false;
           fs.closeSync(fileStream);
-          console.log('File received. Length: ' + payloadLength);
+          //console.log('File received. Length: ' + payloadLength);
 
           if (operation === CODE_UPLOAD_THUMB) {
             updateScanner({
@@ -340,14 +340,14 @@ var server = net.createServer(function(socket) {
           return;
         }
 
-        console.log('Payload receiving: ' + data.length);
+        //console.log('Payload receiving: ' + data.length);
         payloadLength += data.length;
         payload.push(data);
 
         if (payloadLength === length) {
           var payloadData = Buffer.concat(payload, payloadLength);
           scannerMessage(socket, operation, payloadData);
-          console.log('Message is received: ' + operation);
+          //console.log('Message is received: ' + operation);
           operation = 0
         }
       }
@@ -510,27 +510,10 @@ io.on('connection', function(socket) {
     forceGC();
 
     if (lightSettings) {
-      if (mainTrigger) {
-        mainTrigger.emit('soft trigger', JSON.stringify(lightSettings));
-      }
-      var time = process.hrtime();
-
-      var timeout = 1000 * 10;
-      while(timeout){
-        timeout--;
-      }
-      var diff = process.hrtime(time);
-      console.log('Timeout: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
-
-      time = process.hrtime();
       var dt = new Date();
-      var timer = parseInt(dt.getTime() / 1000.0) + 2;
-      console.log("Timer: " + timer);
+      var timer = parseInt(dt.getTime() / 1000.0) + 3;
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
-      diff = process.hrtime(time);
-      console.log('Take photo: ' + (diff[0] * 1000000000 + diff[1]) +' nanoseconds')
     }
-
   });
 
   socket.on('setup settings', function(cmd) {
@@ -599,10 +582,10 @@ function reloadData() {
     return item.scanner.isBusy;
   });
 
-  console.log('reloadData', {
+  /*console.log('reloadData', {
     systemBusy: systemBusy,
     isBusy: isBusy
-  });
+  });*/
 
   if(systemBusy && !isBusy){
     // reset session

@@ -278,6 +278,7 @@ class SocketHandler:
         self.camera = picamera.PiCamera()
         self.applySettings()
         self.camera.resolution = MAX_RES
+        self.updateBusyState(True)
 
         print("Timer %d" % timer)
         if timer != 0:
@@ -292,7 +293,6 @@ class SocketHandler:
         print('Captured %d frames at %.2ffps' % (self.frames, self.frames / (finish - start)))
         print('Timing: %.3f' % (finish - start))
 
-        self.updateBusyState(True)
         time.sleep(1)
 
         counter = 0

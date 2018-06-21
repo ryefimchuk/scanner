@@ -47,6 +47,7 @@
         scanner.data.numb = data.numb;
         scanner.data.thumb = data.thumb;
         scanner.data.files = data.files;
+        scanner.data.projector = data.projector;
 
         $log.log("update scanner", scanner);
 
