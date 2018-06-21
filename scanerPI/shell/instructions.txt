@@ -1,19 +1,35 @@
-# Configuration for NTP clients:
+# Install NTP services on scanners and NTP server:
+sudo systemctl stop systemd-timesyncd && sudo systemctl disable systemd-timesyncd && sudo apt-get --assume-yes install ntp && sudo reboot
+
+
+
+# Configuration for scanners (NTP clients):
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/ntp/ntp.conf --output /etc/ntp.conf && sudo reboot
 
 
-# Configuration for NTP server:
+
+# Configuration for NTP server (192.168.1.100):
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/ntp.server/ntp.conf --output /etc/ntp.conf && sudo reboot
 
 
+
+#force NTP sync (run only on scanners):
+sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start
+
+
+
+
+
+
+
+###### UPDATE SCANNERS
+
 #download new scanner:
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/server.py --output /home/pi/server.py && sudo reboot
-
 
 
 #update loader for new scanner:
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/loader/rc.local --output /etc/rc.local && sudo reboot
 
 
-#force NTP sync:
-sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start
+
