@@ -159,10 +159,13 @@ function scannerMessage(socket, operation, data){
 
       if(scan){
         var pos = scanners.indexOf(scan);
-        scanners[pos] = socket;
-      } else {
-        scanners.push(socket);
+        if(pos != -1) {
+          scanners.splice(pos, 1);
+        }
+        scan.destroy();
       }
+
+      scanners.push(socket);
 
       console.log('Scanner registered. ip:' + socket.scanner.ip);
       reloadData();

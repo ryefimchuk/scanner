@@ -10,6 +10,8 @@
 </div>
 <div>
   <button ng-click="vm.rebootDevices()" id="rebootDevices">Reboot</button>
+  <button ng-click="vm.syncDevices()" id="syncDevices">Sync</button>
+  <button ng-click="vm.updateDevices()" id="updateDevices">[Update Devices]</button>
   <button ng-click="vm.openSetupMode()" ng-disabled="$root.setupMode">Setup</button>
   <button ng-click="vm.openStandbyMode()" ng-disabled="!$root.setupMode" >StandBy</button>
 </div>

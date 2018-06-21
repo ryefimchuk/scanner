@@ -67,7 +67,7 @@
       </div>
     </div>
     <br>
-    <label>Lights:</label>
+    <!--<label>Lights:</label>
     <div>
       <div>
         <div class="title">Start (ms):</div>
@@ -105,16 +105,13 @@
           min="{{option.rangeMin}}"
           max="{{option.rangeMax}}">
       </div>
-    </div>
+    </div>-->
     <div class="commands">
       <form>
         <div class="group">
           <div>Output command</div>
           <button ng-click="vm.setupConfig()" id="setup">Setup config</button>
-          <button ng-click="vm.execute()" id="execute">Execute</button>
-          <button ng-click="vm.softExecute()"
-            id="execute">Execute (soft)
-          </button>
+          <button ng-click="vm.softExecute()" id="execute">Execute</button>
         </div>
       </form>
     </div>

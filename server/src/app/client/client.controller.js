@@ -23,7 +23,15 @@
         city: vm.city,
         id: (new Date()).getTime()
       });
-    }
+    };
+
+    vm.syncDevices = function(){
+      exSocket.emit('shell', {
+        shellCommand: "sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start",
+        target: null
+      });
+    };
+
 
     vm.execute = function(){
       exSocket.emit('start command', {});

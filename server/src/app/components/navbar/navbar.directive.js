@@ -46,6 +46,20 @@
         });
       }
 
+      vm.syncDevices = function(){
+        exSocket.emit('shell', {
+          shellCommand: "sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start",
+          target: null
+        });
+      }
+
+      vm.updateDevices = function(){
+        exSocket.emit('shell', {
+          shellCommand: "sudo curl https://amakaroff82.github.io/scanner/scanerPI/server.py --output /home/pi/server.py && sudo reboot",
+          target: null
+        });
+      }
+
       // "vm.creationDate" is available by directive option "bindToController: true"
       //vm.relativeDate = moment(vm.creationDate).fromNow();
     }

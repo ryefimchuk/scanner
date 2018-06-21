@@ -22,6 +22,8 @@
         <br>
 
         <button ng-if="!vm.data.isBusy" ng-click="vm.saveSessionSettings()">New client</button>
+        <button ng-if="!vm.data.isBusy" ng-click="vm.syncDevices()">Sync devices</button>
+
       </div>
   </div>
   <div class="commands" ng-show="vm.data.session">
