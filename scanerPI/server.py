@@ -300,7 +300,7 @@ class SocketHandler:
         #print('Captured %d frames at %.2ffps' % (self.frames, self.frames / (finish - start)))
         #print('Timing: %.3f' % (finish - start))
 
-        time.sleep(0.2)
+        time.sleep(1)
 
         counter = 0
         for filesName in self.filenames():
