@@ -261,7 +261,7 @@ class SocketHandler:
         self.camera.resolution = (160, 90)
         self.updateBusyState(True)
         self.camera.capture_sequence([thumbFileName], 'jpeg', use_video_port=True)
-        time.sleep(1)
+        time.sleep(0.2)
         self.sendFile(CODE_UPLOAD_THUMB, thumbFileName)
         self.updateBusyState(False)
         self.camera.close()
@@ -274,14 +274,13 @@ class SocketHandler:
         self.camera.resolution = MAX_RES
         self.updateBusyState(True)
         self.camera.capture_sequence([previewFileName], 'jpeg', use_video_port=True)
-        time.sleep(1)
+        time.sleep(0.2)
         self.sendFile(CODE_UPLOAD_PREVIEW, previewFileName)
         self.updateBusyState(False)
         self.camera.close()
 
     def takePhoto(self, timer):
         print("Take photo")
-        start = time.time()
         self.camera = picamera.PiCamera()
         self.applySettings()
         self.camera.resolution = MAX_RES
@@ -289,18 +288,19 @@ class SocketHandler:
 
         print("Timer %d" % timer)
         if timer != 0:
+            #start = time.time()
             time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
-            print(time_shift)
+            #print(time_shift)
             time.sleep(time_shift)
 
-        print(datetime.datetime.utcnow().isoformat())
-		
-        self.camera.capture_sequence(self.filenames(), 'jpeg', use_video_port=True)
-        finish = time.time()
-        print('Captured %d frames at %.2ffps' % (self.frames, self.frames / (finish - start)))
-        print('Timing: %.3f' % (finish - start))
+        #print(datetime.datetime.utcnow().isoformat())
 
-        time.sleep(1)
+        self.camera.capture_sequence(self.filenames(), 'jpeg', use_video_port=True)
+        #finish = time.time()
+        #print('Captured %d frames at %.2ffps' % (self.frames, self.frames / (finish - start)))
+        #print('Timing: %.3f' % (finish - start))
+
+        time.sleep(0.2)
 
         counter = 0
         for filesName in self.filenames():
