@@ -196,7 +196,7 @@ class SocketHandler:
     def executeShell(self, data):
         cmd = json.loads(data)
         self.updateBusyState(True)
-        process
+        process = ''
         try:
             process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             #for line in process.stdout:
