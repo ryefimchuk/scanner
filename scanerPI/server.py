@@ -196,12 +196,17 @@ class SocketHandler:
     def executeShell(self, data):
         cmd = json.loads(data)
         self.updateBusyState(True)
+        process
         try:
             process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            for line in process.stdout:
-                print(line.decode('utf-8'))
+            #for line in process.stdout:
+                #print(line.decode('utf-8'))
         except Exception as e:
             print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
+
+        if process != '':
+            process.kill()
+
         self.updateBusyState(False)
 
     def getScannerNumber(self):
