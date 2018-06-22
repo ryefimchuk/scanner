@@ -9,10 +9,8 @@ import RPi.GPIO as GPIO
 import subprocess
 
 
-
-
-#SHIFT_LIGHT = 0.03
-#SHIFT_PROJECTOR = -0.03
+HIDE = GPIO.HIGH
+SHOW = GPIO.LOW
 
 
 
@@ -23,7 +21,7 @@ CODE_EXECUTE_SHELL = 1010
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
-GPIO.setup(GPIO_PORT, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(GPIO_PORT, GPIO.OUT, initial=SHOW)
 
 
 HOST = '192.168.1.99'
@@ -150,9 +148,9 @@ class SocketHandler:
                 time.sleep(time_shift)
             self.enableProjector(True)
             time.sleep(max(lightStart - projectorStart, 0))
-            GPIO.output(GPIO_PORT, GPIO.LOW)
+            GPIO.output(GPIO_PORT, HIDE)
             time.sleep(projectorFinish)
-            GPIO.output(GPIO_PORT, GPIO.HIGH)
+            GPIO.output(GPIO_PORT, SHOW)
             self.enableProjector(False)
 
         if code == CODE_EXECUTE_SHELL:
