@@ -24,6 +24,14 @@ sudo /etc/init.d/ntp stop && sudo ntpd -q -g && sudo /etc/init.d/ntp start
 
 ###### UPDATE SCANNERS
 
+#update firmware:
+sudo apt-get update && sudo apt-get -qq upgrade && sudo reboot
+
+
+#adjust GPU memory size:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/boot/config.txt --output /boot/config.txt && sudo reboot
+
+
 #download new scanner:
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/server.py --output /home/pi/server.py && sudo reboot
 
