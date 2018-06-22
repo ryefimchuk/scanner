@@ -129,8 +129,9 @@ function scannerSend(socket, operation, data, timer){
     var buf = Buffer.alloc(12);
     buf.writeUInt32BE(0);
     buf.writeUInt32BE(timer, 4);
-    buf.writeUInt32BE(0, 8);
+    buf.writeUInt32BE(data ? data.length : 0, 8);
     projector.write(buf);
+    projector.write(data);
   }
 }
 

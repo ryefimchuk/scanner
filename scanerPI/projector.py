@@ -11,8 +11,8 @@ import subprocess
 
 
 
-SHIFT_LIGHT = 0.03
-SHIFT_PROJECTOR = -0.03
+#SHIFT_LIGHT = 0.03
+#SHIFT_PROJECTOR = -0.03
 
 
 
@@ -135,16 +135,23 @@ class SocketHandler:
         timer = struct.unpack(">I", timer)[0]
         self.lastLength = self.sock.recv(4)
         self.lastLength = struct.unpack(">I", self.lastLength)[0]
-        #print("Receive operation: " + str(self.lastOpCode) + " with length: " + str(self.lastLength))
         if code == 0:
+            data = self.sock.recv(self.lastLength)
+            cmd = json.loads(data.decode('utf-8'))
+
+            lightStart = float(cmd['lightStart']) / 1000.0
+            lightFinish = float(cmd['lightFinish']) / 1000.0
+            projectorStart = float(cmd['projectorStart']) / 1000.0
+            projectorFinish = float(cmd['projectorFinish']) / 1000.0
+
             if timer != 0:
-                time_shift = max(min((float(timer) - time.time()) + SHIFT_PROJECTOR, 5.0), 0.0)
+                time_shift = max(min((float(timer) - time.time()) + projectorStart, 5.0), 0.0)
                 #print(time_shift)
                 time.sleep(time_shift)
             self.enableProjector(True)
-            time.sleep(SHIFT_LIGHT - SHIFT_PROJECTOR)
+            time.sleep(max(lightStart - projectorStart, 0))
             GPIO.output(GPIO_PORT, GPIO.LOW)
-            time.sleep(0.5)
+            time.sleep(projectorFinish)
             GPIO.output(GPIO_PORT, GPIO.HIGH)
             self.enableProjector(False)
 
