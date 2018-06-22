@@ -1,1 +1,2 @@
-git.exe fetch --progress --prune --recurse-submodules=no origin
+git reset --hard && git pull
+
