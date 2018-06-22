@@ -514,7 +514,7 @@ io.on('connection', function(socket) {
 
     if (lightSettings) {
       var dt = new Date();
-      var timer = parseInt(dt.getTime() / 1000.0) + 3;
+      var timer = parseInt((dt.getTime() + 500) / 1000.0) + 1;
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
     }
   });
@@ -548,6 +548,11 @@ io.on('connection', function(socket) {
   });
 
   socket.on('shell', function(cmd) {
+
+    if(cmd.includeProjector && !!projector){
+      scannerSend(projector, CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand))
+    }
+
     if(cmd.target) {
       var scanner = scanners.find(function(scanner){
         return scanner.scanner.ip == cmd.target;

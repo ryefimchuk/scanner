@@ -5,6 +5,7 @@ import time
 import pygame
 import atexit
 import RPi.GPIO as GPIO
+import subprocess
 
 
 
@@ -15,6 +16,8 @@ SHIFT_PROJECTOR = -0.03
 
 
 GPIO_PORT=11
+
+CODE_EXECUTE_SHELL = 1010
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -106,6 +109,19 @@ class SocketHandler:
             print("ConnectionRefused error({0}): {1}".format(e.errno, e.strerror))
             return False
 
+    def executeShell(self, data):
+        cmd = json.loads(data)
+        process = ''
+        try:
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            for line in process.stdout:
+                sleep(0.001)
+        except Exception as e:
+            sleep(1) #print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
+
+        if process != '':
+            process.kill()
+
     def addProjector(self):
         code = struct.pack(">I", CODE_ADD_PROJECTOR)
         len = struct.pack(">I", 0)
@@ -131,6 +147,8 @@ class SocketHandler:
             GPIO.output(GPIO_PORT, GPIO.HIGH)
             self.enableProjector(False)
 
+        if code == CODE_EXECUTE_SHELL:
+            self.executeShell(self.payload)
 
 
 #### SocketHandler instance
