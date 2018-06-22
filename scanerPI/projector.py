@@ -9,8 +9,8 @@ import RPi.GPIO as GPIO
 import subprocess
 
 
-HIDE = GPIO.HIGH
-SHOW = GPIO.LOW
+SHOW = GPIO.HIGH
+HIDE = GPIO.LOW
 
 
 
