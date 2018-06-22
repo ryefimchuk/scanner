@@ -561,7 +561,14 @@ io.on('connection', function(socket) {
           scannerSend(scanners[i], CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand));
         }
       } else {
-        for (var i = 0; i < scanners.length; i++) {
+        var scanns = scanners.sort(function(a, b){
+          if(a.scanner.numb > b.scanner.numb)
+            return 1;
+          if(a.scanner.numb < b.scanner.numb)
+            return -1;
+          return 0;
+        });
+        for (var i = 0; i < scanns.length; i++) {
           (function (scan, step) {
             setTimeout(function () {
               scannerSend(scan, CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand));
