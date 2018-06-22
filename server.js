@@ -556,8 +556,18 @@ io.on('connection', function(socket) {
         scannerSend(scanner, CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand))
       }
     } else {
-      for (var i = 0; i < scanners.length; i++) {
-        scannerSend(scanners[i], CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand))
+      if(cmd.syncExecution){
+        for (var i = 0; i < scanners.length; i++) {
+          scannerSend(scanners[i], CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand));
+        }
+      } else {
+        for (var i = 0; i < scanners.length; i++) {
+          (function (scan, step) {
+            setTimeout(function () {
+              scannerSend(scan, CODE_EXECUTE_SHELL, JSON.stringify(cmd.shellCommand));
+            }, 300 * step);
+          })(scanners[i], i);
+        }
       }
     }
   });

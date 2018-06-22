@@ -42,7 +42,8 @@
       vm.rebootDevices = function(){
         exSocket.emit('shell', {
           shellCommand: "sudo reboot",
-          target: null
+          target: null,
+          syncExecution: true
         });
       }
 
