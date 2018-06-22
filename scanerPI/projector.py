@@ -1,6 +1,7 @@
 import socket
 import fcntl
 import struct
+import json
 import time
 import pygame
 import atexit
@@ -110,17 +111,17 @@ class SocketHandler:
             return False
 
     def executeShell(self, data):
-        cmd = json.loads(data)
+        cmd = json.loads(data.decode('utf-8'))
         process = ''
         try:
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL)
             for line in process.stdout:
-                sleep(0.001)
+                time.sleep(0.001)
         except Exception as e:
-            sleep(1) #print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
+            time.sleep(1) #print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
 
-        if process != '':
-            process.kill()
+        #if process != '':
+            #process.kill()
 
     def addProjector(self):
         code = struct.pack(">I", CODE_ADD_PROJECTOR)
@@ -148,7 +149,8 @@ class SocketHandler:
             self.enableProjector(False)
 
         if code == CODE_EXECUTE_SHELL:
-            self.executeShell(self.payload)
+            payload = self.sock.recv(self.lastLength)
+            self.executeShell(payload)
 
 
 #### SocketHandler instance
