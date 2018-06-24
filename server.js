@@ -155,12 +155,12 @@ function scannerMessage(socket, operation, data){
         var result = data.toString();
       }
 
-      if(socket.scanner && socket.scanner.numb == 1){
+      /*if(socket.scanner && socket.scanner.numb == 1){
         console.log("Scanner data: ", result);
       }
       if(!socket.scanner){
         console.log("Projector data: ", result);
-      }
+      }*/
       break;
     }
     case CODE_ADD_PROJECTOR: {
@@ -537,9 +537,17 @@ io.on('connection', function(socket) {
     forceGC();
 
     if (lightSettings) {
+
+      var NS_PER_SEC = 1e9;
+
       var dt = new Date();
+
       var timer = parseInt(dt.getTime() / 1000.0) + 2;
+
+      var logTime = process.hrtime();
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
+      var diff = process.hrtime(logTime);
+      console.log(`Broadcasting took ${(diff[0] * NS_PER_SEC + diff[1]) / 1000000.0} milliseconds`);
     }
   });
 

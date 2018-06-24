@@ -70,7 +70,7 @@ print("Current IP: ", current_ip)
 
 
 class SocketHandler:
-    frames = 2
+    frames = 3
 
     payload = ''
     lastOpCode = 0
@@ -300,14 +300,13 @@ class SocketHandler:
         print("Timer %d" % timer)
         if timer != 0:
             time_shift = float(timer) - time.time()
-            time.sleep(time_shift)
+            time.sleep(max(time_shift, 0.0))
 
         self.camera.capture_sequence(self.filenames(), 'jpeg', use_video_port=True)
         time.sleep(1)
-        counter = 0
-        for filesName in self.filenames():
-            self.sendFile(CODE_UPLOAD_PHOTO1 + counter, filesName)
-            counter = counter + 1
+
+        self.sendFile(CODE_UPLOAD_PHOTO1, './image00.jpg')
+        self.sendFile(CODE_UPLOAD_PHOTO2, './image02.jpg')
 
         self.updateBusyState(False)
         self.camera.close()
