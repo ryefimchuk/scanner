@@ -31,6 +31,8 @@ var CODE_UPLOAD_PHOTO2 = 1008;
 var CODE_SET_SCANNER_NUMBER = 1009;
 var CODE_EXECUTE_SHELL = 1010;
 var CODE_UPDATE_BUSY_STATE = 1011;
+var CODE_LOG_DATA = 1020;
+
 
 
 app.use(API, express.static('server'));
@@ -139,10 +141,26 @@ function scannerSend(socket, operation, data, timer){
 function scannerMessage(socket, operation, data){
   switch(operation){
     case CODE_UPDATE_BUSY_STATE: {
-      console.log("CODE_UPDATE_BUSY_STATE", data.toString())
+      //console.log("CODE_UPDATE_BUSY_STATE", data.toString())
       var scanner = JSON.parse(data.toString());
       socket.scanner.isBusy = scanner.isBusy;
       reloadData();
+      break;
+    }
+    case CODE_LOG_DATA: {
+      try{
+        var result = JSON.parse(data.toString());
+      }
+      catch(e){
+        var result = data.toString();
+      }
+
+      if(socket.scanner && socket.scanner.numb == 1){
+        console.log("Scanner data: ", result);
+      }
+      if(!socket.scanner){
+        console.log("Projector data: ", result);
+      }
       break;
     }
     case CODE_ADD_PROJECTOR: {
@@ -191,11 +209,16 @@ var server = net.createServer(function(socket) {
   var piping = false;
 
   socket.on('close', function() {
-    console.log('Scanner disconnected');
     var pos = scanners.indexOf(socket);
     if (pos != -1) {
+      console.log('Scanner disconnected');
       scanners.splice(pos, 1);
     }
+
+    if(projector === socket){
+      console.log('Projector and light disconnected');
+    }
+
     reloadData();
   });
 
@@ -515,7 +538,7 @@ io.on('connection', function(socket) {
 
     if (lightSettings) {
       var dt = new Date();
-      var timer = parseInt((dt.getTime() + 500) / 1000.0) + 1;
+      var timer = parseInt(dt.getTime() / 1000.0) + 2;
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
     }
   });

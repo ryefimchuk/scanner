@@ -36,6 +36,8 @@ CODE_SET_SCANNER_NUMBER = 1009
 CODE_EXECUTE_SHELL = 1010
 CODE_UPDATE_BUSY_STATE = 1011
 
+CODE_LOG_DATA = 1020
+
 MAX_RES = (3280, 2464)
 
 
@@ -100,16 +102,12 @@ class SocketHandler:
             return False
 
     def addScanner(self):
-        scanner = {}
-        scanner['ip'] = current_ip
-        scanner['numb'] = self.config['numb']
-        scanner['files'] = []
+        scanner = {'ip': current_ip, 'numb': self.config['numb'], 'files': []}
         self.sendJSON(CODE_ADD_SCANNER, scanner)
 
     def updateBusyState(self, state):
         print("Update state: " + str(state))
-        scanner = {}
-        scanner['isBusy'] = state
+        scanner = {'isBusy': state}
         self.sendJSON(CODE_UPDATE_BUSY_STATE, scanner)
 
     def setHeader(self, opCode, length):
@@ -118,6 +116,17 @@ class SocketHandler:
         c = struct.pack(">I", opCode)
         l = struct.pack(">I", length)
         self.sock.send(c + l)
+
+    def logData(self, data, is_json=True):
+        if is_json:
+            data = json.dumps(data).encode('utf-8')
+        else:
+            data = data.encode('utf-8')
+
+        dataLength = len(data)
+        self.setHeader(CODE_LOG_DATA, dataLength)
+        self.sock.send(data)
+
 
     def sendJSON(self, opCode, obj):
         j = json.dumps(obj).encode('utf-8')
@@ -200,9 +209,10 @@ class SocketHandler:
         try:
             process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             for line in process.stdout:
+                self.logData(line.decode('utf-8'), False)
                 print(line.decode('utf-8'))
         except Exception as e:
-            print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
+            print("Error execute shell({0})")
 
         if process != '':
             process.kill()
@@ -286,6 +296,11 @@ class SocketHandler:
         self.camera.resolution = MAX_RES
         self.updateBusyState(True)
 
+        logs = {
+            timer: timer
+        }
+        self.logData(logs)
+
         print("Timer %d" % timer)
         if timer != 0:
             time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
@@ -323,12 +338,17 @@ while True:
                 s.receive()
 
     except TimeoutError as e:
-        print('Timeout Error: ', e)
+        print('Timeout Error: '.format(e.errno, e.strerror))
 
     except ConnectionResetError as e:
-        print('Connection Reset Error: ', e)
+        print('Connection Reset Error: '.format(e.errno, e.strerror))
 
     except IOError as e:
-        print('IOError: ', e)
+        print('IOError: '.format(e.errno, e.strerror))
+
+    except RuntimeError as e:
+        print('Runtime error')
+
+
 
     time.sleep(3)

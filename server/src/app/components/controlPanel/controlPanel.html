@@ -73,20 +73,16 @@
     <label>Lights:</label>
     <div>
       <div>
-        <div class="title">Start (ms):</div>
+        <div class="title">Hide (ms):</div>
         <input ng-change="vm.change()"
           type="number"
-          ng-model="vm.data.lightSettings.lightStart"
-          min="{{option.rangeMin}}"
-          max="{{option.rangeMax}}">
+          ng-model="vm.data.lightSettings.lightStart">
       </div>
       <div>
-        <div class="title">Finish (ms):</div>
+        <div class="title">Show (ms):</div>
         <input ng-change="vm.change()"
           type="number"
-          ng-model="vm.data.lightSettings.lightFinish"
-          min="{{option.rangeMin}}"
-          max="{{option.rangeMax}}">
+          ng-model="vm.data.lightSettings.lightFinish">
       </div>
     </div>
     <br>
@@ -96,17 +92,13 @@
         <div class="title">Start (ms):</div>
         <input ng-change="vm.change()"
           type="number"
-          ng-model="vm.data.lightSettings.projectorStart"
-          min="{{option.rangeMin}}"
-          max="{{option.rangeMax}}">
+          ng-model="vm.data.lightSettings.projectorStart">
       </div>
       <div>
         <div class="title">Finish (ms):</div>
         <input ng-change="vm.change()"
           type="number"
-          ng-model="vm.data.lightSettings.projectorFinish"
-          min="{{option.rangeMin}}"
-          max="{{option.rangeMax}}">
+          ng-model="vm.data.lightSettings.projectorFinish">
       </div>
     </div>
 

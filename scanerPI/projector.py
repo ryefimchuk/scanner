@@ -17,6 +17,7 @@ HIDE = GPIO.LOW
 GPIO_PORT=11
 
 CODE_EXECUTE_SHELL = 1010
+CODE_LOG_DATA = 1020
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -95,36 +96,54 @@ class SocketHandler:
             pygame.display.update()
 
 
+
     def initSocket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect(self, host, port):
         try:
             # host = socket.gethostbyname(host)
-            print("Host: ", host)
+            #print("Host: ", host)
             self.sock.connect((host, port))
             return True
         except ConnectionRefusedError as e:
-            print("ConnectionRefused error({0}): {1}".format(e.errno, e.strerror))
+            #print("ConnectionRefused error({0}): {1}".format(e.errno, e.strerror))
             return False
 
     def executeShell(self, data):
         cmd = json.loads(data.decode('utf-8'))
         process = ''
         try:
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL)
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             for line in process.stdout:
+                self.logData(line.decode('utf-8'), False)
                 time.sleep(0.001)
         except Exception as e:
-            time.sleep(1) #print("Error execute shell({0}): {1}".format(e.errno, e.strerror))
+            # time.sleep(1)
+            self.logData("Error execute shell", False)
 
-        #if process != '':
-            #process.kill()
+        if process != '':
+            process.kill()
 
     def addProjector(self):
         code = struct.pack(">I", CODE_ADD_PROJECTOR)
         len = struct.pack(">I", 0)
         self.sock.send(code + len)
+
+    def logData(self, data, is_json=True):
+        if is_json:
+            data = json.dumps(data).encode('utf-8')
+        else:
+            data = data.encode('utf-8')
+
+        dataLength = len(data)
+        self.setHeader(CODE_LOG_DATA, dataLength)
+        self.sock.send(data)
+
+    def setHeader(self, opCode, length):
+        c = struct.pack(">I", opCode)
+        l = struct.pack(">I", length)
+        self.sock.send(c + l)
 
     def receive(self):
         code = self.sock.recv(4)
@@ -136,22 +155,40 @@ class SocketHandler:
         if code == 0:
             data = self.sock.recv(self.lastLength)
             cmd = json.loads(data.decode('utf-8'))
-
-            lightStart = float(cmd['lightStart']) / 1000.0
-            lightFinish = float(cmd['lightFinish']) / 1000.0
-            projectorStart = float(cmd['projectorStart']) / 1000.0
-            projectorFinish = float(cmd['projectorFinish']) / 1000.0
+            cmd['timer'] = timer
+            self.logData(cmd)
 
             if timer != 0:
-                time_shift = max(min((float(timer) - time.time()) + projectorStart, 5.0), 0.0)
-                #print(time_shift)
-                time.sleep(time_shift)
-            self.enableProjector(True)
-            time.sleep(max(lightStart - projectorStart, 0))
-            GPIO.output(GPIO_PORT, HIDE)
-            time.sleep(projectorFinish)
-            GPIO.output(GPIO_PORT, SHOW)
-            self.enableProjector(False)
+                timer = float(timer)
+                lightStart = float(cmd['lightStart']) / 1000.0 + timer
+                lightFinish = float(cmd['lightFinish']) / 1000.0 + timer
+                projectorStart = float(cmd['projectorStart']) / 1000.0 + timer
+                projectorFinish = float(cmd['projectorFinish']) / 1000.0 + timer
+                stop = float(5.0) + timer
+
+                isLStart = False
+                isLFinish = False
+                isPStart = False
+                isPFinish = False
+
+                while True:
+                    time.sleep(0.001)
+                    tm = time.time()
+                    if tm >= lightStart and not isLStart:
+                        isLStart = True
+                        GPIO.output(GPIO_PORT, HIDE)
+                    if tm >= lightFinish and not isLFinish:
+                        isLFinish = True
+                        GPIO.output(GPIO_PORT, SHOW)
+                    if tm >= projectorStart and not isPStart:
+                        isPStart = True
+                        self.enableProjector(True)
+                    if tm >= projectorFinish and not isPFinish:
+                        isPFinish = True
+                        self.enableProjector(False)
+                    if tm >= stop:
+                        self.logData("finish set", False)
+                        break
 
         if code == CODE_EXECUTE_SHELL:
             payload = self.sock.recv(self.lastLength)
@@ -159,11 +196,10 @@ class SocketHandler:
 
 
 #### SocketHandler instance
-
 s = SocketHandler()
 
 def exit_handler():
-    print('Close')
+    pygame.display.quit()
 
 
 atexit.register(exit_handler)
@@ -178,12 +214,12 @@ while True:
                 s.receive()
 
     except TimeoutError as e:
-        #print('Timeout Error: ', e)
         time.sleep(3)
     except ConnectionResetError as e:
-        #print('Connection Reset Error: ', e)
         time.sleep(3)
     except IOError as e:
-        #print('IOError: ', e)
         time.sleep(3)
+    # except Exception as e:
+        # time.sleep(3)
+
     time.sleep(3)

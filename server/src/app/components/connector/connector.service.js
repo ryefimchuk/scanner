@@ -16,6 +16,7 @@
         code:""
       },
       allScanners:[],
+      projector: null,
       trigger: null,
       configured:[],
       notConfigured:[],
@@ -47,7 +48,7 @@
         scanner.data.numb = data.numb;
         scanner.data.thumb = data.thumb;
         scanner.data.files = data.files;
-        scanner.data.projector = data.projector;
+        //scanner.data.projector = data.projector;
 
         $log.log("update scanner", scanner);
 
@@ -73,6 +74,7 @@
       serviceData.allScanners = data.scanners;
       serviceData.trigger = data.trigger;
       serviceData.isBusy = data.isBusy;
+      serviceData.projector = data.projector;
 
       $log.log("received full scanners data");
       //alert("new data")
