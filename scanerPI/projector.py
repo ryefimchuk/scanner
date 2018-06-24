@@ -153,7 +153,7 @@ class SocketHandler:
         self.lastLength = self.sock.recv(4)
         self.lastLength = struct.unpack(">I", self.lastLength)[0]
         if code == 0:
-            timer = time.time() + 1.0
+            timer = time.time() + 2.0
             data = self.sock.recv(self.lastLength)
             cmd = json.loads(data.decode('utf-8'))
             cmd['timer'] = timer
