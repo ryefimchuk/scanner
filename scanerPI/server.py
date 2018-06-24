@@ -290,20 +290,16 @@ class SocketHandler:
         self.camera.close()
 
     def takePhoto(self, timer):
+        timer = time.time() + 1.0
         print("Take photo")
         self.camera = picamera.PiCamera()
         self.applySettings()
         self.camera.resolution = MAX_RES
         self.updateBusyState(True)
 
-        logs = {
-            timer: timer
-        }
-        self.logData(logs)
-
         print("Timer %d" % timer)
         if timer != 0:
-            time_shift = max(min(float(timer) - time.time(), 5.0), 0.0)
+            time_shift = max(min(float(start) - time.time(), 1.0), 0.0)
             time.sleep(time_shift)
 
         self.camera.capture_sequence(self.filenames(), 'jpeg', use_video_port=True)
