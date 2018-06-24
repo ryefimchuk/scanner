@@ -35,6 +35,9 @@ sudo curl https://amakaroff82.github.io/scanner/scanerPI/boot/config.txt --outpu
 #download new scanner:
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/server.py --output /home/pi/server.py && sudo reboot
 
+#download new proj:
+sudo curl https://amakaroff82.github.io/scanner/scanerPI/projector.py --output /home/pi/projector.py && sudo reboot
+
 
 #update loader for new scanner:
 sudo curl https://amakaroff82.github.io/scanner/scanerPI/loader/rc.local --output /etc/rc.local && sudo reboot
