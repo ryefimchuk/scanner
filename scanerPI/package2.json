@@ -10,7 +10,7 @@
     "rpi-gpio": "^0.8.1",
     "shelljs": "^0.7.8",
     "socket.io": "^2.0.3",
-    "socket.io-stream": "^0.9.122222"
+    "socket.io-stream": "^0.9.1"
   },
   "scripts": {
     "start": "node server.js"
