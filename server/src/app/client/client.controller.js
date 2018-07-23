@@ -6,14 +6,109 @@
     .controller('ClientController', ClientController);
 
   /** @ngInject */
-  function ClientController($rootScope, $timeout, optionsConfig, toastr, connector, exSocket) {
+  function ClientController($scope, $rootScope, $timeout, $document, optionsConfig, toastr, connector, exSocket) {
     var vm = this;
+
+    exSocket.emit('get-galleries')
 
     vm.cities = optionsConfig.getCities();
 
+    vm.city = localStorage.city;
+
     vm.data = connector.getScanners();
 
+    vm.createNewClient = function(){
+
+      localStorage.city = vm.city;
+
+      exSocket.emit('set-client', {
+        clientId: (new Date()).getTime()
+      });
+    }
+
+    vm.galleryLable = function(gallery){
+      if(gallery){
+        return (new Date(gallery))
+      }
+    }
+
+    vm.isSelected = function(gallery){
+      return gallery == vm.galleryId ? "white" : "lightgray"
+    }
+
+    vm.selColor = "red"
+    vm.unselColor = "gray"
+
+    function removeSession(sessionId){
+
+
+      var pos = vm.data.galleries.indexOf(sessionId);
+      if(pos != -1){
+
+        if(!confirm("Do you wont to remove selected session?")){
+          return;
+        }
+
+        vm.data.galleries.splice(pos, 1)
+
+        if(pos > 0){
+          pos--;
+          vm.selectGallery(vm.data.galleries[pos])
+        }else{
+          vm.selectGallery()
+        }
+
+        exSocket.emit('remove-session', {
+          sessionId: sessionId
+        });
+      }
+    }
+
+    function keyupHandler(keyEvent) {
+      if(keyEvent.target.tagName == "INPUT"){
+        return;
+      }
+
+      var keyCode = keyEvent.keyCode;
+
+      console.log('keyup', keyEvent);
+
+      if(keyCode >= 49 && keyCode <= 57){
+
+        var key = keyCode - 49;
+
+        if(key >= vm.data.galleries.length){
+          return
+        }
+
+        var galleryId = vm.data.galleries[key];
+        vm.selectGallery(galleryId)
+
+        $scope.$apply(); // remove this line if not need
+      }
+
+      if(keyCode == 107){
+        vm.selectGallery()
+      }
+
+      if(keyCode == 46){
+        removeSession(vm.galleryId)
+      }
+    }
+
+    $document.on('keyup', keyupHandler);
+
     vm.saveSessionSettings = function(){
+
+      if(!vm.comments){
+        alert("Comments is required field")
+        return
+      }
+
+      if(!vm.size){
+        alert("Size is required field")
+        return
+      }
 
       exSocket.emit('set-session', {
         firstName: vm.firstName,
@@ -33,17 +128,39 @@
       });
     };
 
+    vm.selectGallery = function(gallery){
+      vm.galleryId = gallery
+    }
+
 
     vm.execute = function(){
       exSocket.emit('start command', {});
     }
 
     vm.executeSoft = function(){
+      vm.stage = 1
+
+      $timeout(function(){
+        vm.stage = 2
+      },2000)
+
+      $timeout(function(){
+        vm.stage = 3
+      },3000)
+
       exSocket.emit('soft trigger', {});
     }
 
     vm.closeSession = function(){
       exSocket.emit('set-session', null);
+    }
+
+    vm.closeClient = function(){
+      if(confirm("Do you want to close curent client?")) {
+        exSocket.emit('set-client', {
+          clientId: null
+        });
+      }
     }
 
   }

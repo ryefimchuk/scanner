@@ -1,0 +1,27 @@
+.gallery-control-panel {
+  position: fixed;
+  width: 100%;
+  background-color: gray;
+
+  &>div {
+    display: inline-block;
+  }
+}
+
+
+.gallery-content {
+  background-color: lightgreen;
+  height: calc(100% - 40px);
+  position: fixed;
+  width: 100%;
+  top: 40px;
+
+  .gallery {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+

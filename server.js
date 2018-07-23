@@ -33,28 +33,44 @@ var CODE_EXECUTE_SHELL = 1010;
 var CODE_UPDATE_BUSY_STATE = 1011;
 var CODE_LOG_DATA = 1020;
 
-
-
 app.use(API, express.static('server'));
+
+app.use('/images', express.static(destinationFolder))
+
 
 var lightSettings = {
   lightStart: 0,
   lightFinish: 500,
-  projectorStart: 500,
+  projectorStart: 0,
   projectorFinish: 500,
 };
 
 var photoSettings = null;
 var presets = [];
 var selectedPreset = '';
-
+var clientId = null;
 var session = null;
 var scanners = [];
 var controllers = [];
 var projector = null;
 var mainTrigger = null;
+var galleries = [];
 
 var configFile = 'settings.json';
+
+function deleteFolderRecursive(path) {
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach(function(file, index){
+      var curPath = path + "/" + file;
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
 
 function loadConfig() {
   fs.readFile(configFile, function read(err, data) {
@@ -78,9 +94,10 @@ function forceGC(){
   if (global.gc) {
     global.gc();
   } else {
-    console.warn('No GC hook! Start your program as `node --expose-gc file.js`.');
+    console.warn('No GC hook. Start your program as `node --expose-gc file.js`.');
   }
 }
+
 function saveConfig() {
   var data = JSON.stringify({
     photoSettings: photoSettings,
@@ -418,6 +435,9 @@ io.on('connection', function(socket) {
     });
 
     reloadData();
+
+    updateSession();
+    updateClient();
   });
 
   socket.on('apply settings', function(presetName) {
@@ -497,6 +517,7 @@ io.on('connection', function(socket) {
   function getConfigJSON(data) {
     var cfg = {
       scanid: data.id,
+      clientid: clientId,
       normaldir: srcFolder + data.id + '\\normal\\',
       projectdir: srcFolder + data.id + '\\projection\\',
       emptydir: srcFolder + data.id + '\\normal\\',
@@ -509,6 +530,54 @@ io.on('connection', function(socket) {
     };
 
     return JSON.stringify(cfg);
+  }
+
+  socket.on('get-galleries', function() {
+    updateGalleries()
+  });
+
+
+
+  socket.on('remove-session', function(data) {
+    sessionId = data.sessionId;
+
+    var pos = galleries.indexOf(sessionId);
+    if(pos != -1) {
+      galleries.splice(pos, 1)
+    }
+
+    updateGalleries()
+    updateClient()
+
+    setTimeout(function(){
+
+      deleteFolderRecursive(destinationFolder + sessionId)
+
+    }, 1000)
+  });
+
+  socket.on('set-client', function(data) {
+    galleries = []
+    clientId = data.clientId
+
+    updateGalleries()
+    updateClient()
+  });
+
+  function updateGalleries() {
+    for (var i = 0; i < controllers.length; i++) {
+      controllers[i].emit('update-galleries', {
+        galleries: galleries
+      });
+    }
+  }
+
+  function updateClient() {
+    for (var i = 0; i < controllers.length; i++) {
+      controllers[i].emit('update-client', {
+        clientId: clientId
+      });
+    }
   }
 
   socket.on('set-session', function(data) {
@@ -528,10 +597,16 @@ io.on('connection', function(socket) {
       });
     }
 
+    if(session && session.id) {
+      galleries.push(session.id)
+    }
+    updateGalleries()
+
     updateSession();
   });
 
   socket.on('soft trigger', function() {
+
     systemBusy = true;
 
     forceGC();

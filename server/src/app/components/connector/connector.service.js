@@ -16,6 +16,7 @@
         code:""
       },
       allScanners:[],
+      galleries: [],
       projector: null,
       trigger: null,
       configured:[],
@@ -23,6 +24,7 @@
       grid:[],
       preview: null,
       session: null,
+      clientId: null,
       isBusy: false
     };
 
@@ -81,9 +83,18 @@
       updateData();
     });
 
+    exSocket.on('update-galleries', function (data) {
+      serviceData.galleries = data.galleries;
+    });
+
 
     exSocket.on('update-session', function (session) {
       serviceData.session = session;
+    });
+
+
+    exSocket.on('update-client', function (data) {
+      serviceData.clientId = data.clientId;
     });
 
 
@@ -103,7 +114,7 @@
     function loadScannerData(item){
       if(item.ip) {
         var data = {
-          ip: ip,
+          ip: item.ip,
           w: 160,
           h: 90
         };

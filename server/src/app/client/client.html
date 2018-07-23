@@ -1,49 +1,84 @@
-<div>
-  <div class="commands" ng-show="!vm.data.session">
-      <div class="group">
-        <div class="title">User Data</div>
-        <br>
+<div ng-if="!vm.data.clientId">
+  <lable>City</lable>
+  <select ng-change="vm.changeCity()" ng-model="vm.city">
+    <option ng-repeat="item in vm.cities">{{item}}</option>
+  </select>
+  <br>
+  <br>
 
-        <lable>Comments</lable>
-        <input ng-model="vm.comments" autocomplete="off" />
-        <br>
-        <br>
-
-        <lable>Size(sm)</lable>
-        <input ng-model="vm.size" autocomplete="off" />
-        <br>
-        <br>
-
-        <lable>City</lable>
-        <select ng-change="vm.changeCity()" ng-model="vm.city">
-          <option ng-repeat="item in vm.cities">{{item}}</option>
-        </select>
-        <br>
-        <br>
-
-        <button ng-if="!vm.data.isBusy" ng-click="vm.saveSessionSettings()">New client</button>
-        <button ng-if="!vm.data.isBusy" ng-click="vm.syncDevices()">Sync devices</button>
-
+  <button ng-click="vm.createNewClient()">New client</button>
+</div>
+<div ng-if="vm.data.clientId">
+  <div ng-show="!vm.data.session">
+    <div class="gallery-control-panel">
+      <div ng-repeat="gallery in vm.data.galleries">
+        <button class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
+                ng-click="vm.selectGallery(gallery)">
+          ({{$index + 1}}) - {{gallery}}
+        </button>
       </div>
-  </div>
-  <div class="commands" ng-show="vm.data.session">
-      <div class="group">
-        <div class="title">User Data</div>
-        <br>
-        <lable>Session ID</lable>
-        <span>{{vm.data.session.id}}</span>
-        <br>
-
-
-        <lable>Comments</lable>
-        <span>{{vm.comments}}</span>
-        <br>
-        <lable>Size(sm)</lable>
-        <span>{{vm.size}}</span>
-        <br>
-
-        <button ng-if="!vm.data.isBusy" ng-click="vm.executeSoft()">Execute</button>
-        <button ng-if="!vm.data.isBusy" ng-click="vm.closeSession()">Close</button>
+      <div >
+        <button class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
+                ng-click="vm.selectGallery()">+</button>
       </div>
+      <div class="pull-right">
+        <button class="gallery-button" ng-style="{'background-color': 'white'}"
+                ng-click="vm.closeClient()">Close client</button>
+      </div>
+    </div>
+    <div class="gallery-content">
+      <div ng-if="vm.galleryId">
+        <div gallery gallery-id="vm.galleryId"></div>
+      </div>
+      <div ng-if="!vm.galleryId">
+        <div class="commands" >
+            <div class="group">
+              <div class="title">User Data</div>
+              <br>
+
+              <lable>Comments</lable>
+              <input ng-model="vm.comments" autocomplete="off" />
+              <br>
+              <br>
+
+              <lable>Size(sm)</lable>
+              <input ng-model="vm.size" autocomplete="off" />
+              <br>
+              <br>
+
+              <button ng-if="!vm.data.isBusy" ng-click="vm.saveSessionSettings()">New session</button>
+            </div>
+        </div>
+      </div>
+    </div>
   </div>
+  <div class="commands" ng-if="vm.data.session">
+    <div class="group" ng-if="!vm.data.isBusy">
+      <div class="title">User Data</div>
+      <br>
+      <lable>Session ID</lable>
+      <span>{{vm.data.session.id}}</span>
+      <br>
+      <lable>Comments</lable>
+      <span>{{vm.comments}}</span>
+      <br>
+      <lable>Size(sm)</lable>
+      <span>{{vm.size}}</span>
+      <br>
+      <button ng-click="vm.executeSoft()">Start scan</button>
+      <button ng-click="vm.closeSession()">Close</button>
+    </div>
+    <div ng-if="vm.data.isBusy">
+      <div class="group" ng-if="vm.stage == 1">
+        Wait...
+      </div>
+      <div class="group" ng-if="vm.stage == 2">
+        Photo
+      </div>
+      <div class="group" ng-if="vm.stage == 3">
+        Photo ready. Transfering data...
+      </div>
+    </div>
+  </div>
+
 </div>

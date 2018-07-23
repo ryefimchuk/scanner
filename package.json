@@ -6,6 +6,7 @@
     "express": "^4.15.2",
     "fs-exists-sync": "^0.1.0",
     "ftp-client": "^0.2.2",
+    "gulp": "^3.9.1",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "request": "^2.87.0",

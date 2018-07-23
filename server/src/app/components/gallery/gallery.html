@@ -1,0 +1,23 @@
+<div class="gallery">
+  <table>
+    <tr class="gallery-row" ng-repeat="galleryRow in vm.galleryRows">
+      <td ng-repeat="galleryItem in galleryRow" >
+        <div class="gallery-item" item="galleryItem.data" ng-style="{'background-image': 'url({{galleryItem.url ? galleryItem.url : vm.defaultImage}})' }">
+          {{galleryItem.url}}
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div class="left-button" ng-click="vm.moveLeft()">
+    <i class="left"></i>
+  </div>
+  <div class="right-button" ng-click="vm.moveRight()">
+    <i class="right"></i>
+  </div>
+  <div class="up-button" ng-click="vm.moveUp()">
+    <i class="up"></i>
+  </div>
+  <div class="down-button" ng-click="vm.moveDown()">
+    <i class="down"></i>
+  </div>
+</div>
