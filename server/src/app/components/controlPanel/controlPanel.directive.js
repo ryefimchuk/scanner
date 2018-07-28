@@ -38,6 +38,37 @@
 
       vm.newPreset = '';
 
+      if(localStorage.galleryMap) {
+        vm.galleryMap = JSON.parse(atob(localStorage.galleryMap));
+      }
+      else{
+        vm.galleryMap = connector.initMap();
+      }
+
+      vm.changeMapItem = function(row, column){
+        console.log(row, column)
+      }
+
+      vm.saveMap = function(){
+        var _rows = []
+
+        for (var i = 0; i < 9 ; i++){
+          var r = vm.galleryMap[i]
+          var _cols = []
+
+          for (var j = 0; j < 9 ;j++){
+            _cols.push({
+              numb: r[j].numb
+            })
+          }
+
+          _rows.push(_cols)
+        }
+
+        var jsn = JSON.stringify(_rows);
+        localStorage.galleryMap = btoa(jsn)
+      }
+
       vm.deletePreset = function(oldName) {
         if (!oldName) return;
 

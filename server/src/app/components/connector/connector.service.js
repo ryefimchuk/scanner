@@ -206,6 +206,34 @@
 
     }
 
+    function initMap(){
+      var posX = 3
+      var posY = 3
+
+      var stepX = 1
+      var stepY = 1
+
+      var _y = 15
+      var _x = 16
+
+      var matrix3x3 = []
+      for (var i = 0; i < 3 * 3; i++) { // rows
+        var row = []
+        for (var j = 0; j < 3 * 3; j++) { // columns
+          var numb = ((stepX * j) + posX) * _x + (stepY * i) + posY + 1
+          row.push({
+            numb:numb
+          })
+        }
+        matrix3x3.push(row)
+      }
+
+      console.log(matrix3x3)
+      return matrix3x3;
+    }
+
+
+
     function getScanners() {
       return serviceData;
     }
@@ -216,6 +244,7 @@
     this.getScannerBy = getScannerBy;
     this.getScannerByNumber = getScannerByNumber;
     this.getScanners = getScanners;
+    this.initMap = initMap;
   }
 
 })();

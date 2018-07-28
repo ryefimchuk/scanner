@@ -100,11 +100,6 @@
 
     vm.saveSessionSettings = function(){
 
-      if(!vm.comments){
-        alert("Comments is required field")
-        return
-      }
-
       if(!vm.size){
         alert("Size is required field")
         return
@@ -140,23 +135,36 @@
     vm.executeSoft = function(){
       vm.stage = 1
 
-      $timeout(function(){
-        vm.stage = 2
-      },2000)
+      vm.counter = 3
 
       $timeout(function(){
-        vm.stage = 3
+        vm.counter = 2
+      },1000)
+
+      $timeout(function(){
+        vm.counter = 1
+      },2000)
+
+
+      $timeout(function(){
+        vm.counter = 0
+        vm.stage = 2
       },3000)
+
+
+      //vm.data.isBusy = true
 
       exSocket.emit('soft trigger', {});
     }
 
     vm.closeSession = function(){
+      vm.selectGallery()
       exSocket.emit('set-session', null);
     }
 
     vm.closeClient = function(){
       if(confirm("Do you want to close curent client?")) {
+        vm.selectGallery()
         exSocket.emit('set-client', {
           clientId: null
         });

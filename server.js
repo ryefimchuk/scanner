@@ -33,9 +33,17 @@ var CODE_EXECUTE_SHELL = 1010;
 var CODE_UPDATE_BUSY_STATE = 1011;
 var CODE_LOG_DATA = 1020;
 
+function setCustomCacheControl (res, path) {
+
+  res.setHeader('Cache-Control', 'public, max-age=10000')
+}
+
 app.use(API, express.static('server'));
 
-app.use('/images', express.static(destinationFolder))
+app.use('/images', express.static(destinationFolder, {
+  //maxage: '2h'
+  setHeaders: setCustomCacheControl
+}))
 
 
 var lightSettings = {

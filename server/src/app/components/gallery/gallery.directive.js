@@ -24,8 +24,8 @@
     function GalleryController(moment, $scope, $document, connector) {
 
       var position = {
-        x: 0,
-        y: 0
+        x: 3,
+        y: 3
       }
       var vm = this;
 
@@ -34,12 +34,18 @@
       vm.defaultImage = 'assets/images/temp.png'
       vm.galleryRows = []
 
+      if(localStorage.galleryMap) {
+        vm.galleryMap = JSON.parse(atob(localStorage.galleryMap));
+      }
+      else{
+        vm.galleryMap = connector.initMap();
+      }
 
-      var _y = 15
-      var _x = 16
+      var _y = 9
+      var _x = 9
 
-      var stepX = 3
-      var stepY = 2
+      var stepX = 1
+      var stepY = 1
 
       var initMatrix = function(posX, posY){
         var sessionId = vm.galleryId
@@ -56,7 +62,9 @@
           for (var i = 0; i < 3; i++) { // rows
             var row = []
             for (var j = 0; j < 3; j++) { // columns
-              var numb = ((stepX * j) + posX) * _x + (stepY * i) + posY + 1
+
+              var numb = vm.galleryMap[posY + i][posX + j].numb
+              //var numb = ((stepX * j) + posX) * _x + (stepY * i) + posY + 1
               row.push({
                 "url": "http://localhost/images/" + sessionId + "/normal/" + numb + ".jpg"
               })
@@ -76,7 +84,7 @@
       initMatrix(0, 0)
 
       vm.moveLeft = function() {
-        position.x--;
+        position.x-=3;
         if(position.x < 0)
           position.x = 0;
 
@@ -84,7 +92,7 @@
       }
 
       vm.moveRight = function() {
-        position.x++;
+        position.x+=3;
         if(position.x > _x - (stepX * 3))
           position.x = _x - (stepX * 3);
 
@@ -92,7 +100,7 @@
       }
 
       vm.moveUp = function() {
-        position.y--;
+        position.y-=3;
         if(position.y < 0)
           position.y = 0;
 
@@ -100,7 +108,7 @@
       }
 
       vm.moveDown = function() {
-        position.y++;
+        position.y+=3;
         if(position.y > _y - (stepY * 3))
           position.y = _y - (stepY * 3);
 

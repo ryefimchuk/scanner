@@ -3,7 +3,7 @@
     <tr class="gallery-row" ng-repeat="galleryRow in vm.galleryRows">
       <td ng-repeat="galleryItem in galleryRow" >
         <div class="gallery-item" item="galleryItem.data" ng-style="{'background-image': 'url({{galleryItem.url ? galleryItem.url : vm.defaultImage}})' }">
-          {{galleryItem.url}}
+
         </div>
       </td>
     </tr>

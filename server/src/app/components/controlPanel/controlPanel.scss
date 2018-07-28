@@ -1,7 +1,7 @@
 .control-panel {
   position: fixed;
   right: 0px;
-  width: 400px;
+  width: 406px;
   background: #fafafa;
   top: 40px;
   bottom: 0px;
@@ -49,5 +49,20 @@
         color: white;
       }
     }
+  }
+
+  .map-row{
+    display: block;
+
+    .map-column{
+      display: inline-block;
+
+      input {
+        width: 43px;
+        display: block;
+
+      }
+    }
+
   }
 }
