@@ -2,7 +2,7 @@
   <table>
     <tr class="gallery-row" ng-repeat="galleryRow in vm.galleryRows">
       <td ng-repeat="galleryItem in galleryRow" >
-        <div class="gallery-item" item="galleryItem.data" ng-style="{'background-image': 'url({{galleryItem.url ? galleryItem.url : vm.defaultImage}})' }">
+        <div ng-click="vm.selectedImage = galleryItem.url" class="gallery-item" item="galleryItem.data" ng-style="{'background-image': 'url({{galleryItem.url ? galleryItem.url : vm.defaultImage}})' }">
 
         </div>
       </td>
@@ -19,5 +19,10 @@
   </div>
   <div class="down-button" ng-click="vm.moveDown()">
     <i class="down"></i>
+  </div>
+  <div ng-click="vm.selectedImage = null" class="preview-image-container" ng-if="vm.selectedImage">
+    <div class="preview-image" ng-style="{'background-image': 'url({{vm.selectedImage}})' }">
+
+    </div>
   </div>
 </div>

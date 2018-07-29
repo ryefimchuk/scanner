@@ -61,3 +61,22 @@ i {
   margin: 2px;
 }
 
+.preview-image-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  .preview-image {
+    position: absolute;
+
+    top: 50px;
+    bottom: 50px;
+    left: 50px;
+    right: 50px;
+
+    background-position: center center;
+    background-size: cover;
+  }
+}
