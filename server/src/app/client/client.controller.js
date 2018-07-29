@@ -45,7 +45,7 @@
       var pos = vm.data.galleries.indexOf(sessionId);
       if(pos != -1){
 
-        if(!confirm("Do you wont to remove selected session?")){
+        if(!confirm("Do you want to remove selected session?")){
           return;
         }
 
@@ -97,6 +97,10 @@
     }
 
     $document.on('keyup', keyupHandler);
+
+    vm.removeSession = function(){
+      removeSession(vm.galleryId)
+    }
 
     vm.saveSessionSettings = function(){
 
