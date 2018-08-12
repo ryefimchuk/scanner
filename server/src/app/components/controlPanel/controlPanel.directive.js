@@ -8,7 +8,7 @@
     .directive('controlPanel', ControlPanel);
 
   /** @ngInject */
-  function ControlPanel($log, $rootScope, exSocket, $timeout, connector) {
+  function ControlPanel($log, $rootScope, exSocket, $timeout) {
     var directive = {
       restrict: 'EA',
       templateUrl: 'app/components/controlPanel/controlPanel.html',
@@ -39,15 +39,17 @@
       vm.newPreset = '';
 
       if(localStorage.galleryMap) {
-        vm.galleryMap = JSON.parse(atob(localStorage.galleryMap));
+        vm.galleryMap = angular.fromJson(atob(localStorage.galleryMap));
       }
       else{
         vm.galleryMap = connector.initMap();
       }
 
-      vm.changeMapItem = function(row, column){
-        console.log(row, column)
-      }
+/*      vm.changeMapItem = function(row, column){
+
+        //console.log(row, column)
+      }*/
+
 
       vm.saveMap = function(){
         var _rows = []
@@ -65,7 +67,7 @@
           _rows.push(_cols)
         }
 
-        var jsn = JSON.stringify(_rows);
+        var jsn = angular.toJson(_rows);
         localStorage.galleryMap = btoa(jsn)
       }
 
@@ -175,7 +177,7 @@
           id: (new Date()).getTime(),
           name: vm.newPreset,
           lightSettings: vm.data.lightSettings,
-          photoSettings: vm.data.photoSettings,
+          photoSettings: vm.data.photoSettings
         });
 
         vm.data.selectedPreset = vm.newPreset;
@@ -216,12 +218,12 @@
             {
               resultCommand[opt.command] = opt.value;
               break;
-            };
+            }
           }
         }
 
-        for(var i = 0; i < vm.data.options.length; i++) {
-          var opt = vm.data.options[i];
+        for(i = 0; i < vm.data.options.length; i++) {
+          opt = vm.data.options[i];
           if(opt.dependency){
             var pair = opt.dependency.split(':'),
               depField = pair[0],
@@ -258,7 +260,7 @@
       }
 
       vm.execShell = function(){
-        console.log("shell: " + vm.shellCommand);
+        //console.log("shell: " + vm.shellCommand);
 
         //vm.target
         exSocket.emit("shell", {

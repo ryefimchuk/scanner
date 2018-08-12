@@ -111,7 +111,7 @@
       }
     });
 
-    function loadScannerData(item){
+    /*function loadScannerData(item){
       if(item.ip) {
         var data = {
           ip: item.ip,
@@ -120,7 +120,7 @@
         };
         exSocket.emit('preview ip', data);
       }
-    }
+    }*/
 
 
     function updateData(){
@@ -149,10 +149,10 @@
         }
       }
 
-      var url = 'css/temp.png';
+      //var url = 'css/temp.png';
 
       var counter = 0;
-      for (var i = 0; i < scanner_row; i++) {
+      for (i = 0; i < scanner_row; i++) {
 
         var row = {
           cameras:[]
@@ -213,7 +213,7 @@
       var stepX = 1
       var stepY = 1
 
-      var _y = 15
+      //var _y = 15
       var _x = 16
 
       var matrix3x3 = []
@@ -228,7 +228,7 @@
         matrix3x3.push(row)
       }
 
-      console.log(matrix3x3)
+      //console.log(matrix3x3)
       return matrix3x3;
     }
 

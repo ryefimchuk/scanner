@@ -6,7 +6,7 @@
     .service('optionsConfig', optionsConfig);
 
   /** @ngInject */
-  function optionsConfig(exSocket) {
+  function optionsConfig(exSocket, $log) {
 
     var data = {
       options: [
@@ -226,8 +226,8 @@
       photoSettings: null
     };
 
-    var _photo = null;
-    var _light = null;
+    //var _photo = null;
+    //var _light = null;
 
     exSocket.on('current settings', function (_data) {
       try
@@ -246,7 +246,9 @@
           data.options[i].value = data.photoSettings[cmd];
         }
       }
-      catch(e){}
+      catch(e){
+        $log(e)
+      }
     });
 
     function getOptions() {

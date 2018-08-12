@@ -10,11 +10,15 @@ var mkdirp = require('mkdirp');
 var net = require('net');
 var API = '/api';
 
+var timeoutInterval = 2 * 60
+
 var srcFolder = 'c:\\example\\';
 var destFolder = 'c:\\example\\';
 
 var destinationFolder = 'c:/photos/';
 var systemBusy = false;
+
+var timeout = null;
 
 var CODE_PING_PONG = 100;
 
@@ -631,6 +635,21 @@ io.on('connection', function(socket) {
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
       var diff = process.hrtime(logTime);
       console.log(`Broadcasting took ${(diff[0] * NS_PER_SEC + diff[1]) / 1000000.0} milliseconds`);
+
+      timeout = setTimeout(function(){
+        if(session){
+
+          var allBusyScanners = scanners.filter(function(item) {
+            return item.scanner.isBusy;
+          });
+
+          allBusyScanners.forEach(function(scanner){
+            scanner.destroy();
+          });
+        }
+        
+        timeout = null;
+      }, 1000 * timeoutInterval)
     }
   });
 
@@ -730,6 +749,12 @@ function reloadData() {
   if(systemBusy && !isBusy){
     // reset session
     session = null;
+
+    if(timeout){
+      clearTimeout(timeout)
+      timeout = null;
+    }
+
     updateSession();
   }
 

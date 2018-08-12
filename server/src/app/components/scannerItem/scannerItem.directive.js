@@ -22,7 +22,7 @@
     return directive;
 
     /** @ngInject */
-    function ScannerItemController(moment) {
+    function ScannerItemController() {
       var vm = this;
       vm.defaultImage = 'assets/images/temp.png'
 

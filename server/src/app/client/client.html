@@ -28,15 +28,17 @@
   <div ng-show="vm.data.clientId" class="client-bg">
     <div ng-show="!vm.data.session">
       <div class="gallery-control-panel">
-        <div ng-repeat="gallery in vm.data.galleries">
-          <button class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
-                  ng-click="vm.selectGallery(gallery)">
-            ({{$index + 1}}) - {{gallery}}
-          </button>
-        </div>
-        <div >
-          <button title="Start new session" class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
-                  ng-click="vm.selectGallery()">+</button>
+        <div class="left-buttons">
+          <div ng-repeat="gallery in vm.data.galleries">
+            <button class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
+                    ng-click="vm.selectGallery(gallery)">
+              ({{$index + 1}}) - {{gallery}}
+            </button>
+          </div>
+          <div >
+            <button title="Start new session" class="gallery-button" ng-style="{'background-color': vm.isSelected(gallery)}"
+                    ng-click="vm.selectGallery()">+</button>
+          </div>
         </div>
         <div class="pull-right">
           <button title="Close current client" class="gallery-button" ng-style="{'background-color': 'white'}"

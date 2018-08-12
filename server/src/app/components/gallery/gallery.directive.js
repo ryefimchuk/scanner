@@ -6,7 +6,7 @@
     .directive('gallery', Gallery);
 
   /** @ngInject */
-  function Gallery($log, $rootScope, exSocket, connector) {
+  function Gallery() {
     var directive = {
       restrict: 'EA',
       templateUrl: 'app/components/gallery/gallery.html',
@@ -35,7 +35,7 @@
       vm.galleryRows = []
 
       if(localStorage.galleryMap) {
-        vm.galleryMap = JSON.parse(atob(localStorage.galleryMap));
+        vm.galleryMap = angular.fromJson(atob(localStorage.galleryMap));
       }
       else{
         vm.galleryMap = connector.initMap();
@@ -73,7 +73,7 @@
           }
         }
 
-        console.log(matrix3x3)
+        //console.log(matrix3x3)
         vm.galleryRows = matrix3x3
       }
 

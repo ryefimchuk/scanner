@@ -26,6 +26,14 @@
       });
     }
 
+    $scope.$watch("vm.data.session", function(newValue, oldValue){
+      if(newValue !== oldValue && !newValue){
+        $timeout(function(){
+          selectLastGallery()
+        },10)
+      }
+    });
+
     vm.galleryLable = function(gallery){
       if(gallery){
         return (new Date(gallery))
@@ -33,11 +41,18 @@
     }
 
     vm.isSelected = function(gallery){
-      return gallery == vm.galleryId ? "white" : "lightgray"
+      return gallery == vm.galleryId ? "white" : "gray"
     }
 
     vm.selColor = "red"
     vm.unselColor = "gray"
+
+    function selectLastGallery() {
+      var pos = vm.data.galleries.length - 1;
+      if(pos != -1) {
+        vm.selectGallery(vm.data.galleries[pos])
+      }
+    }
 
     function removeSession(sessionId){
 
@@ -71,7 +86,7 @@
 
       var keyCode = keyEvent.keyCode;
 
-      console.log('keyup', keyEvent);
+      //console.log('keyup', keyEvent);
 
       if(keyCode >= 49 && keyCode <= 57){
 

@@ -18,20 +18,45 @@
     display: inline-block;}
 
 
+  .left-buttons{
+    width: calc(100% - 230px);
+    overflow-y: hidden;
+    overflow-x: auto;
+    white-space: nowrap;
+
+    height: 49px;
+    display: inline-block;
+
+    &>div {
+      display: inline-block;
+    }
+  }
+
   button {
     font-family: 'font3Dgeneration' !important;
-
     height: 36px;
     line-height: 36px;
-    padding: 0 15px;
-    font-size: 20px;
+    padding: 0 6px;
+    font-size: 14px;
     color: black;
-    background: rgb(52,52,52);
+    background: #343434;
     border: none;
-
     max-width: 220px;
     min-width: 70px;
   }
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: white;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  background: #0f0f0f;
 }
 
 
