@@ -646,6 +646,10 @@ io.on('connection', function(socket) {
           allBusyScanners.forEach(function(scanner){
             scanner.destroy();
           });
+
+          setTimeout(function(){
+            reloadData()
+          }, 1000)
         }
         
         timeout = null;
