@@ -73,14 +73,16 @@
     });
 
     exSocket.on('load data', function (data) {
-      serviceData.allScanners = data.scanners;
-      serviceData.trigger = data.trigger;
-      serviceData.isBusy = data.isBusy;
-      serviceData.projector = data.projector;
+      $timeout(function () {
+        serviceData.allScanners = data.scanners;
+        serviceData.trigger = data.trigger;
+        serviceData.isBusy = data.isBusy;
+        serviceData.projector = data.projector;
 
-      $log.log("received full scanners data");
-      //alert("new data")
-      updateData();
+        $log.log("received full scanners data");
+        //alert("new data")
+        updateData();
+      }, 2000)
     });
 
     exSocket.on('update-galleries', function (data) {

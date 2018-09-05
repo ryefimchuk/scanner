@@ -152,9 +152,10 @@
     }
 
     vm.executeSoft = function(){
+      vm.data.isBusy = true;
       vm.stage = 1
-
       vm.counter = 3
+      exSocket.emit('soft trigger', {});
 
       $timeout(function(){
         vm.counter = 2
@@ -171,9 +172,6 @@
       },3000)
 
 
-      //vm.data.isBusy = true
-
-      exSocket.emit('soft trigger', {});
     }
 
     vm.closeSession = function(){
