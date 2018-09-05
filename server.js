@@ -20,6 +20,8 @@ var systemBusy = false;
 
 var timeout = null;
 
+var _reloadDataTimeout = null;
+
 var CODE_PING_PONG = 100;
 
 var CODE_ADD_PROJECTOR = 999;
@@ -741,6 +743,16 @@ function updateScanner(scanner) {
 }
 
 function reloadData() {
+  if(_reloadDataTimeout)
+    return;
+
+  _reloadDataTimeout = setTimeout(function(){
+    _reloadDataTimeout = null;
+    _reloadData();
+  }, 1000)
+}
+
+function _reloadData() {
   var isBusy = scanners.some(function(item) {
     return item.scanner.isBusy;
   });
