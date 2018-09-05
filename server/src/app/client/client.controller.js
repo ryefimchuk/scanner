@@ -26,6 +26,15 @@
       });
     }
 
+    exSocket.on("read-gallery", function(data){
+      vm.editedGalleryId = vm.galleryId
+      vm.galleryId = null
+
+
+      vm.comments = data.comments
+      vm.size = data.size
+    })
+
     $scope.$watch("vm.data.session", function(newValue, oldValue){
       if(newValue !== oldValue && !newValue){
         $timeout(function(){
@@ -54,8 +63,29 @@
       }
     }
 
-    function removeSession(sessionId){
+    function editSession(sessionId){
+      exSocket.emit('open-session', vm.galleryId)
+    }
 
+
+    vm.updateSession = function(){
+      if(!vm.size){
+        alert("Size is required field")
+        return
+      }
+
+      exSocket.emit('update-session', {
+        firstName: vm.firstName,
+        lastName: vm.lastName,
+        comments: vm.comments,
+        size: vm.size,
+        city: vm.city,
+        id: vm.editedGalleryId
+      });
+      vm.galleryId = vm.editedGalleryId
+    }
+
+    function removeSession(sessionId){
 
       var pos = vm.data.galleries.indexOf(sessionId);
       if(pos != -1){
@@ -113,6 +143,10 @@
 
     $document.on('keyup', keyupHandler);
 
+    vm.editSession = function(){
+      editSession(vm.galleryId)
+    }
+
     vm.removeSession = function(){
       removeSession(vm.galleryId)
     }
@@ -144,6 +178,7 @@
 
     vm.selectGallery = function(gallery){
       vm.galleryId = gallery
+      vm.editedGalleryId = null
     }
 
 

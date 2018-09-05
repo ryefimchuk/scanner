@@ -48,6 +48,10 @@
           <button title="Remove current session" ng-show="vm.galleryId" class="gallery-button" ng-style="{'background-color': 'orange'}"
                   ng-click="vm.removeSession()">x</button>
         </div>
+        <div class="pull-right">
+          <button title="Edit current session" ng-show="vm.galleryId" class="gallery-button" ng-style="{'background-color': 'lightblue'}"
+                  ng-click="vm.editSession()">Edit</button>
+        </div>
       </div>
       <div class="gallery-content">
         <div ng-show="vm.galleryId">
@@ -67,7 +71,9 @@
                   <input ng-model="vm.size" autocomplete="off" />
                 </div>
                 <br>
-                <button ng-show="!vm.data.isBusy" ng-click="vm.saveSessionSettings()">New session</button>
+
+                <button ng-show="!vm.data.isBusy && vm.editedGalleryId" ng-click="vm.updateSession()">Update session</button>
+                <button ng-show="!vm.data.isBusy && !vm.editedGalleryId" ng-click="vm.saveSessionSettings()">New session</button>
               </div>
             <div class="top-border">
               <div class="title">SESSION DATA</div>

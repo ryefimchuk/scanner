@@ -619,6 +619,42 @@ io.on('connection', function(socket) {
     updateSession();
   });
 
+
+  socket.on('open-session', function(sessionId) {
+    var newDir = destinationFolder + sessionId + '/';
+    fs.readFile(newDir + 'example.json', function(err, data) {
+      if (err) {
+        console.log(err);
+        return
+      }
+
+      try{
+        socket.emit('read-gallery', JSON.parse(data))
+      }
+      catch(ex){}
+    });
+
+  })
+
+  socket.on('update-session', function(data) {
+    session = data;
+
+    if (data) {
+      var newConfig = getConfigJSON(data);
+
+      var newDir = destinationFolder + data.id + '/';
+      fs.writeFile(newDir + 'example.json', newConfig, function(err) {
+        if (err) {
+          //return console.log(err);
+          return;
+        }
+      });
+    }
+
+    //updateGalleries()
+    //updateSession();
+  });
+
   socket.on('soft trigger', function() {
 
     systemBusy = true;
