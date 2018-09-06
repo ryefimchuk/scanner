@@ -667,7 +667,7 @@ io.on('connection', function(socket) {
 
       var dt = new Date();
 
-      var timer = parseInt(dt.getTime() / 1000.0) + 2;
+      var timer = parseInt(dt.getTime() / 1000.0) + 3;
 
       var logTime = process.hrtime();
       scannerSend(scanners, CODE_TAKE_PHOTO, JSON.stringify(lightSettings), timer);
