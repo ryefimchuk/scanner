@@ -14,7 +14,8 @@ HIDE = GPIO.LOW
 
 
 
-GPIO_PORT=11
+LIGHT_PORT=11
+PROJ_PORT=13
 
 CODE_EXECUTE_SHELL = 1010
 CODE_LOG_DATA = 1020
@@ -22,7 +23,9 @@ CODE_LOG_DATA = 1020
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
-GPIO.setup(GPIO_PORT, GPIO.OUT, initial=SHOW)
+
+GPIO.setup(PROJ_PORT, GPIO.OUT, initial=HIDE)
+GPIO.setup(LIGHT_PORT, GPIO.OUT, initial=SHOW)
 
 
 HOST = '192.168.1.99'
@@ -177,15 +180,17 @@ class SocketHandler:
                     tm = time.time()
                     if tm >= lightStart and not isLStart:
                         isLStart = True
-                        GPIO.output(GPIO_PORT, HIDE)
+                        GPIO.output(LIGHT_PORT, HIDE)
                     if tm >= lightFinish and not isLFinish:
                         isLFinish = True
-                        GPIO.output(GPIO_PORT, SHOW)
+                        GPIO.output(LIGHT_PORT, SHOW)
                     if tm >= projectorStart and not isPStart:
                         isPStart = True
+                        GPIO.output(PROJ_PORT, SHOW)
                         self.enableProjector(True)
                     if tm >= projectorFinish and not isPFinish:
                         isPFinish = True
+                        GPIO.output(PROJ_PORT, HIDE)
                         self.enableProjector(False)
                     if tm >= stop:
                         self.logData("finish set", False)
