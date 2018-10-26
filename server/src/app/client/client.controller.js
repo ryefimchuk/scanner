@@ -6,7 +6,7 @@
     .controller('ClientController', ClientController);
 
   /** @ngInject */
-  function ClientController($scope, $rootScope, $timeout, $document, optionsConfig, toastr, connector, exSocket) {
+  function ClientController($window, $scope, $rootScope, $timeout, $document, optionsConfig, toastr, connector, exSocket) {
     var vm = this;
 
     exSocket.emit('get-galleries')
@@ -215,7 +215,7 @@
     }
 
     vm.closeClient = function(){
-      if(confirm("Do you want to close curent client?")) {
+      if(confirm("Do you want to close current client?")) {
         vm.selectGallery()
         exSocket.emit('set-client', {
           clientId: null
@@ -223,5 +223,95 @@
       }
     }
 
+    if ($window.parent && $window.parent !== $window) {
+
+      var isLoadEventTriggered = false;
+      var getParameterByName = function (name, url) {
+
+        if (!url) {
+
+          url = $window.location.href;
+        }
+
+        name = name.replace(/[\[\]]/g, "\\$&");
+
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+        var results = regex.exec(url);
+
+        if (!results) {
+
+          return null;
+        }
+
+        if (!results[2]) {
+
+          return '';
+        }
+
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+      };
+
+      var origin = getParameterByName('origin');
+      var city = getParameterByName('city');
+      var comments = getParameterByName('comments');
+      var size = getParameterByName('size');
+
+      if (vm.cities.indexOf(city) !== -1) {
+
+        vm.city = city;
+        vm.comments = comments;
+        vm.size = size;
+
+        vm.createNewClient();
+      } else {
+
+        vm.city = localStorage.city;
+      }
+
+      vm.isEmbedded = true;
+
+      $scope.$watch("vm.data.clientId", function (newValue, oldValue) {
+
+        if (newValue && !oldValue && !isLoadEventTriggered) {
+
+          vm.saveSessionSettings();
+
+          $window.parent.postMessage({
+            command: 'load'
+          }, origin);
+
+          isLoadEventTriggered = true;
+        }
+      });
+
+      $window.addEventListener('message', function (event) {
+
+        switch (event.data.command) {
+          case 'close': {
+
+            if (vm.galleryId) {
+
+              $window.parent.postMessage({
+                command: 'result',
+                result: {
+                  gallery_id: vm.galleryId
+                }
+              }, origin);
+            } else {
+
+              $window.parent.postMessage({
+                command: 'close'
+              }, origin);
+            }
+
+            break;
+          }
+        }
+      });
+    } else {
+
+      vm.city = localStorage.city;
+      vm.isEmbedded = false;
+    }
   }
 })();

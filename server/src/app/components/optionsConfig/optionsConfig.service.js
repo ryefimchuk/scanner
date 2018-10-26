@@ -247,7 +247,7 @@
         }
       }
       catch(e){
-        $log(e)
+        $log.error(e)
       }
     });
 
