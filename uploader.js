@@ -114,14 +114,52 @@ function copyFolder(foldersList) {
           filesList = filesList.sort().reverse();
 
 
-          copy(filesList, 0, function(isOK){
-            if(isOK){
-              setTimeout(function(){
-                deleteFolderRecursive(src);
-                process.exit();
+          copy(filesList, 0, (isOK) => {
+
+            if (isOK) {
+
+              setTimeout(() => {
+
+                try {
+
+                  if (!fs.existsSync(`${src}/example.json`)) {
+
+                    throw new Error(`File example.json doesn't exist`);
+                  }
+
+                  const example = JSON.stringify(
+                    fs.readFileSync(`${src}/example.json`)
+                  );
+
+                  request.put({
+                    url: `http://localhost/erpnext/tasks/modeling/${example.taskName}/transferringCompleted`
+                  }, (error, response, body) => {
+
+                    if (error || response.statusCode !== 200) {
+
+                      if (error) {
+
+                        console.error(error.stack);
+                      } else {
+
+                        console.error(`Unable to send request`);
+                      }
+                    }
+
+                    deleteFolderRecursive(src);
+                    process.exit();
+                  });
+                } catch (e) {
+
+                  console.error(e.stack);
+
+                  deleteFolderRecursive(src);
+                  process.exit();
+                }
               }, 1000);
-            }else{
-              console.log('Some errors occurred during transporting. Will try to repload next time')
+            } else {
+
+              console.log('Some errors occurred during transporting. Will try to reupload next time')
             }
           });
         })

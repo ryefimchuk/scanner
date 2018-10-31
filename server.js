@@ -8,7 +8,6 @@ var fs = require('fs');
 var ss = require('socket.io-stream');
 var mkdirp = require('mkdirp');
 var net = require('net');
-var path = require('path');
 var API = '/api';
 
 var timeoutInterval = 2 * 60
@@ -52,41 +51,7 @@ app.use('/images', express.static(destinationFolder, {
   setHeaders: setCustomCacheControl
 }))
 
-app.use(function (req, res, next) {
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
-
-  next();
-});
-
-app.put('/galleries/:galleryId/attachTask/:taskName', (req, res) => {
-
-  const {galleryId, taskName} = req.params;
-  const jsonPath = path.resolve(destinationFolder, galleryId, 'example.json');
-
-  try {
-
-    fs.writeFileSync(jsonPath, JSON.stringify(
-      _.extend(
-        JSON.parse(
-          fs.readFileSync(jsonPath)
-        ), {
-          taskName: taskName
-        }
-      )
-    ));
-    res.sendStatus(200);
-    console.log(`Task ${taskName} has successfully been attached`);
-  } catch (e) {
-
-    res.sendStatus(500);
-    console.error(`Failed to attach task ${taskName}`);
-  }
-});
-
+require('./erpnext')(destinationFolder, app);
 
 var lightSettings = {
   lightStart: 0,
@@ -579,7 +544,7 @@ io.on('connection', function(socket) {
       city: data.city
     };
 
-    return JSON.stringify(cfg);
+    return JSON.stringify(cfg, null, 2);
   }
 
   socket.on('get-galleries', function() {
