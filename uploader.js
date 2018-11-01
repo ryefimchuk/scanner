@@ -3,6 +3,7 @@ var path = require('path');
 var exists = require('fs-exists-sync');
 var request = require('request');
 var config = require('./uploaderConfig');
+const erpNotifierConfig = require('./erp-notifier.config');
 
 
 var cityid = config.cityid; //'dba40f30-5b1f-444d-9468-5c215de685f1';
@@ -15,6 +16,48 @@ process.on('uncaughtException', function(err){
 })
 
 start();
+
+function notifyERP(src, action, callback) {
+
+  try {
+
+    if (!fs.existsSync(`${src}/example.json`)) {
+
+      throw new Error(`File example.json doesn't exist`);
+    }
+
+    const example = JSON.stringify(
+      fs.readFileSync(`${src}/example.json`)
+    );
+
+    request.put({
+      headers: {
+        'Authorization': Buffer
+          .from(`Basic ${erpNotifierConfig.username}:${erpNotifierConfig.password}`)
+          .toString('base64')
+      },
+      url: `${erpNotifierConfig.host}/erpnext/tasks/modeling/${example.taskName}/${action}`
+    }, (error, response, body) => {
+
+      if (error || response.statusCode !== 200) {
+
+        if (error) {
+
+          console.error(error.stack);
+        } else {
+
+          console.error(`Unable to send request`);
+        }
+      }
+
+      callback();
+    });
+  } catch (e) {
+
+    console.error(e.stack);
+    callback();
+  }
+}
 
 ////////////////////////////////////////////
 function start() {
@@ -44,23 +87,24 @@ function start() {
 
 function copyFolder(foldersList) {
 
-  foldersList = foldersList.filter(function(directory){
+  foldersList = foldersList.filter(function (directory) {
 
     var now = (new Date()).getTime();
     var shiftedTime = now - 1000 * 60 * 20;
 
-/*    console.log({
-      now: now,
-      shiftedTime: shiftedTime
-    })*/
+    /*    console.log({
+          now: now,
+          shiftedTime: shiftedTime
+        })*/
 
-    try{
+    try {
+
       var dt = (new Date(parseInt(directory))).getTime();
 
-      if(dt < shiftedTime){
+      if (dt < shiftedTime) {
         return true;
       }
-    }catch(ex){
+    } catch (ex) {
     }
 
     return false;
@@ -75,100 +119,74 @@ function copyFolder(foldersList) {
     var src = basepath + '/' + folderName;
     var dst = '/';
 
-    if(isFolderNotEmpty(src)) {
-      fs.readdir(src, function (err, items) {
-        if (err) {
-          console.log('Error read directory', err);
-          process.exit(1);
-          return;
-        }
+    if (isFolderNotEmpty(src)) {
 
-        var promises = items.map(function(item){
-          return new Promise(function(res, rej){
-            var subFolder = path.resolve(src,item)
-            if(fs.lstatSync(subFolder).isDirectory()){
-              fs.readdir(subFolder, function (err, subitems){
-                if (err) {
-                  console.log('Error read directory', err);
-                  rej([]);
-                  return;
-                } else {
-                  res(subitems.map(function(subitem){
-                    return folderName + '/' + item + '/' +  subitem
-                  }));
-                }
-              });
-            }
-            else{
-              res([folderName + '/' + item]);
-            }
-          });
-        });
+      notifyERP(src, 'transferringStarted', () => {
 
-        Promise.all(promises).then(function(items){
-          var filesList = [];
-          items.forEach(function(list){
-            filesList = filesList.concat(list);
-          })
+        fs.readdir(src, function (err, items) {
+          if (err) {
+            console.log('Error read directory', err);
+            process.exit(1);
+            return;
+          }
 
-          filesList = filesList.sort().reverse();
-
-
-          copy(filesList, 0, (isOK) => {
-
-            if (isOK) {
-
-              setTimeout(() => {
-
-                try {
-
-                  if (!fs.existsSync(`${src}/example.json`)) {
-
-                    throw new Error(`File example.json doesn't exist`);
+          var promises = items.map(function (item) {
+            return new Promise(function (res, rej) {
+              var subFolder = path.resolve(src, item)
+              if (fs.lstatSync(subFolder).isDirectory()) {
+                fs.readdir(subFolder, function (err, subitems) {
+                  if (err) {
+                    console.log('Error read directory', err);
+                    rej([]);
+                    return;
+                  } else {
+                    res(subitems.map(function (subitem) {
+                      return folderName + '/' + item + '/' + subitem
+                    }));
                   }
+                });
+              }
+              else {
+                res([folderName + '/' + item]);
+              }
+            });
+          });
 
-                  const example = JSON.stringify(
-                    fs.readFileSync(`${src}/example.json`)
-                  );
+          Promise.all(promises).then(function (items) {
+            var filesList = [];
+            items.forEach(function (list) {
+              filesList = filesList.concat(list);
+            })
 
-                  request.put({
-                    url: `http://localhost/erpnext/tasks/modeling/${example.taskName}/transferringCompleted`
-                  }, (error, response, body) => {
+            filesList = filesList.sort().reverse();
 
-                    if (error || response.statusCode !== 200) {
 
-                      if (error) {
+            copy(filesList, 0, (isOK) => {
 
-                        console.error(error.stack);
-                      } else {
+              if (isOK) {
 
-                        console.error(`Unable to send request`);
-                      }
-                    }
+                setTimeout(() => {
+
+                  notifyERP(src, 'transferringCompleted', () => {
 
                     deleteFolderRecursive(src);
                     process.exit();
                   });
-                } catch (e) {
+                }, 1000);
+              } else {
 
-                  console.error(e.stack);
-
-                  deleteFolderRecursive(src);
-                  process.exit();
-                }
-              }, 1000);
-            } else {
-
-              console.log('Some errors occurred during transporting. Will try to reupload next time')
-            }
-          });
-        })
+                console.log('Some errors occurred during transporting. Will try to reupload next time')
+              }
+            });
+          })
+        });
       });
-    }
-    else{
+    } else {
+
       deleteFolderRecursive(src);
     }
-  }else{
+  } else {
+
     process.exit();
   }
 }
