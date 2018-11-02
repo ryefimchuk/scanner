@@ -10,7 +10,7 @@ var cityid = config.cityid; //'dba40f30-5b1f-444d-9468-5c215de685f1';
 var baseurl = config.baseurl; //'http://localhost:3000/upload/';
 var basepath = config.basepath; //'c:/photos/';
 
-process.on('uncaughtException', function(err){
+process.on('uncaughtException', function (err) {
   console.log(err);
   //process.exit()
 })
@@ -46,7 +46,7 @@ function notifyERP(src, action, callback) {
           console.error(error.stack);
         } else {
 
-          console.error(`Unable to send request`);
+          console.error(`Unable to send request, status: ${response.status}, body: ${body}`);
         }
       }
 
@@ -61,22 +61,23 @@ function notifyERP(src, action, callback) {
 
 ////////////////////////////////////////////
 function start() {
-  fs.readdir(basepath, function(err, items) {
+  fs.readdir(basepath, function (err, items) {
     if (err) {
       console.log('Error daemon', err);
       return;
     }
 
-    for(var i = 0; i < items.length; i++){
+    for (var i = 0; i < items.length; i++) {
       var path = basepath + '/' + items[i];
 
-      if(!fs.lstatSync(path).isDirectory()){
+      if (!fs.lstatSync(path).isDirectory()) {
         items.splice(i, 1);
         i--;
-      };
+      }
+      ;
     }
 
-    if(items.length == 0){
+    if (items.length == 0) {
       process.exit();
       //return;
     }
@@ -192,27 +193,27 @@ function copyFolder(foldersList) {
 }
 
 
-function copy(filesList, pos, callback){
+function copy(filesList, pos, callback) {
   var file = filesList[pos];
-  var res = copyFile(file, function(isOK){
-    if(isOK){
+  var res = copyFile(file, function (isOK) {
+    if (isOK) {
       pos++;
-      if(pos < filesList.length){
+      if (pos < filesList.length) {
         copy(filesList, pos, callback);
       }
-      else{
+      else {
         callback(true);
       }
-    }else{
+    } else {
       console.log("Retry to copy file")
       copy(filesList, pos, callback);
     }
   });
 }
 
-function copyFile(filename, callback){
+function copyFile(filename, callback) {
   var file = basepath + '/' + filename;
-  var url = baseurl +  cityid + '/' + filename;
+  var url = baseurl + cityid + '/' + filename;
 
   var rs = fs.createReadStream(file);
   var ws = request.post(url);
@@ -233,7 +234,7 @@ function copyFile(filename, callback){
   });
 
   ws.on('end', function (err) {
-    setTimeout(function(){
+    setTimeout(function () {
       callback(true);
     }, 100);
   });
@@ -241,27 +242,27 @@ function copyFile(filename, callback){
   rs.pipe(ws);
 }
 
-function addFolderPrefix(folder){
+function addFolderPrefix(folder) {
   var folders = folder.split('/');
-  folders[folders.length-1] = "not_uploaded_" + folders[folders.length-1];
+  folders[folders.length - 1] = "not_uploaded_" + folders[folders.length - 1];
   return folders.join('/');
 }
 
-function isFolderNotEmpty(src){
+function isFolderNotEmpty(src) {
   var proj = src + "/projection";
   var norm = src + "/normal";
   projFiles = [];
   normFiles = [];
 
-  if(exists(proj)){
+  if (exists(proj)) {
     projFiles = fs.readdirSync(proj);
   }
 
-  if(exists(norm)){
+  if (exists(norm)) {
     normFiles = fs.readdirSync(norm);
   }
 
-  if(normFiles.length === 0 && projFiles.length === 0){
+  if (normFiles.length === 0 && projFiles.length === 0) {
     return false;
   }
 
@@ -271,7 +272,7 @@ function isFolderNotEmpty(src){
 
 function deleteFolderRecursive(path) {
   if (fs.existsSync(path)) {
-    fs.readdirSync(path).forEach(function(file, index){
+    fs.readdirSync(path).forEach(function (file, index) {
       var curPath = path + "/" + file;
       if (fs.lstatSync(curPath).isDirectory()) { // recurse
         deleteFolderRecursive(curPath);
