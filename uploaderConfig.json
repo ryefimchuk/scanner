@@ -1,6 +1,6 @@
 {
-  "cityid": "dba40f30-5b1f-444d-9468-5c215de685f1",
-  "baseurl": "http://localhost:3003/upload/",
+  "cityid": "19bbec9c-5d42-45f8-81cf-9c730a12445f",
+  "baseurl": "http://192.168.10.50:3005/upload/",
   "basepath": "c:/photos/"
 }
 

@@ -18,6 +18,8 @@ process.on('uncaughtException', function (err) {
 start();
 
 function notifyERP(src, action, callback) {
+	
+	console.log(`action: ${action}`);
 
   try {
 
@@ -26,14 +28,14 @@ function notifyERP(src, action, callback) {
       throw new Error(`File example.json doesn't exist`);
     }
 
-    const example = JSON.stringify(
+    const example = JSON.parse(
       fs.readFileSync(`${src}/example.json`)
     );
 
     request.put({
       headers: {
-        'Authorization': Buffer
-          .from(`Basic ${erpNotifierConfig.username}:${erpNotifierConfig.password}`)
+        'Authorization': 'Basic ' + Buffer
+          .from(`${erpNotifierConfig.username}:${erpNotifierConfig.password}`)
           .toString('base64')
       },
       url: `${erpNotifierConfig.host}/erpnext/tasks/modeling/${example.taskName}/${action}`
@@ -46,10 +48,11 @@ function notifyERP(src, action, callback) {
           console.error(error.stack);
         } else {
 
-          console.error(`Unable to send request, status: ${response.status}, body: ${body}`);
+          console.error(`Unable to send request, status: ${response.statusCode}, body: ${body}`);
         }
       }
 
+	  console.log(`Task: ${example.taskName}, action: ${action}`);
       callback();
     });
   } catch (e) {
@@ -91,7 +94,7 @@ function copyFolder(foldersList) {
   foldersList = foldersList.filter(function (directory) {
 
     var now = (new Date()).getTime();
-    var shiftedTime = now - 1000 * 60 * 20;
+    var shiftedTime = now - 1000 * 60 * 2;
 
     /*    console.log({
           now: now,
