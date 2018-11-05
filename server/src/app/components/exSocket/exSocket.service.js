@@ -8,7 +8,7 @@
   /** @ngInject */
   function exSocket($rootScope) {
 
-    var rootApi = location.protocol + '//' + location.hostname + ':80';
+    var rootApi = location.protocol + '//' + location.hostname + ':81';
     //var rootApi = "192.168.1.99:8080";
     var socket = io.connect(rootApi);
 

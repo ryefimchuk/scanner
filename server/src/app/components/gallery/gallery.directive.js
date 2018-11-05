@@ -66,7 +66,7 @@
               var numb = vm.galleryMap[posY + i][posX + j].numb
               //var numb = ((stepX * j) + posX) * _x + (stepY * i) + posY + 1
               row.push({
-                "url": (location.protocol + '//' + location.hostname + ':80') + "/images/" + sessionId + "/normal/" + numb + ".jpg"
+                "url": (location.protocol + '//' + location.hostname + ':81') + "/images/" + sessionId + "/normal/" + numb + ".jpg"
               })
             }
             matrix3x3.push(row)
