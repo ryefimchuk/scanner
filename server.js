@@ -51,8 +51,6 @@ app.use('/images', express.static(destinationFolder, {
   setHeaders: setCustomCacheControl
 }))
 
-require('./erpnext')(destinationFolder, app);
-
 var lightSettings = {
   lightStart: 0,
   lightFinish: 500,

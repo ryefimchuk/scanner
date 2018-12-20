@@ -38,7 +38,7 @@ function notifyERP(src, action, callback) {
           .from(`${erpNotifierConfig.username}:${erpNotifierConfig.password}`)
           .toString('base64')
       },
-      url: `${erpNotifierConfig.host}/erpnext/tasks/modeling/${example.taskName}/${action}`
+      url: `${erpNotifierConfig.host}/api/scans/${example.scanid}/${action}`
     }, (error, response, body) => {
 
       if (error || response.statusCode !== 200) {
@@ -52,7 +52,7 @@ function notifyERP(src, action, callback) {
         }
       }
 
-	  console.log(`Task: ${example.taskName}, action: ${action}`);
+	  console.log(`ScanId: ${example.scanid}, action: ${action}`);
       callback();
     });
   } catch (e) {
