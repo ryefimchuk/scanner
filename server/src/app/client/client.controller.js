@@ -256,19 +256,16 @@
       var comments = getParameterByName('comments');
       var size = getParameterByName('size');
 
-      if (vm.cities.indexOf(city) !== -1) {
+      if (vm.cities.indexOf(city) === -1) {
 
-        vm.city = city;
-        vm.comments = comments;
-        vm.size = size;
-
-        vm.createNewClient();
-      } else {
-
-        vm.city = localStorage.city;
+        vm.cities.push(city);
       }
 
+      vm.city = city;
+      vm.comments = comments;
+      vm.size = size;
       vm.isEmbedded = true;
+      vm.createNewClient();
 
       $scope.$watch("vm.data.clientId", function (newValue, oldValue) {
 
