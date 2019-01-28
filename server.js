@@ -769,6 +769,24 @@ io.on('connection', function(socket) {
   socket.on('get-data', function(cmd) {
     reloadData();
   });
+  socket.on('save-webcam-photo', function (data) {
+    function makeDir(newDir){
+      try {
+        fs.statSync(newDir);
+      }
+      catch(err) {
+        fs.mkdirSync(newDir);
+      }
+    }
+    var id = data.id || 'not_configured_session';
+    var newDir = destinationFolder + id + '/';
+    makeDir(newDir);
+    var normalDir = newDir + 'normal/';
+    makeDir(normalDir);
+    const base64Data = data.photo.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+    fs.writeFile(newDir + 'normal/200.png', base64Data, 'base64');
+    fs.closeSync(fileStream);
+  });
 });
 
 function updateScanner(scanner) {
