@@ -552,7 +552,7 @@ io.on('connection', function(socket) {
 
 
   socket.on('remove-session', function(data) {
-    sessionId = data.sessionId;
+    var sessionId = data.sessionId;
 
     var pos = galleries.indexOf(sessionId);
     if(pos != -1) {
