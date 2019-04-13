@@ -654,6 +654,22 @@ io.on('connection', function(socket) {
     //updateSession();
   });
 
+  socket.on('update-session-measurements', function(data) {
+    if (data) {
+      var fileData = JSON.parse(fs.readFileSync(destinationFolder + data.id + '/' +'example.json'));
+      fileData['height'] = data.height || 0;
+      fileData['weight'] = data.weight || 0;
+      var newDir = destinationFolder + data.id + '/';
+      var newConfig = JSON.stringify(fileData, null, 2);
+      fs.writeFile(newDir + 'example.json', newConfig, function(err) {
+        if (err) {
+          //return console.log(err);
+          return;
+        }
+      });
+    }
+  });
+
   socket.on('soft trigger', function() {
 
     systemBusy = true;
