@@ -1,0 +1,14 @@
+{
+  "rulesDirectory": [],
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "trailing-comma": true,
+    "variable-name": [
+      true,
+      "allow-leading-underscore"
+    ]
+  }
+}

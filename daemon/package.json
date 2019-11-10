@@ -2,11 +2,45 @@
   "name": "daemon",
   "version": "0.0.1",
   "description": "Scanner 3d daemon",
-  "dependencies": {
-    "ftp-client": "^0.2.2",
-    "mkdirp": "^0.5.1"
-  },
   "scripts": {
-    "start": "node daemon.js"
+    "start": "node daemon.js",
+    "lint": "tslint -t codeFrame 'src/**/*.ts'",
+    "precommit": "npm run lint",
+    "postinstall": "rimraf dist && tsc",
+    "install-packages": "npm install",
+    "builder-feeder": "ts-node ./src/index.ts --config=./.configs/test-config.json",
+    "fake-scan-builder": "ts-node ./src/tests/fake-scan-builder.ts --config=./.configs/test-config.json",
+    "fake-scan-generator": "ts-node ./src/tests/fake-scan-generator.ts --config=./.configs/test-config.json"
+  },
+  "dependencies": {
+    "ajv": "^6.10.2",
+    "chalk": "^2.4.2",
+    "core-js": "^3.4.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "ora": "^4.0.2",
+    "rxjs": "^6.5.3",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.2.1",
+    "yargs": "^14.0.0",
+    "semver": "^6.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.0",
+    "@types/lodash": "^4.14.145",
+    "@types/node": "^12.12.7",
+    "@types/semver": "^6.2.0",
+    "@types/yargs": "^13.0.2",
+    "prettier": "^1.18.2",
+    "rimraf": "^3.0.0",
+    "ts-node": "^6.0.0",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.7.2"
+  },
+  "engines": {
+    "node": ">=6"
   }
 }
