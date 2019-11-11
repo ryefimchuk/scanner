@@ -49,7 +49,7 @@
       "c3target": "target 3",
       "c4target": "target 4"
     },
-    "CB": {
+    "CT_D": {
       "p0": "target 6",
       "px": "target 7",
       "py": "target 8",
@@ -61,7 +61,10 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "requiredFolders": [
+        "nn_res_test123"
+      ]
     },
     "DO": {
       "p0": "target 7",
@@ -91,7 +94,11 @@
       "c3target": "target 3",
       "c4target": "target 4"
     },
-    "EIN": {},
+    "NL": {
+      "requiredFolders": [
+        "nn_res_test"
+      ]
+    },
     "FFM": {
       "p0": "target 5",
       "px": "target 6",
@@ -104,7 +111,10 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "requiredFolders": [
+        "nn_res_test"
+      ]
     },
     "FFM-MM": {
       "p0": "target 5",
@@ -134,7 +144,11 @@
       "c3target": "target 2",
       "c4target": "target 1"
     },
-    "HB": {},
+    "HB": {
+      "requiredFolders": [
+        "nn_res_test213"
+      ]
+    },
     "HH": {
       "p0": "target 6",
       "px": "target 7",
@@ -147,9 +161,12 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "requiredFolders": [
+        "nn_res_test"
+      ]
     },
-    "IN": {
+    "IN_D": {
       "p0": "target 8",
       "px": "target 6",
       "py": "target 5",
@@ -161,7 +178,10 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "requiredFolders": [
+        "nn_res_test213"
+      ]
     },
     "K": {
       "p0": "target 5",
@@ -175,9 +195,28 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "requiredFolders": [
+        "nn_res_test"
+      ]
     },
-    "K_MM": {},
+    "K_MM": {
+      "p0": "target 6",
+      "px": "target 7",
+      "py": "target 8",
+      "distancepx": 0.6,
+      "distancepy": 1,
+      "boxwidth": 1.4,
+      "boxdepth": 1.4,
+      "boxheight": 2.95,
+      "c1target": "target 4",
+      "c2target": "target 3",
+      "c3target": "target 2",
+      "c4target": "target 1",
+      "requiredFolders": [
+        "nn_res_test123"
+      ]
+    },
     "KA": {
       "p0": "target 5",
       "px": "target 6",
@@ -220,7 +259,11 @@
       "c3target": "target 2",
       "c4target": "target 1"
     },
-    "N": {},
+    "N_D": {
+      "requiredFolders": [
+        "nn_res_test123"
+      ]
+    },
     "S": {
       "p0": "target 5",
       "px": "target 6",
@@ -233,7 +276,10 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "requiredFolders": [
+        "nn_res_test"
+      ]
     },
     "SLS": {
       "p0": "target 6",
@@ -249,7 +295,7 @@
       "c3target": "target 2",
       "c4target": "target 1"
     },
-    "VN": {
+    "VIN": {
       "p0": "target 6",
       "px": "target 5",
       "py": "target 7",
@@ -261,10 +307,17 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "requiredFolders": [
+        "nn_res_test123"
+      ]
     },
-    "W": {},
-    "WU": {
+    "W": {
+      "requiredFolders": [
+        "nn_res_test123"
+      ]
+    },
+    "WU_D": {
       "p0": "target 6",
       "px": "target 7",
       "py": "target 8",
@@ -276,7 +329,10 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "requiredFolders": [
+        "nn_res_test"
+      ]
     }
   }
 }
