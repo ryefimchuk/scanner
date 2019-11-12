@@ -11,5 +11,6 @@ export interface ICityConfig {
   c2target: string;
   c3target: string;
   c4target: string;
+  previewCameraIndex: number;
   requiredFolders?: string[];
 }

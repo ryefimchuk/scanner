@@ -144,16 +144,7 @@ export default class DefaultBuilderFeeder implements IBuilderFeeder {
   }
 
   private getCityConfig(cityId: string): Partial<ICityConfig> {
-    let cityConfig: Partial<ICityConfig> = (this.config.cityConfigs || {})[cityId] || {};
-    if (_.size(cityConfig) === 0) {
-      cityConfig = { ...(this.config.defaultCityConfig || {}) };
-    } else {
-      cityConfig = {
-        ...(this.config.defaultCityConfig || {}),
-        ...cityConfig,
-      };
-    }
-    return cityConfig;
+    return (this.config.cityConfigs || {})[cityId] || {};
   }
 
   private copyJSON(newJSON: string, cityId: string, cityConfig: Partial<ICityConfig>): void {

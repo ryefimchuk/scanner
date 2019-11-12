@@ -42,6 +42,10 @@
         "c4target": {
           "type": "string"
         },
+        "previewCameraIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
         "requiredFolders": {
           "description": "List of folder which must be present.",
           "type": "array",
@@ -79,12 +83,8 @@
     },
     "updateInterval": {
       "description": "Update interval in milliseconds.",
-      "type": "number",
+      "type": "integer",
       "minimum": 0
-    },
-    "defaultCityConfig": {
-      "description": "Shared city configuration for all cities.",
-      "$ref": "#/definitions/cityConfig"
     },
     "cityConfigs": {
       "description": "Dictionary of cities configurations.",

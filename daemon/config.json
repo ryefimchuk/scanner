@@ -19,7 +19,8 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "previewCameraIndex": 94
     },
     "BO": {
       "p0": "target 6",
@@ -33,7 +34,8 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "previewCameraIndex": 94
     },
     "BS": {
       "p0": "target 5",
@@ -47,7 +49,8 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "previewCameraIndex": 94
     },
     "CT_D": {
       "p0": "target 6",
@@ -62,6 +65,7 @@
       "c2target": "target 3",
       "c3target": "target 2",
       "c4target": "target 1",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test123"
       ]
@@ -78,7 +82,8 @@
       "c1target": "target 3",
       "c2target": "target 4",
       "c3target": "target 1",
-      "c4target": "target 2"
+      "c4target": "target 2",
+      "previewCameraIndex": 94
     },
     "DU": {
       "p0": "target 5",
@@ -92,9 +97,11 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "previewCameraIndex": 94
     },
     "NL": {
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]
@@ -112,6 +119,7 @@
       "c2target": "target 2",
       "c3target": "target 3",
       "c4target": "target 4",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]
@@ -128,7 +136,8 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "previewCameraIndex": 94
     },
     "FN": {
       "p0": "target 6",
@@ -142,9 +151,11 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "previewCameraIndex": 94
     },
     "HB": {
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test213"
       ]
@@ -162,6 +173,7 @@
       "c2target": "target 3",
       "c3target": "target 2",
       "c4target": "target 1",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]
@@ -179,6 +191,7 @@
       "c2target": "target 2",
       "c3target": "target 3",
       "c4target": "target 4",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test213"
       ]
@@ -196,6 +209,7 @@
       "c2target": "target 2",
       "c3target": "target 3",
       "c4target": "target 4",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]
@@ -213,6 +227,7 @@
       "c2target": "target 3",
       "c3target": "target 2",
       "c4target": "target 1",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test123"
       ]
@@ -229,7 +244,8 @@
       "c1target": "target 1",
       "c2target": "target 2",
       "c3target": "target 3",
-      "c4target": "target 4"
+      "c4target": "target 4",
+      "previewCameraIndex": 94
     },
     "M": {
       "p0": "target 7",
@@ -243,7 +259,8 @@
       "c1target": "target 3",
       "c2target": "target 4",
       "c3target": "target 1",
-      "c4target": "target 2"
+      "c4target": "target 2",
+      "previewCameraIndex": 94
     },
     "MA": {
       "p0": "target 6",
@@ -257,9 +274,11 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "previewCameraIndex": 94
     },
     "N_D": {
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test123"
       ]
@@ -277,6 +296,7 @@
       "c2target": "target 2",
       "c3target": "target 3",
       "c4target": "target 4",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]
@@ -293,7 +313,8 @@
       "c1target": "target 4",
       "c2target": "target 3",
       "c3target": "target 2",
-      "c4target": "target 1"
+      "c4target": "target 1",
+      "previewCameraIndex": 94
     },
     "VIN": {
       "p0": "target 6",
@@ -308,11 +329,13 @@
       "c2target": "target 2",
       "c3target": "target 3",
       "c4target": "target 4",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test123"
       ]
     },
     "W": {
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test123"
       ]
@@ -330,6 +353,7 @@
       "c2target": "target 3",
       "c3target": "target 2",
       "c4target": "target 1",
+      "previewCameraIndex": 94,
       "requiredFolders": [
         "nn_res_test"
       ]

@@ -8,6 +8,5 @@ export interface IConfig {
   inputJSONName: string;
   doneJSONName: string;
   updateInterval: number;
-  defaultCityConfig?: Partial<ICityConfig>;
-  cityConfigs?: _.Dictionary<Partial<ICityConfig>>;
+  cityConfigs: _.Dictionary<Partial<ICityConfig>>;
 }
