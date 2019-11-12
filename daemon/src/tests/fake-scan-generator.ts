@@ -5,7 +5,7 @@ import path from 'path';
 import DefaultConfigLoader from '../default-config-loader';
 import DefaultLogger from '../default-logger';
 import { IConfigLoader, ILogger } from '../interfaces';
-import { IConfig } from '../models';
+import { ICityConfig, IConfig } from '../models';
 
 const configLoader: IConfigLoader = new DefaultConfigLoader();
 const config: IConfig = configLoader.loadConfig();
@@ -29,6 +29,12 @@ function generateNextScan(): void {
     const scanFolder: string = path.resolve(cityFolder, scanId.toString());
     if (!fs.existsSync(scanFolder)) {
       fs.mkdirSync(scanFolder);
+    }
+    const cityConfig: Partial<ICityConfig> = config.cityConfigs[cityId];
+    if (cityConfig && cityConfig.requiredFolders) {
+      for (const requiredFolder of cityConfig.requiredFolders) {
+        fs.mkdirSync(path.resolve(scanFolder, requiredFolder));
+      }
     }
     fs.writeFileSync(path.resolve(scanFolder, config.inputJSONName), JSON.stringify({
       'city': 'S',

@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import yargs from 'yargs';
 
-import configSchema from '../lib/config-schema.json';
 import { IConfigLoader } from './interfaces';
+import configSchema from './json/config-schema.json';
 import { IConfig, IConfigArgs } from './models';
 
 export default class DefaultConfigLoader implements IConfigLoader {

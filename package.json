@@ -14,14 +14,6 @@
     "request": "^2.88.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "daemon.lint": "cd ./daemon && npm run lint",
-    "daemon.install-packages": "cd ./daemon && npm run install-packages"
-  },
-  "pre-commit": [
-    "daemon.lint"
-  ],
-  "update": [
-    "daemon.install-packages"
-  ]
+    "start": "node index.js"
+  }
 }

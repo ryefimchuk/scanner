@@ -11,20 +11,19 @@ import { IConfigArgs } from './models';
 
 export default class DefaultLogger implements ILogger {
 
+  public get logsFolder(): string {
+    return this._logsFolder;
+  }
+
   private readonly datetimeFormat: string = 'HH:mm:ss:SSS DD/MM/YYYY';
   private readonly configArgs: yargs.Argv<IConfigArgs> = yargs as yargs.Argv<IConfigArgs>;
   private logger: Logger;
+  private _logsFolder: string;
 
   constructor(logsFolder?: string) {
     this.configArgs.alias('l', 'logs');
     this.initLogsFolder(logsFolder);
     this.initLogger();
-  }
-
-  private _logsFolder: string;
-
-  public get logsFolder(): string {
-    return this._logsFolder;
   }
 
   public debug(message: string): void {
@@ -54,22 +53,7 @@ export default class DefaultLogger implements ILogger {
           format: format.combine(
             format.timestamp(),
             format.printf(({ level, message, timestamp }): string => {
-              let text: string = '';
-              switch (level) {
-                case 'error': {
-                  text = `${chalk.redBright(`[${moment(timestamp).format(this.datetimeFormat)}]`)} ${message}`;
-                  break;
-                }
-                case 'info': {
-                  text = `${chalk.greenBright(`[${moment(timestamp).format(this.datetimeFormat)}]`)} ${message}`;
-                  break;
-                }
-                default: {
-                  text = message;
-                  break;
-                }
-              }
-              return text;
+              return this.getMessage(level, message, timestamp);
             }),
           ),
           level: 'debug',
@@ -82,22 +66,7 @@ export default class DefaultLogger implements ILogger {
               if (message) {
                 message = message.replace(/\u001B\[([^m]*)m/g, '');
               }
-              let text: string = '';
-              switch (level) {
-                case 'error': {
-                  text = `e [${moment(timestamp).format(this.datetimeFormat)}] ${message}`;
-                  break;
-                }
-                case 'info': {
-                  text = `i [${moment(timestamp).format(this.datetimeFormat)}] ${message}`;
-                  break;
-                }
-                default: {
-                  text = message;
-                  break;
-                }
-              }
-              return text;
+              return this.getMessage(level, message, timestamp);
             }),
           ),
           level: 'info',
@@ -107,5 +76,24 @@ export default class DefaultLogger implements ILogger {
         }),
       ],
     });
+  }
+
+  private getMessage(level: string, message: string, timestamp: number): string {
+    let text: string = '';
+    switch (level) {
+      case 'error': {
+        text = `${chalk.redBright(`[${moment(timestamp).format(this.datetimeFormat)}]`)} ${message}`;
+        break;
+      }
+      case 'info': {
+        text = `${chalk.greenBright(`[${moment(timestamp).format(this.datetimeFormat)}]`)} ${message}`;
+        break;
+      }
+      default: {
+        text = message;
+        break;
+      }
+    }
+    return text;
   }
 }

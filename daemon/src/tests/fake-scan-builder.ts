@@ -1,5 +1,3 @@
-import './../es6-support';
-
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';

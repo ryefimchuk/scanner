@@ -1,5 +1,3 @@
-import './es6-support';
-
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
@@ -41,7 +39,7 @@ try {
       new DefaultSpinner(),
     );
     logger.debug(chalk.green('> Builder feeder running'));
-    logger.debug(`${chalk.yellow('Node = ')}${chalk.cyan(process.version)}`);
+    logger.debug(`${chalk.yellow('Node Version = ')}${chalk.cyan(process.version)}`);
     logger.debug(`${chalk.yellow('Root Folder = ')}${chalk.cyan(inputRootFolder)}`);
     logger.debug(`${chalk.yellow('Monitor Folder = ')}${chalk.cyan(monitorFolder)}`);
     logger.debug(`${chalk.yellow('Update Interval = ')}${chalk.cyan('' + config.updateInterval)}`);
