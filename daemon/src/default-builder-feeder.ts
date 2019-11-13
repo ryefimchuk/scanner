@@ -9,11 +9,30 @@ import { BuilderStatus } from './enums';
 import { IBuilderFeeder, ILogger, ISpinner } from './interfaces';
 import { ICityConfig, IConfig, IUnprocessedScan } from './models';
 
-function getSortedFolders(parentFolder: string, folders: string[]): string[] {
-  if (folders.length === 1) {
-    return folders;
+
+function getSortedFolders(parentFolder: string, dirItemPaths: string[]): string[] {
+
+  interface IDirectoryItemInfo {
+    mtime: Date;
+    path: string;
   }
-  return _.sortBy(folders, (folder: string): number => +fs.statSync(path.resolve(parentFolder, folder)).mtime);
+
+  const directoryItemInfos: IDirectoryItemInfo[] = [];
+
+  dirItemPaths.forEach((dirItemPath: string): void => {
+    const stats: fs.Stats = fs.statSync(path.resolve(parentFolder, dirItemPath));
+    if (stats.isDirectory()) {
+      directoryItemInfos.push({
+        mtime: stats.mtime,
+        path: dirItemPath,
+      });
+    }
+  });
+
+  const sortedDirectories: string[] = _.sortBy(directoryItemInfos, ({ mtime }): number => +mtime)
+    .map(({ path: dirItemPath }): string => dirItemPath);
+
+  return sortedDirectories;
 }
 
 export default class DefaultBuilderFeeder implements IBuilderFeeder {
