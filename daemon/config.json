@@ -1,5 +1,5 @@
 {
-  "$schema": "src/json/config-schema.json",
+  "$schema": "./node_modules/@3dg/builder-feeder/lib/json/config-schema.json",
   "inputRootFolder": "X:\\3DG\\",
   "monitorFolder": "X:\\monitors\\ALL\\",
   "inputJSONName": "example.json",

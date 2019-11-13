@@ -1,50 +1,16 @@
 {
-  "name": "@3dg/builder-feeder",
+  "name": "builder-feeder-container",
   "version": "1.0.0",
-  "description": "Builder Feeder",
-  "repository": {
-    "url": ""
-  },
-  "author": "Roman Yefimchuk & Oleksii Makarov",
+  "description": "Builder Feeder Container",
+  "author": "Roman Yefimchuk",
   "license": "MIT",
   "scripts": {
-    "start": "node daemon.js",
-    "lint": "tslint -t codeFrame 'src/**/*.ts'",
-    "precommit": "npm run lint",
-    "dist": "rimraf dist && tsc",
-    "bootstrap": "node ./daemon.js --config=.configs/test-config.json",
-    "builder-feeder": "ts-node ./src/index.ts --config=./.configs/test-config.json",
-    "fake-scan-builder": "ts-node ./src/tests/fake-scan-builder.ts --config=./.configs/test-config.json",
-    "fake-scan-generator": "ts-node ./src/tests/fake-scan-generator.ts --config=./.configs/test-config.json"
+    "start": "node ./daemon.js",
+    "start:dev": "node ./daemon.js --config=./.configs/test-config.json"
   },
   "dependencies": {
-    "ajv": "^6.10.2",
-    "chalk": "^3.0.0",
+    "@3dg/builder-feeder": "^1.0.0",
     "console-clear": "^1.1.1",
-    "folder-hash": "^3.3.0",
-    "lodash": "^4.17.15",
-    "moment": "^2.24.0",
-    "ora": "^4.0.2",
-    "rxjs": "^6.5.3",
-    "semver": "^6.3.0",
-    "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.2.1",
-    "yargs": "^14.2.0"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.14.146",
-    "@types/node": "^8.10.59",
-    "@types/semver": "^6.2.0",
-    "@types/yargs": "^13.0.3",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.0",
-    "ts-node": "^8.5.0",
-    "tsconfig-paths": "^3.9.0",
-    "tslint": "^5.20.1",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.7.2"
-  },
-  "engines": {
-    "node": ">= 8.12.0"
+    "semver": "^6.3.0"
   }
 }

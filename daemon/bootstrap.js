@@ -1,49 +1,4 @@
-const fs = require('fs');
-const path = require('path');
 const pkg = require('./package');
-
-/**
- * @returns {string}
- */
-function getHashPath() {
-  return path.resolve(process.cwd(), 'dist/.hash');
-}
-
-/**
- * @returns {void}
- */
-function setHash(hash) {
-  try {
-    fs.writeFileSync(getHashPath(), hash, {
-      encoding: 'utf-8',
-    });
-  } catch (e) {
-  }
-}
-
-/**
- * @returns {string | null}
- */
-function getHash() {
-  try {
-    return fs.readFileSync(getHashPath(), {
-      encoding: 'utf-8',
-    }).toString();
-  } catch (e) {
-    return null;
-  }
-}
-
-/**
- * @returns {Promise<string>}
- */
-function calculateHash() {
-  return require('folder-hash').hashElement('./src', {
-    folders: { include: ['**'] },
-  }).then((hashResult) => hashResult.hash, () => {
-    return Promise.reject(new Error('Unable to calculate cache hash'));
-  });
-}
 
 /**
  * @returns {boolean}
@@ -95,13 +50,6 @@ function execute(command) {
 }
 
 /**
- * @returns {void}
- */
-function clearOutput() {
-  require('console-clear')();
-}
-
-/**
  * @returns {Promise<void>}
  */
 function reinstallPackages() {
@@ -109,23 +57,7 @@ function reinstallPackages() {
   return execute('npm install').catch(() => {
     return Promise.reject(new Error(`Unable to reinstall packages, please reinstall packages manually using command 'npm install'`));
   }).then(() => {
-    clearOutput();
-  });
-}
-
-/**
- * @returns {Promise<void>}
- */
-function compileScripts() {
-  console.log('Compiling scripts for better performance');
-  return execute('npm run dist').then(() => {
-    return calculateHash().then((hash) => {
-      setHash(hash);
-      clearOutput();
-      return Promise.resolve();
-    });
-  }, () => {
-    return Promise.reject(new Error('Unable to compile scripts'));
+    require('console-clear')();
   });
 }
 
@@ -134,20 +66,9 @@ function compileScripts() {
  */
 function bootstrap() {
   if (isPackagesReinstallingRequired()) {
-    return reinstallPackages().then(() => {
-      return compileScripts();
-    });
+    return reinstallPackages();
   }
-  const hash = getHash();
-  if (!hash) {
-    return compileScripts();
-  }
-  return calculateHash().then((calculatedHash) => {
-    if (calculatedHash !== hash) {
-      return compileScripts();
-    }
-    return Promise.resolve();
-  });
+  return Promise.resolve();
 }
 
 /**
@@ -170,31 +91,8 @@ function checkRequiredPackages() {
 /**
  * @returns {Promise<void>}
  */
-function checkNode() {
-  if (!pkg.engines || !pkg.engines.node) {
-    return Promise.resolve();
-  }
-  return new Promise((resolve, reject) => {
-    const semver = require('semver');
-    const version = process.version;
-    const minVersion = pkg.engines.node;
-    if (semver.satisfies(version, minVersion)) {
-      resolve();
-    } else {
-      reject(new Error(`Minimum node version must be ${minVersion} but ${version} found`));
-    }
-  });
-}
-
-/**
- * @returns {Promise<void>}
- */
 module.exports = () => {
   return checkRequiredPackages().then(() => {
-    return checkNode().then(() => {
-      return bootstrap().then(() => {
-        process.title = `${pkg.name}@${pkg.version}`;
-      });
-    });
+    return bootstrap();
   });
 };

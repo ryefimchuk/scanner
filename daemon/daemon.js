@@ -1,5 +1,5 @@
 require('./bootstrap')().then(() => {
-  require('./dist');
+  require('@3dg/builder-feeder/bin');
 }, (e) => {
   console.error(e && e.message);
 });

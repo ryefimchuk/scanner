@@ -1,2 +1,2 @@
 @echo off
-node ./daemon.js --config=config.json
+npm run start --config=config.json
