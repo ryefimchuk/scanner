@@ -6,7 +6,7 @@
     .directive('scannerItem', ScannerItem);
 
   /** @ngInject */
-  function ScannerItem($log, $rootScope, exSocket, connector) {
+  function ScannerItem($log, $rootScope) {
     var directive = {
       restrict: 'EA',
       templateUrl: 'app/components/scannerItem/scannerItem.html',
@@ -26,15 +26,21 @@
       var vm = this;
       vm.defaultImage = 'assets/images/temp.png'
 
+/*
       exSocket.on('file-preview', function (data) {
         if($rootScope.preview && $rootScope.preview.ip == data.ip) {
           $rootScope.preview.preview = data.preview;
         }
       });
+*/
 
-      vm.openPreview = function(item){
-        connector.loadPreview(item);
-      }
+      vm.openPreview = function(item) {
+        if (!item) {
+          delete $rootScope.preview;
+          return;
+        }
+        $rootScope.preview = item;
+      };
     }
   }
 

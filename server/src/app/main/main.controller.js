@@ -6,7 +6,8 @@
     .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($rootScope, $timeout, toastr, connector, exSocket) {
+  function MainController($rootScope, $scope, $timeout, $document, toastr, connector, exSocket) {
+
     var vm = this;
 
     vm.awesomeThings = [];
@@ -27,8 +28,8 @@
       vm.closePreview();
     };
 
-    vm.reloadPreview = function(item){
-      connector.loadPreview(item);
+    vm.reloadPreview = function(/*item*/){
+      // connector.loadPreview(item);
     };
 
     vm.submitChangeNumber = function(evt, item){
@@ -36,7 +37,7 @@
       evt.preventDefault();
 
       var ip = item.ip;//divCameraPreview.find("[ip]").text();
-      var numb = item.numb; //divCameraPreview.find("input").val();
+      var numb = item.newNumb; //divCameraPreview.find("input").val();
 
       if(numb != "") {
         var _numb = parseInt(numb);
@@ -73,5 +74,16 @@
       toastr.info(msg);
       vm.classAnimation = '';
     }
+
+    var removePreviewListener = $rootScope.$watch('preview', function(preview) {
+      if (preview) {
+        connector.loadPreview(preview);
+      }
+    });
+
+    $scope.$on('$destroy', function() {
+      vm.closePreview();
+      removePreviewListener();
+    });
   }
 })();

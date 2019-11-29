@@ -63,7 +63,7 @@
       }
     }
 
-    function editSession(sessionId){
+    function editSession(){
       exSocket.emit('open-session', vm.galleryId)
     }
 

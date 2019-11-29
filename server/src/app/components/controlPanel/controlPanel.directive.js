@@ -286,6 +286,18 @@
           exSocket.emit("start command");
       }
 
+      vm.getSortedScanners = function() {
+        return (vm.scannerService.allScanners || []).sort(function(a, b) {
+          if (+a.data.numb < +b.data.numb) {
+            return -1;
+          }
+          if (+a.data.numb > +b.data.numb) {
+            return 1;
+          }
+          return 0;
+        });
+      };
+
       $timeout(function(){
         updateCommands();
         //vm.change();

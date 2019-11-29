@@ -138,7 +138,7 @@
           <select ng-change="vm.changeTarget()"
                   ng-model="vm.target">
             <option value="">All cameras</option>
-            <option ng-repeat="item in vm.scannerService.allScanners track by item.data.ip | orderBy:'item.data.ip'"  value="{{item.data.ip}}">{{item.data.ip}} - {{item.data.numb}}</option>
+            <option ng-repeat="item in vm.getSortedScanners()"  value="{{item.data.ip}}">{{item.data.ip}} - {{item.data.numb}}</option>
           </select>
           <br>
           <div class="title">Shell command</div>

@@ -6,7 +6,7 @@
     .service('connector', connector);
 
   /** @ngInject */
-  function connector($rootScope, exSocket, $timeout, $log) {
+  function connector(exSocket, $timeout, $log) {
     var scanner_row = 10;
     var scanner_col = 24;
 
@@ -192,10 +192,7 @@
       exSocket.emit('remove-camera', data);
     }
 
-    function loadPreview(item){
-      if(!item){
-        return;
-      }
+    function loadPreview(item) {
 
       var data = {
         ip: item.ip,
@@ -204,8 +201,6 @@
       }
 
       exSocket.emit('preview ip', data);
-      $rootScope.preview = item;
-
     }
 
     function initMap(){
