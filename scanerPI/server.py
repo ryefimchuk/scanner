@@ -39,6 +39,7 @@ CODE_UPDATE_BUSY_STATE = 1011
 CODE_LOG_DATA = 1020
 
 MAX_RES = (3280, 2464)
+MAX_PREV_RES = (1093, 821)
 
 
 def _json_object_hook(d): return namedtuple('X', d.keys())(*d.values())
@@ -281,7 +282,7 @@ class SocketHandler:
         previewFileName = './preview.jpg'
         self.camera = picamera.PiCamera()
         self.applySettings()
-        self.camera.resolution = MAX_RES
+        self.camera.resolution = MAX_PREV_RES
         self.updateBusyState(True)
         self.camera.capture_sequence([previewFileName], 'jpeg', use_video_port=True)
         time.sleep(0.2)
