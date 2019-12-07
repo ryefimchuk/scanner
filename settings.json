@@ -1,0 +1,106 @@
+{
+  "photoSettings": {
+    "framerate": 15,
+    "ISO": "0",
+    "exposure": "off",
+    "awb": "auto",
+    "metering": "average",
+    "shutter": 80000,
+    "drc": "off",
+    "thumb": "none",
+    "nopreview": true
+  },
+  "lightSettings": {
+    "lightStart": 0,
+    "lightFinish": 50,
+    "projectorStart": 200,
+    "projectorFinish": 200
+  },
+  "presets": [
+    {
+      "id": 1541166035659,
+      "name": "1",
+      "lightSettings": {
+        "lightStart": -5,
+        "lightFinish": 500,
+        "projectorStart": -45,
+        "projectorFinish": 500
+      },
+      "photoSettings": {
+        "framerate": 15,
+        "ISO": "0",
+        "exposure": "off",
+        "awb": "auto",
+        "metering": "average",
+        "shutter": 80000,
+        "drc": "off",
+        "thumb": "none",
+        "nopreview": true
+      }
+    },
+    {
+      "id": 1555334865434,
+      "name": "2",
+      "lightSettings": {
+        "lightStart": 0,
+        "lightFinish": 200,
+        "projectorStart": 70,
+        "projectorFinish": 200
+      },
+      "photoSettings": {
+        "framerate": 15,
+        "ISO": "0",
+        "exposure": "off",
+        "awb": "auto",
+        "metering": "average",
+        "shutter": 80000,
+        "drc": "off",
+        "thumb": "none",
+        "nopreview": true
+      }
+    },
+    {
+      "id": 1555334999645,
+      "name": "3",
+      "lightSettings": {
+        "lightStart": 0,
+        "lightFinish": 50,
+        "projectorStart": 200,
+        "projectorFinish": 200
+      },
+      "photoSettings": {
+        "framerate": 15,
+        "ISO": "0",
+        "exposure": "off",
+        "awb": "auto",
+        "metering": "average",
+        "shutter": 80000,
+        "drc": "off",
+        "thumb": "none",
+        "nopreview": true
+      }
+    },
+    {
+      "id": 1555926969917,
+      "name": "4",
+      "lightSettings": {
+        "lightStart": 0,
+        "lightFinish": 50,
+        "projectorStart": 200,
+        "projectorFinish": 200
+      },
+      "photoSettings": {
+        "framerate": 15,
+        "ISO": "0",
+        "exposure": "off",
+        "awb": "auto",
+        "metering": "average",
+        "shutter": 80000,
+        "drc": "off",
+        "thumb": "none",
+        "nopreview": true
+      }
+    }
+  ],
+  "selectedPreset": "4"
+}
