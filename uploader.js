@@ -94,7 +94,7 @@ function copyFolder(foldersList) {
   foldersList = foldersList.filter(function (directory) {
 
     var now = (new Date()).getTime();
-    var shiftedTime = now - 1000 * 60 * 2;
+    var shiftedTime = now - 1000 * 60 * 60;
 
     /*    console.log({
           now: now,

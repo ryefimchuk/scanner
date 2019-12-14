@@ -36,7 +36,7 @@ function browserSyncInit(baseDir, browser) {
   server.middleware = proxyMiddleware('/api', {target: 'http://localhost/', changeOrigin: true});
 
   browserSync.instance = browserSync.init({
-    startPath: '/',
+    startPath: '/#/admin',
     ghostMode: false,
     server: server,
     browser: browser
