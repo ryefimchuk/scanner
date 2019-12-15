@@ -1,0 +1,1 @@
+node --expose-gc server.js >> serverjs.log 2>&1
