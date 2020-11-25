@@ -1,5 +1,5 @@
 {
-  "host": "https://erp.3dgeneration.com:8888",
-  "username": "Administrator",
-  "password": "Tofoup64"
+  "host": "<host>",
+  "username": "<username>",
+  "password": "<password>"
 }
